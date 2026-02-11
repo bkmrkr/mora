@@ -1,6 +1,7 @@
 """Ollama HTTP client for local LLM inference."""
 import json
 import logging
+import time
 import urllib.request
 import urllib.error
 
@@ -9,7 +10,7 @@ from config.settings import OLLAMA_BASE_URL, OLLAMA_MODEL
 logger = logging.getLogger(__name__)
 
 
-def ask(system_prompt, user_prompt, max_tokens=8192, temperature=0.7):
+def ask(system_prompt, user_prompt, max_tokens=512, temperature=0.7):
     """Send a chat completion request to Ollama.
 
     Returns (response_text, model_used, full_prompt).
@@ -37,11 +38,15 @@ def ask(system_prompt, user_prompt, max_tokens=8192, temperature=0.7):
     )
 
     try:
+        t0 = time.monotonic()
         resp = urllib.request.urlopen(req, timeout=120)
         result = json.loads(resp.read())
+        elapsed = time.monotonic() - t0
         text = result.get('message', {}).get('content', '')
         model = result.get('model', OLLAMA_MODEL)
-        logger.info('Ollama %s — %d chars response', model, len(text))
+        eval_count = result.get('eval_count', 0)
+        logger.info('Ollama %s — %d chars, %d tokens, %.1fs',
+                     model, len(text), eval_count, elapsed)
         return text, model, full_prompt
     except urllib.error.URLError as e:
         logger.error('Ollama request failed: %s', e)

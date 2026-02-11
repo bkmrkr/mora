@@ -99,11 +99,14 @@
             <div class="result-meta">
                 <span>{{ last_result.node_name }}</span>
                 <span>{{ last_result.skill_rating }} ELO
+                    {% if last_result.rating_delta is defined %}
                     <span class="delta {% if last_result.rating_delta >= 0 %}delta-up{% else %}delta-down{% endif %}">
                         {% if last_result.rating_delta >= 0 %}+{% endif %}{{ last_result.rating_delta }}
                     </span>
+                    {% endif %}
                 </span>
             </div>
+            {% if last_result.mastery_after is defined %}
             <div class="result-meta">
                 <span>Topic Progress: {{ last_result.mastery_after }}%
                     <span class="delta {% if last_result.mastery_delta >= 0 %}delta-up{% else %}delta-down{% endif %}">
@@ -111,6 +114,7 @@
                     </span>
                 </span>
             </div>
+            {% endif %}
         </div>
         {% else %}
         <div class="result-card result-empty">

@@ -17,7 +17,23 @@ PLACEHOLDER_PATTERNS = ['[shows', '[image', '[picture', '[display', '[insert']
 BANNED_CHOICES = {
     'all of the above', 'none of the above',
     'all the above', 'none of these', 'all of these',
+    'not enough information', 'cannot be determined',
+    'not enough info', 'impossible to tell',
 }
+
+# Phrases that indicate the question requires seeing a physical object or image
+# that the student can't see in a text-only interface
+REQUIRES_VISUAL_PATTERNS = [
+    'which is longer', 'which is shorter', 'which is taller', 'which is smaller',
+    'which is heavier', 'which is lighter',
+    'look at the', 'looking at the', 'shown in the', 'shown above',
+    'in the picture', 'in the image', 'in the diagram', 'in the figure',
+    'the picture shows', 'the image shows', 'the diagram shows',
+    'use the graph', 'use the chart', 'use the table',
+    'from the graph', 'from the chart', 'from the table',
+    'read the graph', 'read the chart',
+    'the bar graph', 'the pictograph', 'the tally chart',
+]
 
 LETTER_PREFIX_RE = re.compile(r'^[A-Da-d][).\s]+\s*')
 
@@ -89,6 +105,11 @@ def validate_question(q_data, node_description=''):
     for pattern in PLACEHOLDER_PATTERNS:
         if pattern in q_lower:
             return False, f'Placeholder text found: "{pattern}"'
+
+    # Rule 6b: No questions requiring unseen visuals/physical objects
+    for pattern in REQUIRES_VISUAL_PATTERNS:
+        if pattern in q_lower:
+            return False, f'Question requires visual context: "{pattern}"'
 
     # Rule 7: Answer max length
     if len(answer) > MAX_ANSWER_LENGTH:

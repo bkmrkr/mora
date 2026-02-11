@@ -10,6 +10,18 @@ import json
 from engine import elo
 from engine.difficulty import calibrate_from_recent
 
+# Nodes that require visual aids (images, physical objects, charts) and can't
+# be answered in text-only format. Skipped until image generators are added.
+# Clock nodes are NOT here — they already have an SVG generator.
+VISUAL_REQUIRED_NODES = {
+    'Comparing and Ordering Lengths',
+    'Measuring Length with Units',
+    'Organizing and Reading Data',
+    'Interpreting Data and Answering Questions',
+    'Composing Shapes',
+    'Partitioning into Equal Shares',
+}
+
 
 def analyze_recent(recent_attempts, student_skills):
     """Analyze last 30 attempts for per-node stats, overall accuracy, recency.
@@ -158,6 +170,10 @@ def _get_eligible_nodes(curriculum_nodes, student_skills):
     node_ids = {n['id'] for n in curriculum_nodes}
 
     for node in curriculum_nodes:
+        # Skip nodes that require visual aids we can't generate yet
+        if node.get('name') in VISUAL_REQUIRED_NODES:
+            continue
+
         skill = student_skills.get(node['id'], {})
         if elo.is_mastered(skill.get('mastery_level', 0.0)):
             continue

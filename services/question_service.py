@@ -1,4 +1,4 @@
-"""Question generation orchestrator."""
+"""Question generation orchestrator with validation and dedup."""
 import json
 import logging
 
@@ -11,6 +11,7 @@ from models import curriculum_node as node_model
 from models import topic as topic_model
 from engine import elo
 from engine import next_question as nq_engine
+from engine.question_validator import validate_question
 from ai import question_generator
 from config.settings import SESSION_DEFAULTS
 
@@ -19,6 +20,13 @@ logger = logging.getLogger(__name__)
 
 def generate_next(session_id, student, topic_id):
     """Select focus node, compute difficulty, generate question.
+
+    Three dedup layers (from kidtutor):
+      1. Session dedup — never repeat any question within the same session
+      2. Global dedup — never repeat a correctly-answered question (lifetime)
+      3. Recent texts — passed to LLM to avoid similar questions
+
+    Post-generation validation rejects bad LLM output and retries.
 
     Stores question in flask_session['current_question'].
     Returns question_dict or None.
@@ -62,30 +70,66 @@ def generate_next(session_id, student, topic_id):
         focus_node_id, all_skills, analysis
     )
 
-    # Get recent question texts for dedup
+    # --- Dedup layers ---
+    # Layer 1: Session dedup — all question texts in this session
     session_attempts = attempt_model.get_for_session(session_id)
-    recent_texts = [a['content'] for a in session_attempts if a.get('content')]
+    session_texts = {a['content'] for a in session_attempts if a.get('content')}
 
-    # Generate question via Ollama (with retry)
+    # Layer 2: Global dedup — all correctly-answered question texts (lifetime)
+    global_correct_texts = attempt_model.get_correct_texts(student_id)
+
+    # Combined exclude set for LLM prompt
+    all_exclude = session_texts | global_correct_texts
+    recent_text_list = list(all_exclude)
+
+    # --- Generate with validation + dedup retry ---
     q_data = None
     model = None
     prompt = None
+    node_desc = focus_node.get('description', '')
+
     for attempt_num in range(SESSION_DEFAULTS['max_generation_attempts']):
         try:
             q_data, model, prompt = question_generator.generate(
                 focus_node['name'],
-                focus_node.get('description', ''),
+                node_desc,
                 topic['name'] if topic else '',
-                '',
+                node_desc,
                 target_diff,
                 q_type,
-                recent_texts,
+                recent_text_list,
             )
-            if q_data and q_data.get('question'):
-                break
         except Exception as e:
             logger.warning('Generation attempt %d failed: %s', attempt_num + 1, e)
             q_data = None
+            continue
+
+        if not q_data or not q_data.get('question'):
+            logger.warning('Generation attempt %d: empty question', attempt_num + 1)
+            q_data = None
+            continue
+
+        # Validate the generated question
+        is_valid, reason = validate_question(q_data, node_desc)
+        if not is_valid:
+            logger.warning('Validation rejected (attempt %d): %s', attempt_num + 1, reason)
+            q_data = None
+            continue
+
+        # Dedup check: reject if question already seen in session or globally
+        q_text = q_data['question'].strip()
+        if q_text in session_texts:
+            logger.warning('Session dedup rejected (attempt %d)', attempt_num + 1)
+            q_data = None
+            continue
+
+        if q_text in global_correct_texts:
+            logger.warning('Global dedup rejected (attempt %d)', attempt_num + 1)
+            q_data = None
+            continue
+
+        # Passed all checks
+        break
 
     if not q_data:
         flask_session['current_question'] = None
@@ -94,6 +138,7 @@ def generate_next(session_id, student, topic_id):
     # Store question in DB
     skill = all_skills.get(focus_node_id, {})
     skill_rating = skill.get('skill_rating', 1000.0)
+    p_correct = elo.p_correct(skill_rating, target_diff)
 
     question_id = question_model.create(
         curriculum_node_id=focus_node_id,
@@ -103,10 +148,14 @@ def generate_next(session_id, student, topic_id):
         correct_answer=q_data.get('correct_answer', ''),
         explanation=q_data.get('explanation', ''),
         difficulty=target_diff,
-        estimated_p_correct=elo.p_correct(skill_rating, target_diff),
+        estimated_p_correct=p_correct,
         generated_prompt=prompt,
         model_used=model,
     )
+
+    # Compute difficulty score (1-10) for display
+    norm_diff = max(0.0, min(1.0, (target_diff - 600) / 800))
+    difficulty_score = round(norm_diff * 9) + 1
 
     question_dict = {
         'question_id': question_id,
@@ -118,6 +167,8 @@ def generate_next(session_id, student, topic_id):
         'correct_answer': q_data.get('correct_answer', ''),
         'explanation': q_data.get('explanation', ''),
         'difficulty': target_diff,
+        'difficulty_score': difficulty_score,
+        'p_correct': round(p_correct * 100),
     }
     flask_session['current_question'] = question_dict
     return question_dict

@@ -146,7 +146,32 @@ When a student enters a topic that doesn't exist yet, the system generates a cur
 
 #### Question Generation
 
-Generates a question for a specific curriculum node at a target difficulty. The ELO-scale difficulty is normalized to a 0-1 scale for the prompt: difficulty of 600 maps to 0.0 (easiest), 1400 maps to 1.0 (hardest). The prompt includes the topic name, concept name and description, normalized difficulty, question type (mcq/short_answer/problem), and a list of recently asked question texts to avoid repetition. For MCQ, the LLM is instructed to return exactly 4 options with the correct answer as a letter. Temperature is 0.7. If generation fails, it retries up to 2 times total.
+Generates a question for a specific curriculum node at a target difficulty. The ELO-scale difficulty is normalized to a 0-1 scale for the prompt: difficulty of 600 maps to 0.0 (easiest), 1400 maps to 1.0 (hardest). The prompt includes the topic name, concept name and description, normalized difficulty, question type (mcq/short_answer/problem), and a combined exclude list of all session questions and all lifetime correctly-answered questions. The system prompt has 14 rules covering: difficulty matching, dedup, MCQ format (exactly 4 options, correct answer among them), answer format (concise, not a sentence), single correct answer (no multiple blanks), no placeholder text, no "all/none of the above", punctuation, and answer length limits. If generation fails, it retries up to 2 times total.
+
+#### Question Validation
+
+Every generated question passes through a 12-rule post-generation validator before being accepted. If validation fails, the system retries generation. Rules:
+1. Question text minimum 10 characters.
+2. Answer not empty or placeholder (rejects empty strings, "?", "...", "N/A", "none", "null").
+3. Choices must be unique after stripping letter prefixes (A/B/C/D) — case-insensitive.
+4. Correct answer must appear among choices (by text match, letter match, or index).
+5. Answer not given away in question text, with exceptions for math expressions ("What is 86 - 43?" answer "43" is allowed), comparison questions, classification questions, and "what/which" identification questions.
+6. No placeholder text patterns ("[shows", "[image", "[picture", "[display", "[insert").
+7. Answer maximum 200 characters.
+8. No HTML or markdown artifacts ("</", "```").
+9. Minimum 3 choices if any are provided.
+10. Answer length bias prevention — rejects if correct answer is 3x longer than average distractor AND 15+ chars longer than the longest distractor.
+11. No "all of the above", "none of the above", "none of these", or similar banned choices.
+12. Question must end with punctuation (? : .), contain a blank (__), or start with an imperative verb (solve, calculate, find, etc.).
+
+#### Question Deduplication
+
+Three dedup layers prevent question repetition:
+1. **Session dedup**: Never repeat any question within the same session. All question texts from the current session are collected and any generated question matching one is rejected.
+2. **Global correct-answer dedup**: Never repeat a question the student has correctly answered in any previous session. A lifetime set of all correctly-answered question texts is queried from the attempts table and used as an exclusion set.
+3. **LLM prompt dedup**: The combined exclusion set (session + global correct) is passed to the LLM in the prompt with an instruction not to repeat or ask similar questions.
+
+Both dedup checks happen post-generation as hard rejections. If a generated question matches either set, it is discarded and the system retries.
 
 #### Explanation Generation
 
@@ -174,7 +199,7 @@ Receives student_id and topic_id. Creates a new session record with a UUID. Call
 
 #### Question Page (GET /session/<session_id>/question)
 
-Displays the current question from the Flask session. Shows: the student name, a topic mastery percentage (0-100%) with a progress bar that updates after every answer, the curriculum node name as a badge, the question type as a badge, and the question text. For MCQ, renders four clickable choice buttons with letter indicators (A/B/C/D) and the choice text (with any LLM-generated letter prefix stripped via a custom Jinja2 filter). For short_answer and problem types, renders a textarea with a submit button. A hidden field tracks response time via JavaScript (timer starts on page load, captured on submit). MCQ buttons support keyboard shortcuts (pressing A/B/C/D keys). An "End Session Early" button links to the session end page.
+Displays the current question from the Flask session. Shows: the student name, a topic mastery percentage (0-100%) with a progress bar that updates after every answer, the curriculum node name as a badge, the question type as a badge, and the question text. At the bottom of the question card, a difficulty indicator shows: 10 dots (filled proportionally), a numeric score (1-10), and the estimated probability of the student getting it correct. The difficulty score maps ELO difficulty to a 1-10 scale: ELO 600 = 1, ELO 1400 = 10. The probability is computed from the ELO formula P(correct) = 1/(1+10^((D-S)/400)) and should hover around 80% when the adaptive system is calibrated. For MCQ, renders four clickable choice buttons with letter indicators (A/B/C/D) and the choice text (with any LLM-generated letter prefix stripped via a custom Jinja2 filter). For short_answer and problem types, renders a textarea with a submit button. A hidden field tracks response time via JavaScript (timer starts on page load, captured on submit). MCQ buttons support keyboard shortcuts (pressing A/B/C/D keys). An "End Session Early" button links to the session end page.
 
 #### Answer Submission (POST /session/<session_id>/answer)
 
@@ -216,4 +241,4 @@ Paginated table of all attempts (30 per page) showing timestamp, concept name, q
 
 All tests use pytest. A shared `conftest.py` fixture (`temp_db`) is marked `autouse` and redirects `DB_PATH` to a temporary file for every test, then runs `init_db()` to create the schema. No test touches the production database.
 
-Test files cover: ELO algorithm (probability, target difficulty, skill updates, K-factor, mastery computation), difficulty calibration, answer matching (exact, case-insensitive, numeric, MCQ letter extraction), next-question selection (empty history, per-node accuracy, node advancement on mastery), JSON parsing (raw, markdown-wrapped, surrounding text, invalid input), and model CRUD operations (student creation, topic creation, curriculum nodes, sessions, skill upsert, attempts, session finalization).
+Test files cover: ELO algorithm (probability, target difficulty, skill updates, K-factor, mastery computation), difficulty calibration, answer matching (exact, case-insensitive, numeric, MCQ letter extraction), next-question selection (empty history, per-node accuracy, node advancement on mastery), JSON parsing (raw, markdown-wrapped, surrounding text, invalid input), question validation (all 12 rules with positive and negative cases including edge cases for math expressions, letter-prefixed choices, length bias, and banned choice patterns), and model CRUD operations (student creation, topic creation, curriculum nodes, sessions, skill upsert, attempts, session finalization).

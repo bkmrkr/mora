@@ -53,6 +53,21 @@ def get_for_session(session_id):
     )
 
 
+def get_correct_texts(student_id):
+    """All distinct question texts the student answered correctly (lifetime).
+
+    Used for global dedup — never re-ask a mastered question.
+    """
+    rows = query_db(
+        """SELECT DISTINCT q.content
+           FROM attempts a
+           JOIN questions q ON a.question_id = q.id
+           WHERE a.student_id=? AND a.is_correct=1""",
+        (student_id,),
+    )
+    return {r['content'] for r in rows}
+
+
 def count_for_student(student_id):
     row = query_db(
         "SELECT COUNT(*) as cnt FROM attempts WHERE student_id=?",

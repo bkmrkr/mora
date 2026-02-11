@@ -44,11 +44,22 @@
             <button type="submit" class="btn btn-primary">Submit Answer</button>
             {% endif %}
         </form>
+
+        <div class="difficulty-display">
+            <span class="difficulty-label">Difficulty:</span>
+            <span class="difficulty-dots">
+                {% for i in range(10) %}
+                <span class="difficulty-dot {% if i < question.difficulty_score %}filled{% endif %}"></span>
+                {% endfor %}
+            </span>
+            <span class="difficulty-value">{{ question.difficulty_score }}/10</span>
+            <span class="difficulty-chance">({{ question.p_correct }}% chance)</span>
+        </div>
     </div>
 
     <form action="{{ url_for('session.end', session_id=session_id) }}" method="get"
           class="end-session-form">
-        <button type="submit" class="btn btn-secondary">End Session Early</button>
+        <button type="submit" class="btn btn-secondary">End Session</button>
     </form>
 </div>
 {% endblock %}

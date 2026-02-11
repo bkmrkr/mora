@@ -275,6 +275,42 @@ body {
     white-space: nowrap;
 }
 
+/* Difficulty Display */
+.difficulty-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.difficulty-label {
+    font-weight: 600;
+}
+.difficulty-dots {
+    display: flex;
+    gap: 3px;
+}
+.difficulty-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+}
+.difficulty-dot.filled {
+    background: var(--primary);
+}
+.difficulty-value {
+    font-weight: 600;
+    color: var(--text);
+}
+.difficulty-chance {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
 .end-session-form {
     text-align: center;
     margin-top: 1rem;

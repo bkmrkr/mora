@@ -27,8 +27,8 @@
 - Show original question text on the wrong-answer feedback page
 
 ### Added
-- Question pre-caching: JS fires async POST to `/precache` on page load, server pre-generates next question while student thinks — eliminates 1-3s wait between questions
-- 10 unit tests for cache behavior (pop_cached empty/hit/miss, node match/mismatch, overwrites, wrong student/session)
+- Dual question pre-caching: pre-generates TWO questions per page load — one for correct answer (harder difficulty) and one for wrong answer (easier difficulty). Uses ELO prediction to simulate post-answer skill ratings without DB writes, then generates at appropriate difficulty for each outcome.
+- 13 unit tests for dual cache behavior (correct/wrong path selection, different difficulties, partial None handling, overwrites, default path)
 
 ### Changed
 - Enabled threaded mode in Flask dev server for concurrent precache + answer requests

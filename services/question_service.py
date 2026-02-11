@@ -24,8 +24,12 @@ _precache = {}
 _precache_lock = threading.Lock()
 
 
-def pop_cached(student_id, session_id, expected_node_id=None):
-    """Return and remove a pre-cached question if available and node matches.
+def pop_cached(student_id, session_id, is_correct=True):
+    """Return and remove a pre-cached question for the given outcome.
+
+    Args:
+        is_correct: whether the student answered correctly — selects the
+            appropriate cached question (harder after correct, easier after wrong).
 
     Returns question_dict or None.
     """
@@ -34,26 +38,78 @@ def pop_cached(student_id, session_id, expected_node_id=None):
         cached = _precache.pop(key, None)
     if cached is None:
         return None
-    if expected_node_id is not None and cached.get('node_id') != expected_node_id:
-        logger.info('Pre-cache miss: node changed (%s → %s)', cached.get('node_id'), expected_node_id)
+    outcome_key = 'correct' if is_correct else 'wrong'
+    question = cached.get(outcome_key)
+    if question is None:
+        logger.info('Pre-cache miss: no %s-path question cached', outcome_key)
         return None
-    logger.info('Pre-cache hit for student %d session %s', student_id, session_id)
-    return cached
+    logger.info('Pre-cache hit (%s path) for student %d session %s (diff=%.0f)',
+                outcome_key, student_id, session_id, question.get('difficulty', 0))
+    return question
 
 
-def precache_next(session_id, student, topic_id):
-    """Pre-generate and cache the next question (called from background request)."""
-    question_dict = generate_next(session_id, student, topic_id, store_in_session=False)
-    if question_dict:
-        key = (student['id'], session_id)
-        with _precache_lock:
-            _precache[key] = question_dict
-        logger.info('Pre-cached question for student %d session %s (node: %s)',
-                     student['id'], session_id, question_dict.get('node_name'))
-    return question_dict
+def precache_next(session_id, student, topic_id, current_question=None):
+    """Pre-generate and cache TWO questions: one for correct, one for wrong.
+
+    Uses ELO prediction to compute what the skill rating would be after each
+    outcome, then generates questions at the appropriate difficulty.
+    """
+    student_id = student['id']
+    if current_question is None:
+        return None
+
+    node_id = current_question.get('node_id')
+    difficulty = current_question.get('difficulty', 800)
+
+    # Get current skill state
+    all_skills = {
+        s['curriculum_node_id']: s
+        for s in skill_model.get_for_student(student_id)
+    }
+    skill = all_skills.get(node_id, {})
+    skill_rating = skill.get('skill_rating', 800.0)
+    uncertainty = skill.get('uncertainty', 350.0)
+
+    # Compute global streak for ELO prediction
+    recent = attempt_model.get_recent(student_id, limit=30)
+    streak = 0
+    for a in recent:
+        if a['is_correct']:
+            streak += 1
+        else:
+            break
+
+    # Predict skill after correct answer
+    rating_correct, _ = elo.update_skill(
+        skill_rating, uncertainty, difficulty, is_correct=True, streak=streak,
+    )
+    # Predict skill after wrong answer (streak resets)
+    rating_wrong, _ = elo.update_skill(
+        skill_rating, uncertainty, difficulty, is_correct=False, streak=0,
+    )
+
+    logger.info('Pre-caching dual: current=%.0f, if_correct=%.0f, if_wrong=%.0f',
+                skill_rating, rating_correct, rating_wrong)
+
+    # Generate question for each outcome with predicted skill overrides
+    result = {}
+    for outcome, predicted_rating in [('correct', rating_correct), ('wrong', rating_wrong)]:
+        overrides = {node_id: predicted_rating}
+        q = generate_next(session_id, student, topic_id,
+                          store_in_session=False, skill_overrides=overrides)
+        result[outcome] = q
+        if q:
+            logger.info('Pre-cached %s-path question (diff=%.0f, node=%s)',
+                        outcome, q.get('difficulty', 0), q.get('node_name'))
+
+    key = (student_id, session_id)
+    with _precache_lock:
+        _precache[key] = result
+    return result
 
 
-def generate_next(session_id, student, topic_id, store_in_session=True):
+def generate_next(session_id, student, topic_id, store_in_session=True,
+                   skill_overrides=None):
     """Select focus node, compute difficulty, generate question.
 
     Three dedup layers (from kidtutor):
@@ -65,6 +121,8 @@ def generate_next(session_id, student, topic_id, store_in_session=True):
 
     When store_in_session=True, stores in flask_session['current_question'].
     When False (pre-caching), skips session writes.
+    skill_overrides: dict of {node_id: predicted_skill_rating} — used by
+        dual precache to generate at post-answer difficulty.
     Returns question_dict or None.
     """
     student_id = student['id']
@@ -105,9 +163,20 @@ def generate_next(session_id, student, topic_id, store_in_session=True):
     focus_node = node_model.get_by_id(focus_node_id)
     topic = topic_model.get_by_id(topic_id)
 
+    # Apply skill overrides for precache predictions
+    effective_skills = all_skills
+    if skill_overrides:
+        effective_skills = dict(all_skills)
+        for nid, predicted_rating in skill_overrides.items():
+            if nid in effective_skills:
+                effective_skills[nid] = dict(effective_skills[nid])
+                effective_skills[nid]['skill_rating'] = predicted_rating
+            else:
+                effective_skills[nid] = {'skill_rating': predicted_rating}
+
     # Compute target difficulty and question type
     target_diff, q_type = nq_engine.compute_question_params(
-        focus_node_id, all_skills, analysis
+        focus_node_id, effective_skills, analysis
     )
 
     # --- Dedup layers ---

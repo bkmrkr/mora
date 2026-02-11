@@ -73,9 +73,9 @@ def test_compute_question_params_mcq_early():
     assert diff < 1000  # Should be easier than skill
 
 
-def test_compute_question_params_problem_late():
-    """High mastery should produce problem type."""
-    skills = {1: {'skill_rating': 1200, 'mastery_level': 0.7, 'total_attempts': 50}}
+def test_compute_question_params_short_answer_late():
+    """High mastery should produce short_answer type."""
+    skills = {1: {'skill_rating': 1200, 'mastery_level': 0.8, 'total_attempts': 50}}
     analysis = {'per_node': {}}
     diff, q_type = compute_question_params(1, skills, analysis)
-    assert q_type == 'problem'
+    assert q_type == 'short_answer'

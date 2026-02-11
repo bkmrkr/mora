@@ -187,14 +187,12 @@ def compute_question_params(focus_node_id, student_skills, recent_analysis):
     else:
         adjusted = base_target
 
-    # Question type: MCQ early, short_answer mid, problem late
+    # Question type: mostly MCQ (easier for young kids), short_answer only when mastered
     mastery = skill.get('mastery_level', 0.0)
-    if mastery < 0.3:
+    if mastery < 0.7:
         q_type = 'mcq'
-    elif mastery < 0.6:
-        q_type = 'short_answer'
     else:
-        q_type = 'problem'
+        q_type = 'short_answer'
 
     return adjusted, q_type
 

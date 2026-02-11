@@ -14,16 +14,15 @@ def ask(system_prompt, user_prompt, max_tokens=8192, temperature=0.7):
 
     Returns (response_text, model_used, full_prompt).
     """
-    # Append /no_think to disable qwen3's thinking mode — saves tokens and latency
-    user_prompt_final = user_prompt + "\n/no_think"
     full_prompt = f"SYSTEM: {system_prompt}\n\nUSER: {user_prompt}"
     data = json.dumps({
         'model': OLLAMA_MODEL,
         'messages': [
             {'role': 'system', 'content': system_prompt},
-            {'role': 'user', 'content': user_prompt_final},
+            {'role': 'user', 'content': user_prompt},
         ],
         'stream': False,
+        'think': False,
         'keep_alive': '30m',
         'options': {
             'num_predict': max_tokens,

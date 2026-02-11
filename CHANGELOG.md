@@ -8,6 +8,9 @@
 - Database layer (get_db, init_db, query_db, execute_db)
 - Configuration with ELO defaults, Ollama settings, session defaults
 
+### Changed
+- Rewrote spec.md to match implemented code — plain language only, no code snippets, covers all algorithms, data model, user flow, and frontend details
+
 ### Fixed
 - Feedback template referenced wrong route name (`session.next` → `session.next_question`)
 - MCQ options displayed doubled letter prefix (added `strip_letter` Jinja2 filter)

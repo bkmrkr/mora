@@ -5,9 +5,11 @@ Returns (is_correct, is_close) tuples.
 import re
 
 
-def check_answer(student_answer, correct_answer, question_type='short_answer'):
+def check_answer(student_answer, correct_answer, question_type='short_answer',
+                  options=None):
     """Check if student_answer matches correct_answer.
 
+    For MCQ, pass options list so we can resolve text↔letter mismatches.
     Returns (is_correct: bool, is_close: bool).
     """
     if not student_answer or not correct_answer:
@@ -17,7 +19,7 @@ def check_answer(student_answer, correct_answer, question_type='short_answer'):
     correct = _normalize(correct_answer)
 
     if question_type == 'mcq':
-        return _check_mcq(student, correct)
+        return _check_mcq(student, correct, options)
 
     # Short answer: try exact, then numeric, then fuzzy
     if student == correct:
@@ -42,15 +44,50 @@ def check_answer(student_answer, correct_answer, question_type='short_answer'):
     return False, _is_close(student, correct)
 
 
-def _check_mcq(student, correct):
-    """MCQ: match on letter (A/B/C/D) or full text."""
-    # Extract letter if present
+def _check_mcq(student, correct, options=None):
+    """MCQ: match on letter (A/B/C/D), full text, or text↔letter via options."""
+    LETTERS = 'ABCD'
     s_letter = _extract_letter(student)
     c_letter = _extract_letter(correct)
+
+    # Both are letters — direct compare
     if s_letter and c_letter:
         return s_letter == c_letter, False
+
     # Full text match
-    return student == correct, False
+    if student == correct:
+        return True, False
+
+    # Resolve mismatches using options list
+    if options:
+        norm_opts = [_normalize(o) for o in options]
+        # Strip letter prefixes from options for matching
+        clean_opts = [re.sub(r'^[a-d][.)\s]+\s*', '', o).strip() for o in norm_opts]
+
+        # Student submitted text, correct is letter → find correct text
+        if not s_letter and c_letter:
+            idx = LETTERS.index(c_letter)
+            if idx < len(clean_opts) and student == clean_opts[idx]:
+                return True, False
+
+        # Student submitted letter, correct is text → find correct index
+        if s_letter and not c_letter:
+            for i, opt_text in enumerate(clean_opts):
+                if opt_text == correct and i < len(LETTERS):
+                    return s_letter == LETTERS[i], False
+
+        # Neither is a letter — try matching both as option texts
+        s_idx = None
+        c_idx = None
+        for i, opt_text in enumerate(clean_opts):
+            if opt_text == student:
+                s_idx = i
+            if opt_text == correct:
+                c_idx = i
+        if s_idx is not None and c_idx is not None:
+            return s_idx == c_idx, False
+
+    return False, False
 
 
 def _normalize(text):

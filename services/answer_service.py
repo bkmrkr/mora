@@ -24,7 +24,8 @@ def process_answer(student, current_question, student_answer,
     # Grade answer
     is_close = False
     if q_type in ('mcq', 'short_answer'):
-        is_correct, is_close = check_answer(student_answer, correct_answer, q_type)
+        options = current_question.get('options') if q_type == 'mcq' else None
+        is_correct, is_close = check_answer(student_answer, correct_answer, q_type, options)
         partial_score = 1.0 if is_correct else 0.0
         feedback = ''
     else:

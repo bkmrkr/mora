@@ -3,6 +3,7 @@
 ## [2026-02-11]
 
 ### Added
+- Research paper (paper.md) situating Mora's design within educational research literature, identifying established foundations vs. novel contributions
 - Initial project structure: config, db, models, engine, ai, services, routes
 - SQLite schema with 7 tables: students, topics, curriculum_nodes, sessions, questions, attempts, student_skill
 - Database layer (get_db, init_db, query_db, execute_db)
@@ -30,3 +31,4 @@
 ### Fixed
 - Feedback template referenced wrong route name (`session.next` → `session.next_question`)
 - MCQ options displayed doubled letter prefix (added `strip_letter` Jinja2 filter)
+- MCQ answer matching failed when LLM returned letter ("B") but student submitted text ("6") or vice versa — added text↔letter resolution using options list (6 new tests)

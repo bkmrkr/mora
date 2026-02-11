@@ -1,4 +1,4 @@
-/* Moriah — Adaptive Learning System */
+/* Mora — Adaptive Learning System */
 
 :root {
     --primary: #4f46e5;
@@ -250,6 +250,30 @@ body {
     flex-shrink: 0;
 }
 .choice-text { flex: 1; }
+
+/* Topic Mastery Display */
+.topic-mastery-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+}
+.topic-mastery-display .mastery-pct {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--primary);
+    min-width: 3rem;
+    text-align: right;
+}
+.topic-mastery-display .mastery-bar {
+    flex: 1;
+    min-width: 80px;
+}
+.topic-mastery-display .mastery-label {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
 
 .end-session-form {
     text-align: center;

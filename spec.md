@@ -1,6 +1,6 @@
-**Moriah: Specification for an Adaptive, LLM-Powered Learning Program**
+**Mora: Specification for an Adaptive, LLM-Powered Learning Program**
 
-Moriah is a local, privacy-first adaptive learning system. It starts from any user-specified topic and dynamically generates questions using a local Ollama model. The system keeps the student in their "sweet spot" by targeting an 80% success rate per question, using an ELO-inspired rating system with Bayesian uncertainty decay. It follows a structured curriculum, adjusts progression based on performance, and heavily weights the most recent 30 questions when deciding the next one. All questions, attempts, and progress statistics are stored persistently in SQLite.
+Mora is a local, privacy-first adaptive learning system. It starts from any user-specified topic and dynamically generates questions using a local Ollama model. The system keeps the student in their "sweet spot" by targeting an 80% success rate per question, using an ELO-inspired rating system with Bayesian uncertainty decay. It follows a structured curriculum, adjusts progression based on performance, and heavily weights the most recent 30 questions when deciding the next one. All questions, attempts, and progress statistics are stored persistently in SQLite.
 
 ---
 
@@ -19,7 +19,7 @@ Moriah is a local, privacy-first adaptive learning system. It starts from any us
 - **Frontend**: Flask web application with Jinja2 templates and vanilla CSS/JS.
 - **Backend**: Python 3.9+. Uses raw `sqlite3` (no ORM), `urllib.request` for Ollama HTTP calls, and `python-dotenv` for configuration. No pandas, no SQLAlchemy.
 - **LLM Integration**: Ollama via its `/api/chat` HTTP endpoint. Model is configurable (default: `qwen3:8b`).
-- **Storage**: Single SQLite file (`moriah.db`).
+- **Storage**: Single SQLite file (`mora.db`).
 - **Server**: Flask runs on `0.0.0.0:5002` in debug mode.
 
 ### Project Structure
@@ -35,7 +35,7 @@ The codebase follows a strict layered architecture. Each layer only depends on l
 - **`routes/`** — Flask blueprints. Three blueprints: home (no prefix), session (`/session`), dashboard (`/dashboard`).
 - **`templates/`** — Jinja2 HTML templates extending a shared `base.html`.
 - **`static/`** — CSS stylesheet and session JavaScript (response timer, MCQ keyboard shortcuts).
-- **`tests/`** — Unit tests using pytest with an `autouse` fixture that redirects `DB_PATH` to a temporary file for every test. No test ever touches `moriah.db`.
+- **`tests/`** — Unit tests using pytest with an `autouse` fixture that redirects `DB_PATH` to a temporary file for every test. No test ever touches `mora.db`.
 
 ### Configuration
 
@@ -45,7 +45,7 @@ All settings live in `config/settings.py` and are importable as module-level dic
 
 **DIFFICULTY_DEFAULTS**: target_success_rate is 0.80, recent_window is 30 attempts, elo_scale_factor is 400.0.
 
-**SESSION_DEFAULTS**: questions_per_session is 15, target_success_rate is 0.80, max_generation_attempts is 2 (retry limit for Ollama calls).
+**SESSION_DEFAULTS**: target_success_rate is 0.80, max_generation_attempts is 2 (retry limit for Ollama calls). Sessions have no question limit — they continue indefinitely until the student clicks "End Session".
 
 **Ollama**: base URL defaults to `http://localhost:11434`, model defaults to `qwen3:8b`. Both are overridable via `OLLAMA_BASE_URL` and `OLLAMA_MODEL` environment variables.
 
@@ -53,7 +53,7 @@ All settings live in `config/settings.py` and are importable as module-level dic
 
 ### Data Model
 
-Seven tables stored in `moriah.db`.
+Seven tables stored in `mora.db`.
 
 **students**: Stores student records. Fields: integer `id` (primary key), unique text `name`, datetime `created_at` with auto-timestamp.
 
@@ -174,15 +174,15 @@ Receives student_id and topic_id. Creates a new session record with a UUID. Call
 
 #### Question Page (GET /session/<session_id>/question)
 
-Displays the current question from the Flask session. Shows: the curriculum node name as a badge, the question type as a badge, a progress indicator ("Question N / 15"), a progress bar, and the question text. For MCQ, renders four clickable choice buttons with letter indicators (A/B/C/D) and the choice text (with any LLM-generated letter prefix stripped via a custom Jinja2 filter). For short_answer and problem types, renders a textarea with a submit button. A hidden field tracks response time via JavaScript (timer starts on page load, captured on submit). MCQ buttons support keyboard shortcuts (pressing A/B/C/D keys). An "End Session Early" button links to the session end page.
+Displays the current question from the Flask session. Shows: the student name, a topic mastery percentage (0-100%) with a progress bar that updates after every answer, the curriculum node name as a badge, the question type as a badge, and the question text. For MCQ, renders four clickable choice buttons with letter indicators (A/B/C/D) and the choice text (with any LLM-generated letter prefix stripped via a custom Jinja2 filter). For short_answer and problem types, renders a textarea with a submit button. A hidden field tracks response time via JavaScript (timer starts on page load, captured on submit). MCQ buttons support keyboard shortcuts (pressing A/B/C/D keys). An "End Session Early" button links to the session end page.
 
 #### Answer Submission (POST /session/<session_id>/answer)
 
-Receives the student's answer text and response time. Calls the answer service which grades the answer, updates ELO, and records the attempt. If the answer is correct: stores the result in Flask session and either ends the session (if question count reached the limit of 15) or generates the next question and redirects to the question page. If wrong: stores the result and redirects to the feedback page.
+Receives the student's answer text and response time. Calls the answer service which grades the answer, updates ELO, and records the attempt. If the answer is correct: stores the result in Flask session, generates the next question, and redirects to the question page. If wrong: stores the result and redirects to the feedback page.
 
 #### Feedback Page (GET /session/<session_id>/feedback)
 
-Shown only after wrong answers. Calls the Ollama explainer to generate an explanation. Displays: a "Not quite!" header, the LLM-generated encouragement, the student's answer (in red) vs the correct answer (in green), the LLM-generated step-by-step explanation in a yellow box, the key concept with a left-border accent, a tip with a left-border accent, the current skill name/rating/mastery percentage, and a "Next Question" button that submits a POST to generate the next question.
+Shown only after wrong answers. Displays the topic mastery bar at the top (same as the question page). Calls the Ollama explainer to generate an explanation. Displays: a "Not quite!" header, the LLM-generated encouragement, the student's answer (in red) vs the correct answer (in green), the LLM-generated step-by-step explanation in a yellow box, the key concept with a left-border accent, a tip with a left-border accent, the current skill name/rating/mastery percentage, and a "Next Question" button that submits a POST to generate the next question.
 
 #### Session End (GET /session/<session_id>/end)
 

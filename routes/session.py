@@ -9,9 +9,17 @@ from models import student_skill as skill_model
 from models import curriculum_node as node_model
 from services import question_service, answer_service
 from engine import elo
-from config.settings import SESSION_DEFAULTS
 
 session_bp = Blueprint('session', __name__)
+
+
+def _compute_topic_mastery(student_id, topic_id):
+    """Average mastery_level across all curriculum nodes for a topic, as 0-100."""
+    nodes = node_model.get_for_topic(topic_id)
+    if not nodes:
+        return 0
+    total = sum(skill_model.get(student_id, n['id'])['mastery_level'] for n in nodes)
+    return round(total / len(nodes) * 100)
 
 
 @session_bp.route('/start', methods=['POST'])
@@ -39,16 +47,14 @@ def question(session_id):
     if not current:
         return redirect(url_for('session.end', session_id=session_id))
 
-    questions_done = len(attempt_model.get_for_session(session_id))
-    max_questions = SESSION_DEFAULTS['questions_per_session']
+    topic_mastery = _compute_topic_mastery(student['id'], sess['topic_id'])
 
     return render_template(
         'session/question.html',
         session_id=session_id,
         student=student,
         question=current,
-        questions_done=questions_done,
-        max_questions=max_questions,
+        topic_mastery=topic_mastery,
     )
 
 
@@ -71,9 +77,6 @@ def answer(session_id):
 
     if result['is_correct']:
         flask_session['last_result'] = result
-        questions_done = len(attempt_model.get_for_session(session_id))
-        if questions_done >= SESSION_DEFAULTS['questions_per_session']:
-            return redirect(url_for('session.end', session_id=session_id))
         question_service.generate_next(session_id, student, sess['topic_id'])
         return redirect(url_for('session.question', session_id=session_id))
 
@@ -108,6 +111,8 @@ def feedback(session_id):
                 'encouragement': 'Keep going!',
             }
 
+    topic_mastery = _compute_topic_mastery(student['id'], sess['topic_id'])
+
     return render_template(
         'session/feedback_wrong.html',
         session_id=session_id,
@@ -115,6 +120,7 @@ def feedback(session_id):
         result=result,
         question=current,
         explanation=explanation,
+        topic_mastery=topic_mastery,
     )
 
 
@@ -124,10 +130,6 @@ def next_question(session_id):
     if not sess:
         return redirect(url_for('home.index'))
     student = student_model.get_by_id(sess['student_id'])
-
-    questions_done = len(attempt_model.get_for_session(session_id))
-    if questions_done >= SESSION_DEFAULTS['questions_per_session']:
-        return redirect(url_for('session.end', session_id=session_id))
 
     question_service.generate_next(session_id, student, sess['topic_id'])
     return redirect(url_for('session.question', session_id=session_id))

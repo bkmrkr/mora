@@ -1,11 +1,11 @@
-"""Moriah — centralized configuration."""
+"""Mora — centralized configuration."""
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(BASE_DIR, 'moriah.db')
+DB_PATH = os.path.join(BASE_DIR, 'mora.db')
 
 # Ollama
 OLLAMA_BASE_URL = os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')
@@ -28,7 +28,6 @@ DIFFICULTY_DEFAULTS = {
 
 # Session defaults
 SESSION_DEFAULTS = {
-    'questions_per_session': 15,
     'target_success_rate': 0.80,
     'max_generation_attempts': 2,
 }

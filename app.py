@@ -1,4 +1,4 @@
-"""Moriah — Flask application entry point."""
+"""Mora — Flask application entry point."""
 import logging
 import os
 import re
@@ -18,7 +18,7 @@ logging.basicConfig(
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = os.environ.get('SECRET_KEY', 'moriah-dev-key')
+    app.secret_key = os.environ.get('SECRET_KEY', 'mora-dev-key')
 
     app.register_blueprint(home_bp)
     app.register_blueprint(session_bp, url_prefix='/session')

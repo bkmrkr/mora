@@ -1,12 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Moriah — Question{% endblock %}
+{% block title %}Mora — Question{% endblock %}
 {% block content %}
 <div class="session-container">
     <div class="session-header">
         <span class="student-name">{{ student.name }}</span>
-        <span class="progress-text">Question {{ questions_done + 1 }} / {{ max_questions }}</span>
-        <div class="progress-bar">
-            <div class="progress-fill" style="width: {{ (questions_done / max_questions * 100)|int }}%"></div>
+        <div class="topic-mastery-display">
+            <span class="mastery-pct">{{ topic_mastery }}%</span>
+            <div class="mastery-bar">
+                <div class="mastery-fill {% if topic_mastery >= 75 %}mastered{% endif %}"
+                     style="width: {{ topic_mastery }}%"></div>
+            </div>
+            <span class="mastery-label">Topic Mastery</span>
         </div>
     </div>
 

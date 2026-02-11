@@ -1,4 +1,4 @@
-# Moriah Changelog
+# Mora Changelog
 
 ## [2026-02-11]
 
@@ -9,6 +9,9 @@
 - Configuration with ELO defaults, Ollama settings, session defaults
 
 ### Changed
+- Renamed project from "Moriah" to "Mora" everywhere (templates, config, DB file, spec, CSS, tests)
+- Removed question limit — sessions now continue indefinitely until user clicks "End Session"
+- Added topic mastery percentage (0-100%) at top of question and feedback pages, updates after every answer
 - Rewrote spec.md to match implemented code — plain language only, no code snippets, covers all algorithms, data model, user flow, and frontend details
 
 ### Fixed

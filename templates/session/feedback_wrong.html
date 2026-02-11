@@ -1,7 +1,19 @@
 {% extends "base.html" %}
-{% block title %}Moriah — Feedback{% endblock %}
+{% block title %}Mora — Feedback{% endblock %}
 {% block content %}
 <div class="session-container">
+    <div class="session-header">
+        <span class="student-name">{{ student.name }}</span>
+        <div class="topic-mastery-display">
+            <span class="mastery-pct">{{ topic_mastery }}%</span>
+            <div class="mastery-bar">
+                <div class="mastery-fill {% if topic_mastery >= 75 %}mastered{% endif %}"
+                     style="width: {{ topic_mastery }}%"></div>
+            </div>
+            <span class="mastery-label">Topic Mastery</span>
+        </div>
+    </div>
+
     <div class="feedback-card wrong">
         <div class="feedback-header">
             <span class="feedback-icon">&#10060;</span>

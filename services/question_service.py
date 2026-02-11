@@ -97,7 +97,8 @@ def precache_next(session_id, student, topic_id, current_question=None):
     for outcome, predicted_rating in [('correct', rating_correct), ('wrong', rating_wrong)]:
         overrides = {node_id: predicted_rating}
         q = generate_next(session_id, student, topic_id,
-                          store_in_session=False, skill_overrides=overrides)
+                          store_in_session=False, skill_overrides=overrides,
+                          last_was_correct=(outcome == 'correct'))
         result[outcome] = q
         if q:
             logger.info('Pre-cached %s-path question (diff=%.0f, node=%s)',
@@ -110,7 +111,7 @@ def precache_next(session_id, student, topic_id, current_question=None):
 
 
 def generate_next(session_id, student, topic_id, store_in_session=True,
-                   skill_overrides=None):
+                   skill_overrides=None, last_was_correct=None):
     """Select focus node, compute difficulty, generate question.
 
     Three dedup layers (from kidtutor):
@@ -124,6 +125,8 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
     When False (pre-caching), skips session writes.
     skill_overrides: dict of {node_id: predicted_skill_rating} — used by
         dual precache to generate at post-answer difficulty.
+    last_was_correct: whether the student's last answer was correct — drives
+        variety-first node selection (always switch topics after correct).
     Returns question_dict or None.
     """
     student_id = student['id']
@@ -153,7 +156,7 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
         current_q = flask_session.get('current_question')
         current_node_id = current_q.get('node_id') if current_q else None
     focus_node_id = nq_engine.select_focus_node(
-        analysis, nodes, all_skills, current_node_id
+        analysis, nodes, all_skills, current_node_id, last_was_correct
     )
 
     if focus_node_id is None:

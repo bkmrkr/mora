@@ -185,7 +185,8 @@ def answer(session_id):
         flask_session['current_question'] = cached
         session_model.update_current_question(session_id, cached['question_id'])
     elif result['is_correct']:
-        question_service.generate_next(session_id, student, sess['topic_id'])
+        question_service.generate_next(session_id, student, sess['topic_id'],
+                                       last_was_correct=True)
 
     if result['is_correct']:
         return redirect(url_for('session.question', session_id=session_id))
@@ -247,10 +248,11 @@ def next_question(session_id):
     student = student_model.get_by_id(sess['student_id'])
 
     # Wrong-path question may already be set by answer() from dual cache.
-    # If not, generate fresh.
+    # If not, generate fresh (after wrong answer).
     current = flask_session.get('current_question')
     if not current:
-        question_service.generate_next(session_id, student, sess['topic_id'])
+        question_service.generate_next(session_id, student, sess['topic_id'],
+                                       last_was_correct=False)
     return redirect(url_for('session.question', session_id=session_id))
 
 

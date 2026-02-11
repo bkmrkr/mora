@@ -1,8 +1,8 @@
-"""Next-question selection based on last-30 analysis.
+"""Next-question selection — variety-first approach.
 
 Algorithm:
-1. Analyze last 30 attempts → per-node accuracy, trend
-2. Select focus node: current if 60-90%, prerequisite if <60%, next if mastered
+1. Analyze last 30 attempts → per-node accuracy, trend, recency
+2. Select focus node: NEVER same node twice, score by need + recency
 3. Compute target difficulty from ELO + recent calibration
 """
 import json
@@ -12,13 +12,14 @@ from engine.difficulty import calibrate_from_recent
 
 
 def analyze_recent(recent_attempts, student_skills):
-    """Analyze last 30 attempts for per-node stats and overall accuracy.
+    """Analyze last 30 attempts for per-node stats, overall accuracy, recency.
 
     Args:
         recent_attempts: list of dicts with keys: curriculum_node_id, is_correct, difficulty
+            Ordered newest-first.
         student_skills: dict of {node_id: student_skill_row}
 
-    Returns dict with overall_accuracy, per_node stats, improvement_trend.
+    Returns dict with overall_accuracy, per_node stats, improvement_trend, last_seen.
     """
     if not recent_attempts:
         return {
@@ -26,6 +27,7 @@ def analyze_recent(recent_attempts, student_skills):
             'per_node': {},
             'improvement_trend': 'stable',
             'total_attempts': 0,
+            'last_seen': {},
         }
 
     total_correct = sum(1 for a in recent_attempts if a['is_correct'])
@@ -60,96 +62,142 @@ def analyze_recent(recent_attempts, student_skills):
     else:
         trend = 'stable'
 
+    # Recency: how many questions ago was each node last seen?
+    # Index 0 = most recent attempt
+    last_seen = {}
+    for i, a in enumerate(recent_attempts):
+        nid = a.get('curriculum_node_id')
+        if nid and nid not in last_seen:
+            last_seen[nid] = i
+
     return {
         'overall_accuracy': overall_accuracy,
         'per_node': per_node,
         'improvement_trend': trend,
         'total_attempts': len(recent_attempts),
+        'last_seen': last_seen,
     }
 
 
 def select_focus_node(recent_analysis, curriculum_nodes, student_skills,
-                      current_node_id=None):
-    """Pick the curriculum node for the next question.
+                      current_node_id=None, last_was_correct=None):
+    """Pick the curriculum node for the next question — variety-first.
 
-    Priority:
-    1. Current node if accuracy in 60-90% range (sweet spot)
-    2. Prerequisites of current node if struggling (<60%)
-    3. Next node in order if current is mastered
-    4. Weakest recently-practiced node
-    5. Next untouched node in curriculum order
+    Core rule: NEVER repeat the same node consecutively.
+    Scores candidates by need (low mastery) and recency (not seen recently).
+
+    Args:
+        recent_analysis: output from analyze_recent()
+        curriculum_nodes: list of node dicts
+        student_skills: dict of {node_id: skill_row}
+        current_node_id: the node of the question just answered
+        last_was_correct: whether the last answer was correct (None for first question)
 
     Returns node_id or None.
     """
     if not curriculum_nodes:
         return None
 
-    per_node = recent_analysis.get('per_node', {})
     nodes_by_id = {n['id']: n for n in curriculum_nodes}
+    per_node = recent_analysis.get('per_node', {})
+    last_seen = recent_analysis.get('last_seen', {})
 
-    # If we have a current node, check its performance
-    if current_node_id and current_node_id in nodes_by_id:
+    # Build eligible pool: unmastered nodes with accessible prerequisites
+    eligible = _get_eligible_nodes(curriculum_nodes, student_skills)
+
+    if not eligible:
+        # All mastered — return least mastered for continued practice
+        return _least_mastered_id(curriculum_nodes, student_skills)
+
+    # After wrong answer with low accuracy: check for weak prerequisite
+    if last_was_correct is False and current_node_id and current_node_id in nodes_by_id:
         node_stats = per_node.get(current_node_id)
-        skill = student_skills.get(current_node_id, {})
+        if node_stats and node_stats['accuracy'] < 0.50:
+            prereq = _find_weak_prerequisite(
+                nodes_by_id[current_node_id], student_skills, nodes_by_id
+            )
+            if prereq and prereq != current_node_id:
+                return prereq
+
+    # Hard rule: exclude current node (never same node twice in a row)
+    candidates = [n for n in eligible if n['id'] != current_node_id]
+    if not candidates:
+        candidates = eligible  # only 1 eligible node — use it
+
+    # Score candidates by need + recency + virgin bonus
+    best_id, best_score = None, -1.0
+    for node in candidates:
+        skill = student_skills.get(node['id'], {})
         mastery = skill.get('mastery_level', 0.0)
+        need = 1.0 - mastery
 
-        if node_stats:
-            acc = node_stats['accuracy']
-            count = node_stats['count']
+        # Recency: how many questions since last asked?
+        recency = last_seen.get(node['id'], 99)
+        recency_bonus = min(recency / 3.0, 2.0)
 
-            # Fast advance: if acing it (85%+) after 2+ attempts, move on.
-            # Don't waste time on stuff the student clearly knows.
-            if count >= 2 and acc >= 0.85:
-                next_node = _next_in_order(curriculum_nodes, current_node_id, student_skills)
-                if next_node:
-                    return next_node
+        # Virgin node bonus: introduce new topics
+        attempts = skill.get('total_attempts', 0)
+        virgin_bonus = 0.5 if attempts == 0 else 0.0
 
-            # Sweet spot: keep going
-            if 0.60 <= acc <= 0.90 and not elo.is_mastered(mastery):
-                return current_node_id
+        score = need * (0.5 + recency_bonus) + virgin_bonus
 
-            # Struggling: fall back to prerequisites
-            if acc < 0.60:
-                prereqs = _get_prerequisite_ids(nodes_by_id[current_node_id])
-                for pid in prereqs:
-                    if pid in nodes_by_id:
-                        p_skill = student_skills.get(pid, {})
-                        if not elo.is_mastered(p_skill.get('mastery_level', 0.0)):
-                            return pid
+        if score > best_score:
+            best_score = score
+            best_id = node['id']
 
-            # Mastered or too easy: advance
-            if elo.is_mastered(mastery) or acc > 0.90:
-                next_node = _next_in_order(curriculum_nodes, current_node_id, student_skills)
-                if next_node:
-                    return next_node
+    return best_id
 
-    # Weakest recently-practiced node (not mastered)
-    weakest_id, weakest_acc = None, 1.0
-    for nid, stats in per_node.items():
-        if nid in nodes_by_id:
-            skill = student_skills.get(nid, {})
-            if not elo.is_mastered(skill.get('mastery_level', 0.0)):
-                if stats['accuracy'] < weakest_acc:
-                    weakest_acc = stats['accuracy']
-                    weakest_id = nid
-    if weakest_id:
-        return weakest_id
 
-    # Next untouched node in curriculum order
+def _get_eligible_nodes(curriculum_nodes, student_skills):
+    """Get unmastered nodes whose prerequisites are accessible.
+
+    Prerequisites are "accessible" if mastered OR attempted 2+ times.
+    This allows variety without hard-locking behind sequential mastery.
+    """
+    eligible = []
+    node_ids = {n['id'] for n in curriculum_nodes}
+
     for node in curriculum_nodes:
-        if node['id'] not in student_skills or student_skills[node['id']].get('total_attempts', 0) == 0:
-            return node['id']
+        skill = student_skills.get(node['id'], {})
+        if elo.is_mastered(skill.get('mastery_level', 0.0)):
+            continue
 
-    # All nodes touched — pick least mastered
-    least_mastered_id, least_mastery = None, 1.0
+        prereqs = _get_prerequisite_ids(node)
+        if prereqs:
+            accessible = all(
+                elo.is_mastered(student_skills.get(pid, {}).get('mastery_level', 0.0))
+                or student_skills.get(pid, {}).get('total_attempts', 0) >= 2
+                for pid in prereqs
+                if pid in node_ids
+            )
+            if not accessible:
+                continue
+
+        eligible.append(node)
+    return eligible
+
+
+def _find_weak_prerequisite(node, student_skills, nodes_by_id):
+    """Find an unmastered prerequisite of the given node."""
+    prereqs = _get_prerequisite_ids(node)
+    for pid in prereqs:
+        if pid in nodes_by_id:
+            p_skill = student_skills.get(pid, {})
+            if not elo.is_mastered(p_skill.get('mastery_level', 0.0)):
+                return pid
+    return None
+
+
+def _least_mastered_id(curriculum_nodes, student_skills):
+    """Return the node_id with the lowest mastery level."""
+    least_id, least_mastery = None, 1.0
     for node in curriculum_nodes:
         skill = student_skills.get(node['id'], {})
         m = skill.get('mastery_level', 0.0)
         if m < least_mastery:
             least_mastery = m
-            least_mastered_id = node['id']
-
-    return least_mastered_id
+            least_id = node['id']
+    return least_id
 
 
 def compute_question_params(focus_node_id, student_skills, recent_analysis):
@@ -206,17 +254,3 @@ def _get_prerequisite_ids(node):
         except (json.JSONDecodeError, TypeError):
             return []
     return prereqs if isinstance(prereqs, list) else []
-
-
-def _next_in_order(curriculum_nodes, current_node_id, student_skills):
-    """Find the next unmastered node after current_node_id in order."""
-    found_current = False
-    for node in curriculum_nodes:
-        if node['id'] == current_node_id:
-            found_current = True
-            continue
-        if found_current:
-            skill = student_skills.get(node['id'], {})
-            if not elo.is_mastered(skill.get('mastery_level', 0.0)):
-                return node['id']
-    return None

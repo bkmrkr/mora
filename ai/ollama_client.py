@@ -22,6 +22,7 @@ def ask(system_prompt, user_prompt, max_tokens=2048, temperature=0.7):
             {'role': 'user', 'content': user_prompt},
         ],
         'stream': False,
+        'keep_alive': '30m',
         'options': {
             'num_predict': max_tokens,
             'temperature': temperature,

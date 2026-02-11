@@ -1,6 +1,7 @@
 """Moriah — Flask application entry point."""
 import logging
 import os
+import re
 
 from flask import Flask
 
@@ -22,6 +23,11 @@ def create_app():
     app.register_blueprint(home_bp)
     app.register_blueprint(session_bp, url_prefix='/session')
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+
+    @app.template_filter('strip_letter')
+    def strip_letter_prefix(text):
+        """Remove leading letter prefix like 'A) ' or 'B. ' from MCQ options."""
+        return re.sub(r'^[A-Da-d][).\s]+\s*', '', str(text))
 
     with app.app_context():
         init_db()

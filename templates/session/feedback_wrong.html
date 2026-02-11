@@ -53,7 +53,7 @@
             <span>Mastery: {{ (result.mastery_level * 100)|round(1) }}%</span>
         </div>
 
-        <form action="{{ url_for('session.next', session_id=session_id) }}" method="post">
+        <form action="{{ url_for('session.next_question', session_id=session_id) }}" method="post">
             <button type="submit" class="btn btn-primary">Next Question</button>
         </form>
     </div>

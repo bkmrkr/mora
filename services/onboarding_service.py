@@ -26,6 +26,10 @@ def onboard(student_name, topic_name):
     if not topic:
         description, nodes_data, model, prompt = \
             curriculum_generator.generate_curriculum(topic_name)
+
+        if not nodes_data:
+            raise ValueError(f'Ollama returned no curriculum nodes for "{topic_name}"')
+
         tid = topic_model.create(topic_name, description)
         topic = topic_model.get_by_id(tid)
 

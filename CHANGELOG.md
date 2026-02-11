@@ -23,7 +23,9 @@
 - Supports 15+ question patterns: direct expressions (5+3), word operations (5 plus 3), phrased patterns (7 less than 15, subtract 3 from 10, sum of 6 and 8), missing number equations (__ + 5 = 12), three addends, unicode dash variants
 - MCQ answer resolution: resolves letter answers (D) to option text (9) before verification
 - Explanation vs answer cross-check (Rule 14): catches word problems where the LLM's explanation correctly computes the answer but the correct_answer field is wrong (e.g., explanation says "9 - 5 = 4" but answer says "3")
-- 72 new tests for math verifier + explanation cross-check (175 total, was 103)
+- Explanation arithmetic verification (Rule 15): verifies every "A op B = C" expression within the explanation is correct — catches "4 - 2 = 3" where both answer and explanation agree on a wrong value
+- Word problem parsing: _try_compute_answer now handles "has N ... eats/gives/loses M" (subtraction), "has N ... gets/finds/bought M" (addition), and "there are N ... M fly away/left" patterns — covers 30+ verb forms
+- 62 new tests for Rules 13-15: word problem parsing (12 subtraction verbs, 6 addition verbs, 5 "there are" patterns), explanation arithmetic (wrong/correct for +,-,*,/, chained ops, unicode, off-by-one, large numbers), consistently-wrong answer+explanation pairs, screenshot bug regression tests (286 total, was 224)
 - Show original question text on the wrong-answer feedback page
 
 ### Added

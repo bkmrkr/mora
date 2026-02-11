@@ -1,6 +1,6 @@
 """Post-generation question validation — ported from kidtutor + math verifier.
 
-13 rules that catch bad LLM output before it reaches the student.
+15 rules that catch bad LLM output before it reaches the student.
 Returns (is_valid, rejection_reason) tuple.
 """
 import ast
@@ -138,6 +138,11 @@ def validate_question(q_data, node_description=''):
     if not expl_ok:
         return False, expl_reason
 
+    # Rule 15: Verify arithmetic expressions within explanation
+    arith_ok, arith_reason = verify_explanation_arithmetic(q_data)
+    if not arith_ok:
+        return False, arith_reason
+
     return True, ''
 
 
@@ -272,6 +277,51 @@ def _try_compute_answer(question_text):
     # "What is 10 more than 45?" → 45 + 10 = 55  (already caught above)
     # "What is 10 less than 45?" → 45 - 10 = 35  (already caught above)
 
+    # --- Word problem: subtraction ---
+    # "has/have N ... eats/gives/loses/gave/spent M"
+    m = re.search(
+        r'(?:has|have|had|holds|starts?\s+with|began?\s+with|picks?\s+up|'
+        r'bought|collects?|finds?|found|carries?|bakes?|makes?|owns?)\s+(\d+)'
+        r'.*?'
+        r'(?:eats?|ate|gives?\s+away|gives?|gave|loses?|lost|spent|spends?|'
+        r'breaks?|broke|drops?|dropped|took\s+away|takes?\s+away|'
+        r'used|uses?|removes?|removed|throws?\s+away|threw\s+away|'
+        r'sold|sells?|shares?|shared|lends?|lent|returns?|returned)\s+(\d+)',
+        q
+    )
+    if m:
+        return int(m.group(1)) - int(m.group(2))
+
+    # --- Word problem: addition ---
+    # "has/have N ... gets/receives/finds/bought M more"
+    m = re.search(
+        r'(?:has|have|had|holds|starts?\s+with|began?\s+with|owns?)\s+(\d+)'
+        r'.*?'
+        r'(?:gets?|receives?|finds?|found|picks?\s+up|bought|buys?|'
+        r'collects?|collected|earns?|earned|wins?|won|adds?|added|'
+        r'gets?\s+back|more)\s+(\d+)',
+        q
+    )
+    if m:
+        return int(m.group(1)) + int(m.group(2))
+
+    # --- Word problem: "N things, M verb away" (reverse order) ---
+    # "There are N birds. M fly away."
+    m = re.search(
+        r'(?:there\s+(?:are|were|is)|(\w+)\s+(?:has|have|had))\s+(\d+)'
+        r'.*?'
+        r'(\d+)\s+(?:fly\s+away|flew\s+away|walk\s+away|walked\s+away|'
+        r'ran\s+away|run\s+away|leave|left|fall\s+off|fell\s+off|'
+        r'go\s+away|went\s+away|are\s+taken|were\s+taken|'
+        r'are\s+eaten|were\s+eaten|are\s+removed|were\s+removed|'
+        r'pop|popped|burst|break|broke)',
+        q
+    )
+    if m:
+        total = int(m.group(2))
+        removed = int(m.group(3))
+        return total - removed
+
     return None  # Can't determine — skip verification
 
 
@@ -375,6 +425,44 @@ def verify_explanation_vs_answer(q_data):
                 f'Explanation contradicts answer: explanation computes '
                 f'{int(final_computed) if final_computed == int(final_computed) else final_computed}, '
                 f'but stated answer is {resolved}'
+            )
+
+    return True, ''
+
+
+def verify_explanation_arithmetic(q_data):
+    """Rule 15: Verify that arithmetic expressions within the explanation are correct.
+
+    Catches cases like "4 - 2 = 3" where the LLM's own arithmetic is wrong,
+    even when the stated answer and explanation's final result agree.
+
+    Returns (is_valid, reason).
+    """
+    explanation = (q_data.get('explanation') or '').strip()
+    if not explanation:
+        return True, ''
+
+    # Normalize unicode dashes
+    explanation = _DASH_RE.sub('-', explanation)
+
+    # Find all "A op B [op C ...] = N" patterns
+    # e.g. "4 - 2 = 3", "5 + 3 + 2 = 10", "6 * 4 = 24"
+    pattern = r'(\d+(?:\s*[+\-*/×÷]\s*\d+)+)\s*=\s*(\d+(?:\.\d+)?)'
+
+    for match in re.finditer(pattern, explanation):
+        expr_str = match.group(1)
+        stated_result = float(match.group(2))
+
+        # Normalize unicode operators
+        normalized = expr_str.replace('×', '*').replace('÷', '/')
+
+        computed = _safe_eval_expr(normalized)
+        if computed is not None and abs(computed - stated_result) > 0.01:
+            computed_display = int(computed) if computed == int(computed) else computed
+            stated_display = int(stated_result) if stated_result == int(stated_result) else stated_result
+            return False, (
+                f'Explanation arithmetic error: {expr_str.strip()} = '
+                f'{computed_display}, not {stated_display}'
             )
 
     return True, ''

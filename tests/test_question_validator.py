@@ -1,6 +1,7 @@
-"""Tests for question_validator — 14 rules including math answer verification."""
+"""Tests for question_validator — 15 rules including math answer verification."""
 from engine.question_validator import (
     validate_question, verify_math_answer, verify_explanation_vs_answer,
+    verify_explanation_arithmetic,
     _try_compute_answer, _resolve_answer_text, _parse_numeric, _safe_eval_expr,
 )
 
@@ -484,11 +485,11 @@ def test_compute_unicode_minus():
 def test_compute_endash_minus():
     assert _try_compute_answer('What is 15 – 7?') == 8
 
-def test_compute_word_problem_unverifiable():
-    """Word problems without clear math expressions can't be verified."""
+def test_compute_word_problem_gives():
+    """Word problems with 'has N ... gives M' are now verifiable."""
     assert _try_compute_answer(
         'Tom has 5 apples and gives 2 to Sam. How many does he have?'
-    ) is None
+    ) == 3
 
 def test_compute_comparison_unverifiable():
     """Comparison questions can't be numerically verified."""
@@ -559,12 +560,20 @@ def test_verify_non_numeric_answer_skipped():
     )
     assert ok
 
-def test_verify_unparseable_question_skipped():
-    """Questions without extractable math — benefit of the doubt."""
+def test_verify_word_problem_correct():
+    """Word problems with extractable math are now verified."""
     ok, _ = verify_math_answer(
         _q('Tom has 5 apples. He gives 2 away. How many left?', '3')
     )
     assert ok
+
+def test_verify_word_problem_wrong():
+    """Word problems with wrong answers are now caught."""
+    ok, reason = verify_math_answer(
+        _q('Tom has 5 apples. He gives 2 away. How many left?', '4')
+    )
+    assert not ok
+    assert 'computes to 3' in reason
 
 def test_verify_missing_number_correct():
     ok, _ = verify_math_answer(_q('__ + 5 = 12', '7'))
@@ -711,3 +720,494 @@ def test_validate_full_catches_explanation_mismatch():
     )
     assert not ok
     assert 'explanation contradicts' in reason.lower()
+
+
+# === Rule 15: Verify arithmetic expressions in explanation ===
+
+def test_arith_catches_wrong_subtraction_in_explanation():
+    """THE EXACT SCREENSHOT BUG: '4 - 2 = 3' in explanation."""
+    ok, reason = verify_explanation_arithmetic(
+        _qe(explanation='Tommy starts with 4 candies and eats 2. So, 4 - 2 = 3.')
+    )
+    assert not ok
+    assert '4 - 2 = 2, not 3' in reason
+
+
+def test_arith_accepts_correct_subtraction():
+    ok, _ = verify_explanation_arithmetic(
+        _qe(explanation='4 - 2 = 2. Tommy has 2 candies left.')
+    )
+    assert ok
+
+
+def test_arith_catches_wrong_addition():
+    ok, reason = verify_explanation_arithmetic(
+        _qe(explanation='3 + 5 = 9')
+    )
+    assert not ok
+    assert '3 + 5 = 8, not 9' in reason
+
+
+def test_arith_accepts_correct_addition():
+    ok, _ = verify_explanation_arithmetic(
+        _qe(explanation='3 + 5 = 8')
+    )
+    assert ok
+
+
+def test_arith_catches_wrong_multiplication():
+    ok, reason = verify_explanation_arithmetic(
+        _qe(explanation='6 * 3 = 15')
+    )
+    assert not ok
+    assert '6 * 3 = 18, not 15' in reason
+
+
+def test_arith_catches_wrong_division():
+    ok, reason = verify_explanation_arithmetic(
+        _qe(explanation='12 / 4 = 4')
+    )
+    assert not ok
+    assert 'not 4' in reason
+
+
+def test_arith_accepts_correct_division():
+    ok, _ = verify_explanation_arithmetic(
+        _qe(explanation='12 / 4 = 3.')
+    )
+    assert ok
+
+
+def test_arith_catches_wrong_chained():
+    ok, reason = verify_explanation_arithmetic(
+        _qe(explanation='5 + 3 + 2 = 11')
+    )
+    assert not ok
+    assert '5 + 3 + 2 = 10, not 11' in reason
+
+
+def test_arith_accepts_correct_chained():
+    ok, _ = verify_explanation_arithmetic(
+        _qe(explanation='5 + 3 + 2 = 10')
+    )
+    assert ok
+
+
+def test_arith_multiple_expressions_first_wrong():
+    """If any expression is wrong, reject."""
+    ok, reason = verify_explanation_arithmetic(
+        _qe(explanation='First, 10 - 3 = 8. Then 8 - 2 = 6.')
+    )
+    assert not ok
+    assert '10 - 3 = 7, not 8' in reason
+
+
+def test_arith_multiple_expressions_all_correct():
+    ok, _ = verify_explanation_arithmetic(
+        _qe(explanation='First, 10 - 3 = 7. Then 7 - 2 = 5.')
+    )
+    assert ok
+
+
+def test_arith_no_expression_passes():
+    ok, _ = verify_explanation_arithmetic(
+        _qe(explanation='Count the apples: there are four.')
+    )
+    assert ok
+
+
+def test_arith_empty_explanation_passes():
+    ok, _ = verify_explanation_arithmetic(
+        _qe(explanation='')
+    )
+    assert ok
+
+
+def test_arith_unicode_minus():
+    """Unicode minus sign in explanation."""
+    ok, reason = verify_explanation_arithmetic(
+        _qe(explanation='8 − 3 = 6')
+    )
+    assert not ok
+    assert 'not 6' in reason
+
+
+def test_arith_catches_off_by_one():
+    """Common LLM error: off by one."""
+    ok, reason = verify_explanation_arithmetic(
+        _qe(explanation='7 - 3 = 5')
+    )
+    assert not ok
+    assert '7 - 3 = 4, not 5' in reason
+
+
+def test_arith_large_numbers():
+    ok, reason = verify_explanation_arithmetic(
+        _qe(explanation='45 + 37 = 83')
+    )
+    assert not ok
+    assert '45 + 37 = 82, not 83' in reason
+
+
+def test_arith_large_numbers_correct():
+    ok, _ = verify_explanation_arithmetic(
+        _qe(explanation='45 + 37 = 82')
+    )
+    assert ok
+
+
+# === Word problem parsing: _try_compute_answer ===
+
+def test_compute_word_has_eats():
+    """'has N ... eats M' → N - M"""
+    assert _try_compute_answer(
+        'Tommy has 4 candies, and he eats 2 of them. How many left?'
+    ) == 2
+
+
+def test_compute_word_has_gives():
+    assert _try_compute_answer(
+        'Sara has 8 stickers. She gives 3 to her friend. How many left?'
+    ) == 5
+
+
+def test_compute_word_has_gives_away():
+    assert _try_compute_answer(
+        'Tom has 10 marbles. He gives away 4. How many left?'
+    ) == 6
+
+
+def test_compute_word_has_loses():
+    assert _try_compute_answer(
+        'Jake has 7 toys. He loses 2. How many left?'
+    ) == 5
+
+
+def test_compute_word_has_lost():
+    assert _try_compute_answer(
+        'Anna had 9 coins. She lost 5. How many left?'
+    ) == 4
+
+
+def test_compute_word_has_spent():
+    assert _try_compute_answer(
+        'Mike has 15 dollars. He spent 8 on a book. How much left?'
+    ) == 7
+
+
+def test_compute_word_has_broke():
+    assert _try_compute_answer(
+        'Emma has 6 eggs. She broke 2. How many are left?'
+    ) == 4
+
+
+def test_compute_word_has_dropped():
+    assert _try_compute_answer(
+        'He has 5 balls. He dropped 1. How many left?'
+    ) == 4
+
+
+def test_compute_word_has_sold():
+    assert _try_compute_answer(
+        'She has 12 cookies. She sold 4. How many left?'
+    ) == 8
+
+
+def test_compute_word_has_used():
+    assert _try_compute_answer(
+        'James has 10 crayons. He used 3. How many left?'
+    ) == 7
+
+
+def test_compute_word_has_ate():
+    assert _try_compute_answer(
+        'Lucy has 6 candies. She ate 4. How many left?'
+    ) == 2
+
+
+def test_compute_word_has_shared():
+    assert _try_compute_answer(
+        'Ben has 8 toys. He shared 3 with his friend. How many left?'
+    ) == 5
+
+
+def test_compute_word_has_gets():
+    """'has N ... gets M' → N + M"""
+    assert _try_compute_answer(
+        'Sara has 3 stickers. She gets 5 more. How many now?'
+    ) == 8
+
+
+def test_compute_word_has_finds():
+    assert _try_compute_answer(
+        'Tom has 4 shells. He finds 3 more. How many now?'
+    ) == 7
+
+
+def test_compute_word_has_receives():
+    assert _try_compute_answer(
+        'Anna has 6 cards. She receives 4 more. How many now?'
+    ) == 10
+
+
+def test_compute_word_has_bought():
+    assert _try_compute_answer(
+        'Mike has 5 books. He bought 3 more. How many now?'
+    ) == 8
+
+
+def test_compute_word_has_earned():
+    assert _try_compute_answer(
+        'She has 10 dollars. She earned 5 more. How many now?'
+    ) == 15
+
+
+def test_compute_word_has_won():
+    assert _try_compute_answer(
+        'He has 2 trophies. He won 1 more. How many now?'
+    ) == 3
+
+
+def test_compute_word_there_are_fly_away():
+    """'There are N ... M fly away' → N - M"""
+    assert _try_compute_answer(
+        'There are 7 birds on a tree. 3 fly away. How many are left?'
+    ) == 4
+
+
+def test_compute_word_there_are_walk_away():
+    assert _try_compute_answer(
+        'There are 10 ducks. 4 walk away. How many are left?'
+    ) == 6
+
+
+def test_compute_word_there_are_fell_off():
+    assert _try_compute_answer(
+        'There are 5 apples on a tree. 2 fell off. How many left?'
+    ) == 3
+
+
+def test_compute_word_there_were_popped():
+    assert _try_compute_answer(
+        'There were 8 balloons. 3 popped. How many left?'
+    ) == 5
+
+
+def test_compute_word_there_are_left():
+    assert _try_compute_answer(
+        'There are 9 children. 4 left. How many remain?'
+    ) == 5
+
+
+def test_compute_word_problem_still_unverifiable():
+    """Complex word problems without matching patterns are still skipped."""
+    assert _try_compute_answer(
+        'A train travels at 60 km/h. How far does it go in 2 hours?'
+    ) is None
+
+
+def test_compute_word_problem_no_action_verb():
+    """No recognizable action verb — can't parse."""
+    assert _try_compute_answer(
+        'A box contains 5 red and 3 blue balls. How many balls total?'
+    ) is None
+
+
+# === THE SCREENSHOT BUG: Full integration test ===
+
+def test_screenshot_bug_caught_by_rule13():
+    """The exact bug: 'has 4 candies, eats 2' with answer=3. Rule 13 catches it."""
+    ok, reason = verify_math_answer({
+        'question': 'Tommy has 4 candies, and he eats 2 of them. How many candies does Tommy have left?',
+        'correct_answer': 'C) 3',
+        'options': ['A) 1', 'B) 4', 'C) 3', 'D) 2'],
+    })
+    assert not ok
+    assert 'computes to 2' in reason
+
+
+def test_screenshot_bug_caught_by_rule15():
+    """The exact bug: explanation '4 - 2 = 3'. Rule 15 catches it."""
+    ok, reason = verify_explanation_arithmetic({
+        'question': 'Tommy has 4 candies, and he eats 2 of them. How many candies does Tommy have left?',
+        'correct_answer': 'C) 3',
+        'options': ['A) 1', 'B) 4', 'C) 3', 'D) 2'],
+        'explanation': 'Tommy starts with 4 candies and eats 2. So, 4 - 2 = 3. Tommy has 3 candies left.',
+    })
+    assert not ok
+    assert '4 - 2 = 2, not 3' in reason
+
+
+def test_screenshot_bug_validate_question_rejects():
+    """Full validation: the exact screenshot bug is rejected."""
+    ok, reason = validate_question({
+        'question': 'Tommy has 4 candies, and he eats 2 of them. How many candies does Tommy have left?',
+        'correct_answer': 'C) 3',
+        'options': ['A) 1', 'B) 4', 'C) 3', 'D) 2'],
+        'explanation': 'Tommy starts with 4 candies and eats 2. So, 4 - 2 = 3. Tommy has 3 candies left.',
+    })
+    assert not ok
+
+
+def test_screenshot_bug_correct_version_accepted():
+    """Same question with correct answer=2 passes all rules."""
+    ok, _ = validate_question({
+        'question': 'Tommy has 4 candies, and he eats 2 of them. How many candies does Tommy have left?',
+        'correct_answer': 'D) 2',
+        'options': ['A) 1', 'B) 4', 'C) 3', 'D) 2'],
+        'explanation': 'Tommy starts with 4 candies and eats 2. So, 4 - 2 = 2. Tommy has 2 candies left.',
+    })
+    assert ok
+
+
+# === Consistently wrong explanation + answer (the gap Rule 15 fills) ===
+
+def test_consistent_wrong_explanation_and_answer_caught():
+    """When explanation says '6 - 3 = 4' and answer is 4, Rule 14 passes but Rule 15 catches it."""
+    q = _qe(
+        question='Amy has 6 apples. She gives 3 away. How many left?',
+        correct_answer='B) 4',
+        options=['A) 2', 'B) 4', 'C) 3', 'D) 5'],
+        explanation='Amy has 6 apples and gives 3 away. 6 - 3 = 4. She has 4 left.',
+    )
+    # Rule 14 passes (explanation final = 4, answer = 4)
+    ok14, _ = verify_explanation_vs_answer(q)
+    assert ok14  # This is the gap!
+
+    # Rule 15 catches it (6 - 3 = 3, not 4)
+    ok15, reason = verify_explanation_arithmetic(q)
+    assert not ok15
+    assert '6 - 3 = 3, not 4' in reason
+
+
+def test_consistent_wrong_addition():
+    """'3 + 4 = 8' with answer 8 — consistently wrong."""
+    q = _qe(
+        question='Sam has 3 red balls and 4 blue balls. How many total?',
+        correct_answer='8',
+        explanation='3 + 4 = 8',
+    )
+    ok15, reason = verify_explanation_arithmetic(q)
+    assert not ok15
+    assert '3 + 4 = 7, not 8' in reason
+
+
+def test_consistent_wrong_off_by_one():
+    """Common LLM error: 9 - 5 = 3 with answer 3."""
+    q = _qe(
+        question='Lisa has 9 stickers. She uses 5. How many left?',
+        correct_answer='3',
+        explanation='Lisa uses 5 of her 9 stickers. 9 - 5 = 3.',
+    )
+    ok15, reason = verify_explanation_arithmetic(q)
+    assert not ok15
+    assert '9 - 5 = 4, not 3' in reason
+
+
+# === Edge cases for Rule 15 ===
+
+def test_arith_decimal_result():
+    """10 / 4 = 2.5 should pass."""
+    ok, _ = verify_explanation_arithmetic(
+        _qe(explanation='10 / 4 = 2.5')
+    )
+    assert ok
+
+
+def test_arith_explanation_with_text_around():
+    """Arithmetic buried in prose should still be checked."""
+    ok, reason = verify_explanation_arithmetic(
+        _qe(explanation='We know that when you have 8 items and take away 3, you get 8 - 3 = 6 items remaining.')
+    )
+    assert not ok
+    assert '8 - 3 = 5, not 6' in reason
+
+
+def test_arith_does_not_false_positive_on_equations():
+    """'x = 5' or standalone '= 5' should not trigger false positives."""
+    ok, _ = verify_explanation_arithmetic(
+        _qe(explanation='The answer is = 5. So we have 5 items.')
+    )
+    assert ok
+
+
+def test_arith_mixed_correct_and_no_expr():
+    ok, _ = verify_explanation_arithmetic(
+        _qe(explanation='Count: 2 + 3 = 5. Five items total.')
+    )
+    assert ok
+
+
+# === Word problem edge cases ===
+
+def test_compute_word_starts_with():
+    assert _try_compute_answer(
+        'Sam starts with 10 coins. He spent 4 coins. How many left?'
+    ) == 6
+
+
+def test_compute_word_had_gave():
+    assert _try_compute_answer(
+        'She had 8 flowers. She gave 5 away. How many left?'
+    ) == 3
+
+
+def test_compute_word_bakes_gives():
+    assert _try_compute_answer(
+        'Mom bakes 12 cookies. She gives 7 to neighbors. How many left?'
+    ) == 5
+
+
+def test_compute_word_makes_uses():
+    assert _try_compute_answer(
+        'He makes 9 sandwiches. He uses 3. How many left?'
+    ) == 6
+
+
+def test_compute_word_picks_up_loses():
+    assert _try_compute_answer(
+        'She picks up 6 rocks. She loses 2 on the way. How many left?'
+    ) == 4
+
+
+# === Full validate_question: word problems with wrong answers ===
+
+def test_validate_word_problem_wrong_answer_rejected():
+    """Word problem with wrong MCQ answer is rejected."""
+    ok, reason = validate_question({
+        'question': 'Sara has 8 stickers. She gives 3 away. How many left?',
+        'correct_answer': 'C) 6',
+        'options': ['A) 3', 'B) 4', 'C) 6', 'D) 5'],
+        'explanation': '8 - 3 = 6.',
+    })
+    assert not ok
+
+
+def test_validate_word_problem_correct_answer_accepted():
+    ok, _ = validate_question({
+        'question': 'Sara has 8 stickers. She gives 3 away. How many left?',
+        'correct_answer': 'D) 5',
+        'options': ['A) 3', 'B) 4', 'C) 6', 'D) 5'],
+        'explanation': '8 - 3 = 5. Sara has 5 stickers left.',
+    })
+    assert ok
+
+
+def test_validate_addition_word_problem_wrong():
+    ok, reason = validate_question({
+        'question': 'Tom has 4 shells. He finds 3 more. How many now?',
+        'correct_answer': 'A) 8',
+        'options': ['A) 8', 'B) 7', 'C) 6', 'D) 1'],
+        'explanation': '4 + 3 = 8.',
+    })
+    assert not ok
+
+
+def test_validate_addition_word_problem_correct():
+    ok, _ = validate_question({
+        'question': 'Tom has 4 shells. He finds 3 more. How many now?',
+        'correct_answer': 'B) 7',
+        'options': ['A) 8', 'B) 7', 'C) 6', 'D) 1'],
+        'explanation': '4 + 3 = 7.',
+    })
+    assert ok

@@ -1,6 +1,8 @@
 """Session routes — the core learning loop."""
+import logging
+
 from flask import (Blueprint, render_template, request, redirect,
-                   url_for, session as flask_session)
+                   url_for, session as flask_session, jsonify)
 
 from models import student as student_model
 from models import session as session_model
@@ -10,6 +12,7 @@ from models import curriculum_node as node_model
 from services import question_service, answer_service
 from engine import elo
 
+logger = logging.getLogger(__name__)
 session_bp = Blueprint('session', __name__)
 
 
@@ -136,7 +139,12 @@ def answer(session_id):
 
     if result['is_correct']:
         flask_session['last_result'] = result
-        question_service.generate_next(session_id, student, sess['topic_id'])
+        # Try pre-cached question first, fall back to fresh generation
+        cached = question_service.pop_cached(student['id'], session_id)
+        if cached:
+            flask_session['current_question'] = cached
+        else:
+            question_service.generate_next(session_id, student, sess['topic_id'])
         return redirect(url_for('session.question', session_id=session_id))
 
     flask_session['last_result'] = result
@@ -190,7 +198,12 @@ def next_question(session_id):
         return redirect(url_for('home.index'))
     student = student_model.get_by_id(sess['student_id'])
 
-    question_service.generate_next(session_id, student, sess['topic_id'])
+    # Try pre-cached question first
+    cached = question_service.pop_cached(student['id'], session_id)
+    if cached:
+        flask_session['current_question'] = cached
+    else:
+        question_service.generate_next(session_id, student, sess['topic_id'])
     return redirect(url_for('session.question', session_id=session_id))
 
 
@@ -239,3 +252,19 @@ def end(session_id):
         accuracy=accuracy,
         skills_practiced=skills_practiced,
     )
+
+
+@session_bp.route('/<session_id>/precache', methods=['POST'])
+def precache(session_id):
+    """Pre-generate the next question in the background while student thinks."""
+    sess = session_model.get_by_id(session_id)
+    if not sess:
+        return '', 204
+    student = student_model.get_by_id(sess['student_id'])
+    if not student:
+        return '', 204
+    try:
+        question_service.precache_next(session_id, student, sess['topic_id'])
+    except Exception as e:
+        logger.warning('Precache failed for session %s: %s', session_id, e)
+    return '', 204

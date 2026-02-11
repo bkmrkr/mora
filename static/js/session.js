@@ -36,4 +36,15 @@ document.addEventListener('DOMContentLoaded', function() {
     if (input) {
         input.focus();
     }
+
+    // Pre-cache next question while student thinks
+    if (form) {
+        const action = form.getAttribute('action') || '';
+        const match = action.match(/\/session\/([^/]+)\/answer/);
+        if (match) {
+            const sessionId = match[1];
+            fetch('/session/' + sessionId + '/precache', {method: 'POST'})
+                .catch(function() {}); // fire-and-forget
+        }
+    }
 });

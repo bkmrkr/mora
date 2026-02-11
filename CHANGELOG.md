@@ -26,7 +26,12 @@
 - 72 new tests for math verifier + explanation cross-check (175 total, was 103)
 - Show original question text on the wrong-answer feedback page
 
+### Added
+- Question pre-caching: JS fires async POST to `/precache` on page load, server pre-generates next question while student thinks — eliminates 1-3s wait between questions
+- 10 unit tests for cache behavior (pop_cached empty/hit/miss, node match/mismatch, overwrites, wrong student/session)
+
 ### Changed
+- Enabled threaded mode in Flask dev server for concurrent precache + answer requests
 - Increased max_generation_attempts from 2 to 3 — more retries since math verification rejects more bad questions
 - Switched default model from qwen3:4b to qwen2.5 — qwen3's thinking mode generates thousands of invisible tokens (22s/question), qwen2.5 responds in <1s with valid JSON
 - Removed ineffective /no_think prompt hack, added think:false API parameter as safety net for thinking-capable models

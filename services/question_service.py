@@ -1,6 +1,7 @@
-"""Question generation orchestrator with validation and dedup."""
+"""Question generation orchestrator with validation, dedup, and pre-caching."""
 import json
 import logging
+import threading
 
 from flask import session as flask_session
 
@@ -18,8 +19,41 @@ from config.settings import SESSION_DEFAULTS
 
 logger = logging.getLogger(__name__)
 
+# Pre-cache: one question per (student_id, session_id)
+_precache = {}
+_precache_lock = threading.Lock()
 
-def generate_next(session_id, student, topic_id):
+
+def pop_cached(student_id, session_id, expected_node_id=None):
+    """Return and remove a pre-cached question if available and node matches.
+
+    Returns question_dict or None.
+    """
+    key = (student_id, session_id)
+    with _precache_lock:
+        cached = _precache.pop(key, None)
+    if cached is None:
+        return None
+    if expected_node_id is not None and cached.get('node_id') != expected_node_id:
+        logger.info('Pre-cache miss: node changed (%s → %s)', cached.get('node_id'), expected_node_id)
+        return None
+    logger.info('Pre-cache hit for student %d session %s', student_id, session_id)
+    return cached
+
+
+def precache_next(session_id, student, topic_id):
+    """Pre-generate and cache the next question (called from background request)."""
+    question_dict = generate_next(session_id, student, topic_id, store_in_session=False)
+    if question_dict:
+        key = (student['id'], session_id)
+        with _precache_lock:
+            _precache[key] = question_dict
+        logger.info('Pre-cached question for student %d session %s (node: %s)',
+                     student['id'], session_id, question_dict.get('node_name'))
+    return question_dict
+
+
+def generate_next(session_id, student, topic_id, store_in_session=True):
     """Select focus node, compute difficulty, generate question.
 
     Three dedup layers (from kidtutor):
@@ -29,7 +63,8 @@ def generate_next(session_id, student, topic_id):
 
     Post-generation validation rejects bad LLM output and retries.
 
-    Stores question in flask_session['current_question'].
+    When store_in_session=True, stores in flask_session['current_question'].
+    When False (pre-caching), skips session writes.
     Returns question_dict or None.
     """
     student_id = student['id']
@@ -46,21 +81,25 @@ def generate_next(session_id, student, topic_id):
     # Get curriculum nodes for this topic
     nodes = node_model.get_for_topic(topic_id)
     if not nodes:
-        flask_session['current_question'] = None
+        if store_in_session:
+            flask_session['current_question'] = None
         return None
 
     # Analyze recent history
     analysis = nq_engine.analyze_recent(recent_attempts, all_skills)
 
     # Select focus node
-    current_q = flask_session.get('current_question')
-    current_node_id = current_q.get('node_id') if current_q else None
+    current_node_id = None
+    if store_in_session:
+        current_q = flask_session.get('current_question')
+        current_node_id = current_q.get('node_id') if current_q else None
     focus_node_id = nq_engine.select_focus_node(
         analysis, nodes, all_skills, current_node_id
     )
 
     if focus_node_id is None:
-        flask_session['current_question'] = None
+        if store_in_session:
+            flask_session['current_question'] = None
         return None
 
     focus_node = node_model.get_by_id(focus_node_id)
@@ -143,7 +182,8 @@ def generate_next(session_id, student, topic_id):
             break
 
     if not q_data:
-        flask_session['current_question'] = None
+        if store_in_session:
+            flask_session['current_question'] = None
         return None
 
     # Store question in DB
@@ -182,5 +222,6 @@ def generate_next(session_id, student, topic_id):
         'p_correct': round(p_correct * 100),
         'clock_svg': q_data.get('clock_svg'),
     }
-    flask_session['current_question'] = question_dict
+    if store_in_session:
+        flask_session['current_question'] = question_dict
     return question_dict

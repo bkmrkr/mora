@@ -184,9 +184,17 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
     )
 
     # --- Dedup layers ---
-    # Layer 1: Session dedup — all question texts in this session
+    # Layer 1: Session dedup — all question texts in this session (answered)
     session_attempts = attempt_model.get_for_session(session_id)
     session_texts = {a['content'] for a in session_attempts if a.get('content')}
+
+    # Also include the current unanswered question (not yet in attempts).
+    # Critical for precache: prevents generating a duplicate of the active question.
+    sess = session_model.get_by_id(session_id)
+    if sess and sess.get('current_question_id'):
+        current_q_row = question_model.get_by_id(sess['current_question_id'])
+        if current_q_row and current_q_row.get('content'):
+            session_texts.add(current_q_row['content'])
 
     # Layer 2: Global dedup — all correctly-answered question texts (lifetime)
     global_correct_texts = attempt_model.get_correct_texts(student_id)

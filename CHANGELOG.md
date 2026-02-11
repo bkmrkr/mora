@@ -56,7 +56,16 @@
 - Enhanced LLM system prompt with 14 strict rules (from kidtutor): difficulty matching, single correct answer, no placeholder text, no banned choices, concise answers, punctuation requirements
 - Rewrote spec.md to match implemented code — plain language only, no code snippets, covers all algorithms, data model, user flow, and frontend details
 
+### Added
+- Variety-first node selection: never repeat same curriculum node twice in a row, score candidates by need (low mastery), recency (not seen recently), and virgin bonus (new topics)
+- Soft prerequisites: nodes accessible after 2 attempts on prerequisite (not just mastery)
+- Visual-required node skip: 6 curriculum nodes disabled that need physical objects/images/charts
+- Visual context detection (Rule 6b): rejects LLM questions containing phrases like "which is longer", "look at the picture", "use the graph"
+
 ### Fixed
+- **Duplicate questions bug**: after wrong answer with no precached question, `flask_session['current_question']` was not cleared — same question served repeatedly in a loop. Fix: explicitly clear question state after every answer, before setting the next one.
+- Dedup strengthened: session exclude set now includes the current unanswered question (critical for precache path)
+- 22 new dedup tests: session state clearing, dedup set construction, current question inclusion, consecutive duplicate detection, global dedup isolation, wrong-path regression tests (330 total)
 - Feedback template referenced wrong route name (`session.next` → `session.next_question`)
 - MCQ options displayed doubled letter prefix (added `strip_letter` Jinja2 filter)
 - MCQ answer matching failed when LLM returned letter ("B") but student submitted text ("6") or vice versa — added text↔letter resolution using options list (6 new tests)

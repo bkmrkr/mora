@@ -177,6 +177,11 @@ def answer(session_id):
     flask_session['last_result'] = result
     session_model.update_last_result(session_id, json.dumps(result))
 
+    # Clear the answered question — it must never be served again.
+    # Without this, wrong-path with no cache would re-serve the same question.
+    flask_session.pop('current_question', None)
+    session_model.update_current_question(session_id, None)
+
     # Try pre-cached question for the actual outcome
     cached = question_service.pop_cached(
         student['id'], session_id, is_correct=result['is_correct'],

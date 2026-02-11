@@ -9,17 +9,19 @@ from config.settings import OLLAMA_BASE_URL, OLLAMA_MODEL
 logger = logging.getLogger(__name__)
 
 
-def ask(system_prompt, user_prompt, max_tokens=2048, temperature=0.7):
+def ask(system_prompt, user_prompt, max_tokens=8192, temperature=0.7):
     """Send a chat completion request to Ollama.
 
     Returns (response_text, model_used, full_prompt).
     """
+    # Append /no_think to disable qwen3's thinking mode — saves tokens and latency
+    user_prompt_final = user_prompt + "\n/no_think"
     full_prompt = f"SYSTEM: {system_prompt}\n\nUSER: {user_prompt}"
     data = json.dumps({
         'model': OLLAMA_MODEL,
         'messages': [
             {'role': 'system', 'content': system_prompt},
-            {'role': 'user', 'content': user_prompt},
+            {'role': 'user', 'content': user_prompt_final},
         ],
         'stream': False,
         'keep_alive': '30m',

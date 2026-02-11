@@ -70,7 +70,20 @@ def question(session_id):
     student = student_model.get_by_id(sess['student_id'])
     current = flask_session.get('current_question')
     if not current:
-        return redirect(url_for('session.end', session_id=session_id))
+        # Always retry — sessions never auto-end
+        question_service.generate_next(session_id, student, sess['topic_id'])
+        current = flask_session.get('current_question')
+    if not current:
+        # Generation failed twice — show retry page, not end
+        topic_mastery = _compute_topic_mastery(student['id'], sess['topic_id'])
+        topic_progress = _get_topic_progress(student['id'], sess['topic_id'])
+        session_stats = _get_session_stats(session_id)
+        return render_template(
+            'session/retry.html',
+            session_id=session_id, student=student,
+            topic_mastery=topic_mastery, topic_progress=topic_progress,
+            session_stats=session_stats,
+        )
 
     topic_mastery = _compute_topic_mastery(student['id'], sess['topic_id'])
     last_result = flask_session.get('last_result')

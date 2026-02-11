@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Mora — Generating Question{% endblock %}
+{% block content %}
+<div class="session-top-bar">
+    <span class="student-name">{{ student.name }}</span>
+    <div class="topic-mastery-display">
+        <span class="mastery-pct">{{ topic_mastery }}%</span>
+        <div class="mastery-bar">
+            <div class="mastery-fill {% if topic_mastery >= 75 %}mastered{% endif %}"
+                 style="width: {{ topic_mastery }}%"></div>
+        </div>
+        <span class="mastery-label">Topic Mastery</span>
+    </div>
+    {% if session_stats and session_stats.total > 0 %}
+    <span class="session-stat">{{ session_stats.correct }}/{{ session_stats.total }} ({{ session_stats.accuracy }}%)</span>
+    {% endif %}
+</div>
+
+<div class="question-card" style="text-align: center; padding: 3rem;">
+    <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">Question generation is taking a moment. Click below to try again.</p>
+    <a href="{{ url_for('session.question', session_id=session_id) }}" class="btn btn-primary">Generate Next Question</a>
+</div>
+{% endblock %}

@@ -165,7 +165,7 @@ def generate_next(session_id, student, topic_id):
     )
 
     # Compute difficulty score (1-10) for display
-    norm_diff = max(0.0, min(1.0, (target_diff - 600) / 800))
+    norm_diff = max(0.0, min(1.0, (target_diff - 500) / 600))
     difficulty_score = round(norm_diff * 9) + 1
 
     question_dict = {

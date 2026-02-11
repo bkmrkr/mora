@@ -19,6 +19,8 @@
 - 1st Grade Math curriculum seed script (`scripts/seed_1st_grade_math.py`) with 31 nodes across 5 domains (OA, NBT, Measurement, Data, Geometry), full prerequisite chains, NJ standards-aligned
 
 ### Changed
+- Aggressive difficulty ramp-up: base K-factor 32→48, 2x streak bonus after 3+ consecutive correct, calibration 5x more aggressive, global streak/accuracy used across nodes (not just per-node), warm-start new nodes from student's proven level, faster node advancement (3 correct at 85%+ = move on)
+- Tighter difficulty display scale (500-1100 ELO → 1-10) so progress is visible sooner — also makes LLM generate harder questions earlier
 - Result card shows score delta (+3.9 green / -16.3 red) and topic progress delta after each answer
 - Lowered initial skill rating from 1000 to 800 — students start with easiest questions, no prior knowledge assumed
 - Raised initial uncertainty from 300 to 350 — faster skill adaptation in early questions

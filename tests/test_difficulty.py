@@ -30,8 +30,8 @@ def test_at_target_no_change():
 
 
 def test_adjustment_magnitude():
-    """10% off target ≈ 10 points adjustment."""
+    """10% off target ≈ 50 points adjustment (aggressive ramp)."""
     results = [True] * 9 + [False] * 1  # 90%
     d = calibrate_from_recent(800, results)
-    # 90% - 80% = 10% -> ~10 point increase
-    assert abs(d - 810) < 1
+    # 90% - 80% = 10% -> ~50 point increase
+    assert abs(d - 850) < 1

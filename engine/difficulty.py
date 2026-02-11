@@ -21,7 +21,8 @@ def calibrate_from_recent(base_target_difficulty, recent_results,
 
     recent_accuracy = sum(recent_results) / len(recent_results)
     error = recent_accuracy - target
-    # Scale: 10% off target → ~10 ELO points adjustment
-    adjustment = error * 100
+    # Scale: 20% off target (100% vs 80%) → 100 ELO points adjustment.
+    # Aggressive so the system finds the student's level within ~10 questions.
+    adjustment = error * 500
 
     return base_target_difficulty + adjustment

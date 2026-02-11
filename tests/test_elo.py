@@ -100,3 +100,19 @@ def test_update_returns_tuple():
     assert len(result) == 2
     assert isinstance(result[0], float)
     assert isinstance(result[1], float)
+
+
+def test_streak_bonus_doubles_k():
+    """With streak >= 3 and high uncertainty, rating should jump ~2x more."""
+    no_streak, _ = update_skill(800, 300, 559, True, base_k=48, initial_uncertainty=350)
+    with_streak, _ = update_skill(800, 300, 559, True, base_k=48, initial_uncertainty=350, streak=5)
+    delta_no = no_streak - 800
+    delta_yes = with_streak - 800
+    assert delta_yes > delta_no * 1.8  # ~2x with streak
+
+
+def test_streak_no_bonus_low_uncertainty():
+    """Streak bonus should not apply when uncertainty is low (student is calibrated)."""
+    no_streak, _ = update_skill(1000, 100, 800, True, base_k=48, initial_uncertainty=350)
+    with_streak, _ = update_skill(1000, 100, 800, True, base_k=48, initial_uncertainty=350, streak=5)
+    assert abs(no_streak - with_streak) < 0.01

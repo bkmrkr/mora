@@ -38,14 +38,25 @@ def compute_k_factor(uncertainty,
 
 def update_skill(skill_rating, uncertainty, difficulty, is_correct,
                  base_k=ELO_DEFAULTS['base_k_factor'],
-                 initial_uncertainty=ELO_DEFAULTS['initial_uncertainty']):
+                 initial_uncertainty=ELO_DEFAULTS['initial_uncertainty'],
+                 streak=0):
     """Update skill_rating and uncertainty after an attempt.
+
+    Args:
+        streak: number of consecutive correct answers on this node.
+            When >= 3 and uncertainty is still high, K is doubled for
+            faster ramp-up.
 
     Returns (new_skill_rating, new_uncertainty).
     """
     expected = p_correct(skill_rating, difficulty)
     actual = 1.0 if is_correct else 0.0
     k = compute_k_factor(uncertainty, base_k, initial_uncertainty)
+
+    # Streak bonus: when student is clearly above current level, ramp faster.
+    # Only applies when still uncertain (early assessment phase).
+    if streak >= 3 and uncertainty > 150:
+        k *= 2.0
 
     delta = k * (actual - expected)
     new_rating = skill_rating + delta

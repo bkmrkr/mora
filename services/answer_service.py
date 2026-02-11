@@ -43,12 +43,23 @@ def process_answer(student, current_question, student_answer,
 
     # Update ELO
     skill = skill_model.get(student_id, node_id)
+
+    # Compute global streak for fast ramp-up (across all nodes, not just current)
+    all_recent = attempt_model.get_recent(student_id, limit=30)
+    streak = 0
+    for a in all_recent:
+        if a['is_correct']:
+            streak += 1
+        else:
+            break
+
     new_rating, new_uncertainty = elo.update_skill(
         skill['skill_rating'], skill['uncertainty'],
         current_question['difficulty'], is_correct,
+        streak=streak,
     )
 
-    # Compute mastery from recent accuracy
+    # Compute mastery from recent accuracy on this specific node
     recent = attempt_model.get_recent_for_node(student_id, node_id, limit=30)
     recent_results = [bool(a['is_correct']) for a in recent] + [is_correct]
     recent_accuracy = sum(recent_results) / len(recent_results)

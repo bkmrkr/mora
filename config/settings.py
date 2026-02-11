@@ -15,7 +15,7 @@ OLLAMA_MODEL = os.environ.get('OLLAMA_MODEL', 'qwen3:4b')
 ELO_DEFAULTS = {
     'initial_skill_rating': 800.0,
     'initial_uncertainty': 350.0,
-    'base_k_factor': 32.0,
+    'base_k_factor': 48.0,
     'mastery_threshold': 0.75,
 }
 

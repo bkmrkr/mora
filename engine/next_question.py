@@ -95,6 +95,15 @@ def select_focus_node(recent_analysis, curriculum_nodes, student_skills,
 
         if node_stats:
             acc = node_stats['accuracy']
+            count = node_stats['count']
+
+            # Fast advance: if acing it (85%+) after 3+ attempts, move on.
+            # Don't waste time on stuff the student clearly knows.
+            if count >= 3 and acc >= 0.85:
+                next_node = _next_in_order(curriculum_nodes, current_node_id, student_skills)
+                if next_node:
+                    return next_node
+
             # Sweet spot: keep going
             if 0.60 <= acc <= 0.90 and not elo.is_mastered(mastery):
                 return current_node_id
@@ -149,14 +158,32 @@ def compute_question_params(focus_node_id, student_skills, recent_analysis):
     Returns (target_difficulty, question_type).
     """
     skill = student_skills.get(focus_node_id, {})
-    skill_rating = skill.get('skill_rating', 1000.0)
+    total_attempts = skill.get('total_attempts', 0)
+
+    # Warm-start: for untouched nodes, use the student's proven level
+    # from other nodes instead of the default 800. This prevents
+    # resetting to easy questions when advancing through topics.
+    if total_attempts == 0:
+        rated = [s['skill_rating'] for s in student_skills.values()
+                 if s.get('total_attempts', 0) >= 3]
+        skill_rating = sum(rated) / len(rated) if rated else skill.get('skill_rating', 800.0)
+    else:
+        skill_rating = skill.get('skill_rating', 800.0)
 
     base_target = elo.target_difficulty(skill_rating)
 
-    # Adjust based on recent performance on this node
+    # Adjust based on recent performance.
+    # Prefer per-node stats, but fall back to overall accuracy when
+    # per-node data is insufficient (e.g., just advanced to a new node).
     node_stats = recent_analysis.get('per_node', {}).get(focus_node_id)
-    if node_stats and node_stats['results']:
+    if node_stats and len(node_stats['results']) >= 3:
         adjusted = calibrate_from_recent(base_target, node_stats['results'])
+    elif recent_analysis.get('total_attempts', 0) >= 3:
+        # Use all recent results across nodes for calibration
+        all_results = []
+        for ns in recent_analysis['per_node'].values():
+            all_results.extend(ns['results'])
+        adjusted = calibrate_from_recent(base_target, all_results)
     else:
         adjusted = base_target
 

@@ -47,7 +47,7 @@ def generate(node_name, node_description, topic_name, skill_description,
     Returns (question_dict, model_used, prompt_used).
     """
     # Map ELO difficulty to 0-1 scale for the prompt
-    norm_difficulty = max(0.0, min(1.0, (target_difficulty_elo - 600) / 800))
+    norm_difficulty = max(0.0, min(1.0, (target_difficulty_elo - 500) / 600))
 
     recent_str = "\n".join(f"- {q}" for q in (recent_questions or [])[:20]) or "None"
 

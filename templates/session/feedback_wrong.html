@@ -24,6 +24,13 @@
         <p class="encouragement">{{ explanation.encouragement }}</p>
         {% endif %}
 
+        {% if question and question.content %}
+        <div class="original-question">
+            <span class="label">Question:</span>
+            <span class="value">{{ question.content }}</span>
+        </div>
+        {% endif %}
+
         <div class="answer-comparison">
             <div class="answer-row">
                 <span class="label">Your answer:</span>

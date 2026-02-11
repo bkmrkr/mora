@@ -23,6 +23,7 @@
 - Supports 15+ question patterns: direct expressions (5+3), word operations (5 plus 3), phrased patterns (7 less than 15, subtract 3 from 10, sum of 6 and 8), missing number equations (__ + 5 = 12), three addends, unicode dash variants
 - MCQ answer resolution: resolves letter answers (D) to option text (9) before verification
 - 63 new tests for math verifier (166 total, was 103)
+- Show original question text on the wrong-answer feedback page
 
 ### Changed
 - Increased max_generation_attempts from 2 to 3 — more retries since math verification rejects more bad questions

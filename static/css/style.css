@@ -461,6 +461,19 @@ body {
     font-style: italic;
     margin-bottom: 1rem;
 }
+.original-question {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+.original-question .label {
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-right: 0.5rem;
+}
 .answer-comparison {
     background: var(--bg);
     border-radius: 8px;

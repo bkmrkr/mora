@@ -18,7 +18,14 @@
 - Global dedup model function `attempt.get_correct_texts()` for lifetime correct-answer tracking
 - 1st Grade Math curriculum seed script (`scripts/seed_1st_grade_math.py`) with 31 nodes across 5 domains (OA, NBT, Measurement, Data, Geometry), full prerequisite chains, NJ standards-aligned
 
+### Added
+- Math answer verification (Rule 13): independently computes the correct answer for arithmetic questions and rejects LLM-generated questions where the answer is wrong — catches bugs like "7 less than 15 = 9" (should be 8)
+- Supports 15+ question patterns: direct expressions (5+3), word operations (5 plus 3), phrased patterns (7 less than 15, subtract 3 from 10, sum of 6 and 8), missing number equations (__ + 5 = 12), three addends, unicode dash variants
+- MCQ answer resolution: resolves letter answers (D) to option text (9) before verification
+- 63 new tests for math verifier (166 total, was 103)
+
 ### Changed
+- Increased max_generation_attempts from 2 to 3 — more retries since math verification rejects more bad questions
 - Switched default model from qwen3:4b to qwen2.5 — qwen3's thinking mode generates thousands of invisible tokens (22s/question), qwen2.5 responds in <1s with valid JSON
 - Removed ineffective /no_think prompt hack, added think:false API parameter as safety net for thinking-capable models
 - Aggressive difficulty ramp-up: base K-factor 32→48, 2x streak bonus after 3+ consecutive correct, calibration 5x more aggressive, global streak/accuracy used across nodes (not just per-node), warm-start new nodes from student's proven level, faster node advancement (3 correct at 85%+ = move on)

@@ -29,5 +29,5 @@ DIFFICULTY_DEFAULTS = {
 # Session defaults
 SESSION_DEFAULTS = {
     'target_success_rate': 0.80,
-    'max_generation_attempts': 2,
+    'max_generation_attempts': 3,
 }

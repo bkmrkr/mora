@@ -1,8 +1,9 @@
-"""Post-generation question validation — ported from kidtutor.
+"""Post-generation question validation — ported from kidtutor + math verifier.
 
-11 rules that catch bad LLM output before it reaches the student.
+13 rules that catch bad LLM output before it reaches the student.
 Returns (is_valid, rejection_reason) tuple.
 """
+import ast
 import re
 
 MAX_ANSWER_LENGTH = 200
@@ -126,6 +127,215 @@ def validate_question(q_data, node_description=''):
     has_imperative = first_word in IMPERATIVE_VERBS
     if not (has_punctuation or has_blank or has_imperative):
         return False, 'Question lacks punctuation or imperative verb'
+
+    # Rule 13: Mathematical answer verification
+    math_ok, math_reason = verify_math_answer(q_data)
+    if not math_ok:
+        return False, math_reason
+
+    return True, ''
+
+
+# ---------------------------------------------------------------------------
+# Rule 13 helpers: Mathematical answer verification
+# ---------------------------------------------------------------------------
+
+def _safe_eval_expr(expr):
+    """Safely evaluate a simple arithmetic expression using AST.
+
+    Only allows integer/float literals and +, -, *, / operators.
+    Returns a number or None if the expression is unsafe or invalid.
+    """
+    allowed_chars = set('0123456789+-*/ .')
+    if not all(c in allowed_chars for c in expr):
+        return None
+    try:
+        tree = ast.parse(expr.strip(), mode='eval')
+    except SyntaxError:
+        return None
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Expression, ast.BinOp, ast.UnaryOp)):
+            continue
+        if isinstance(node, (ast.Add, ast.Sub, ast.Mult, ast.Div, ast.USub)):
+            continue
+        if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+            continue
+        return None  # disallowed node type
+    try:
+        return eval(compile(tree, '<expr>', 'eval'))
+    except (ZeroDivisionError, OverflowError):
+        return None
+
+
+# Unicode dash variants: hyphen-minus, minus sign, en-dash, em-dash
+_DASH_RE = re.compile(r'[−–—]')
+
+
+def _try_compute_answer(question_text):
+    """Try to extract and compute the mathematical answer from a question.
+
+    Returns a number if the question contains a verifiable expression,
+    or None if the question can't be parsed (benefit of the doubt).
+    """
+    q = _DASH_RE.sub('-', question_text.lower().strip())
+
+    # Skip comparison questions — they pick between values, not compute
+    if any(w in q for w in ('which is bigger', 'which is larger',
+                             'which is smaller', 'which is greater',
+                             'which is less', 'which is more',
+                             'compare', 'order')):
+        return None
+
+    # --- Direct arithmetic expressions ---
+    # "5 + 3", "15 - 7", "5 + 3 + 2", "8 * 4", "12 / 3"
+    expr_match = re.search(r'(\d+(?:\s*[+\-*/]\s*\d+)+)', q)
+    if expr_match:
+        result = _safe_eval_expr(expr_match.group(1))
+        if result is not None:
+            return result
+
+    # --- Word-based operations ---
+    # "A plus B [plus C]"
+    m = re.search(r'(\d+)\s+plus\s+(\d+)(?:\s+plus\s+(\d+))?', q)
+    if m:
+        nums = [int(g) for g in m.groups() if g is not None]
+        return sum(nums)
+
+    # "A minus B"
+    m = re.search(r'(\d+)\s+minus\s+(\d+)', q)
+    if m:
+        return int(m.group(1)) - int(m.group(2))
+
+    # "A times B"
+    m = re.search(r'(\d+)\s+times\s+(\d+)', q)
+    if m:
+        return int(m.group(1)) * int(m.group(2))
+
+    # "A divided by B"
+    m = re.search(r'(\d+)\s+divided\s+by\s+(\d+)', q)
+    if m and int(m.group(2)) != 0:
+        return int(m.group(1)) / int(m.group(2))
+
+    # --- Phrased patterns ---
+    # "N more than M" → M + N
+    m = re.search(r'(\d+)\s+more\s+than\s+(\d+)', q)
+    if m:
+        return int(m.group(2)) + int(m.group(1))
+
+    # "N less than M" → M - N
+    m = re.search(r'(\d+)\s+less\s+than\s+(\d+)', q)
+    if m:
+        return int(m.group(2)) - int(m.group(1))
+
+    # "subtract A from B" → B - A
+    m = re.search(r'subtract\s+(\d+)\s+from\s+(\d+)', q)
+    if m:
+        return int(m.group(2)) - int(m.group(1))
+
+    # "add A and B" / "sum of A and B"
+    m = re.search(r'(?:add|sum\s+of)\s+(\d+)\s+and\s+(\d+)', q)
+    if m:
+        return int(m.group(1)) + int(m.group(2))
+
+    # "difference between/of A and B" → |A - B|
+    m = re.search(r'difference\s+(?:between|of)\s+(\d+)\s+and\s+(\d+)', q)
+    if m:
+        return abs(int(m.group(1)) - int(m.group(2)))
+
+    # --- Missing number equations ---
+    # "__ + A = B" or "? + A = B" → B - A
+    m = re.search(r'(?:_+|\?)\s*\+\s*(\d+)\s*=\s*(\d+)', q)
+    if m:
+        return int(m.group(2)) - int(m.group(1))
+
+    # "A + __ = B" or "A + ? = B" → B - A
+    m = re.search(r'(\d+)\s*\+\s*(?:_+|\?)\s*=\s*(\d+)', q)
+    if m:
+        return int(m.group(2)) - int(m.group(1))
+
+    # "__ - A = B" → B + A
+    m = re.search(r'(?:_+|\?)\s*-\s*(\d+)\s*=\s*(\d+)', q)
+    if m:
+        return int(m.group(2)) + int(m.group(1))
+
+    # "A - __ = B" → A - B
+    m = re.search(r'(\d+)\s*-\s*(?:_+|\?)\s*=\s*(\d+)', q)
+    if m:
+        return int(m.group(1)) - int(m.group(2))
+
+    # --- "10 more/less" patterns ---
+    # "What is 10 more than 45?" → 45 + 10 = 55  (already caught above)
+    # "What is 10 less than 45?" → 45 - 10 = 35  (already caught above)
+
+    return None  # Can't determine — skip verification
+
+
+def _resolve_answer_text(answer, options):
+    """Resolve an MCQ answer to its actual text value.
+
+    Handles: "D) 9" → "9", "D" → options[3] text, "9" → "9"
+    """
+    if not answer:
+        return answer
+
+    # Strip letter prefix: "D) 9" → "9", "B. cat" → "cat"
+    stripped = LETTER_PREFIX_RE.sub('', answer).strip()
+    if stripped and stripped != answer.strip():
+        return stripped
+
+    # If answer is just a letter (A-D), look it up in options
+    if options and len(answer.strip()) == 1 and answer.strip().upper() in 'ABCD':
+        idx = ord(answer.strip().upper()) - ord('A')
+        if idx < len(options):
+            return LETTER_PREFIX_RE.sub('', options[idx]).strip()
+
+    return answer.strip()
+
+
+def _parse_numeric(text):
+    """Try to parse a string as a number. Returns float or None."""
+    text = text.strip()
+    try:
+        if '/' in text and text.count('/') == 1:
+            num, den = text.split('/')
+            d = float(den)
+            return float(num) / d if d != 0 else None
+        return float(text)
+    except (ValueError, ZeroDivisionError):
+        return None
+
+
+def verify_math_answer(q_data):
+    """Independently verify the mathematical correctness of a question's answer.
+
+    Returns (is_valid, reason).
+    - (True, '') if answer is correct or can't be verified.
+    - (False, reason) if computed answer differs from stated answer.
+    """
+    question = (q_data.get('question') or '').strip()
+    answer = str(q_data.get('correct_answer') or '').strip()
+    options = q_data.get('options') or []
+
+    # Resolve MCQ letter to actual answer text
+    resolved = _resolve_answer_text(answer, options)
+
+    # Parse the stated answer as a number
+    stated_num = _parse_numeric(resolved)
+    if stated_num is None:
+        return True, ''  # Not a numeric answer — can't verify
+
+    # Try to compute the correct answer from the question
+    computed = _try_compute_answer(question)
+    if computed is None:
+        return True, ''  # Can't extract expression — skip
+
+    # Compare (allow small floating point tolerance)
+    if abs(computed - stated_num) > 0.01:
+        return False, (
+            f'Math verification failed: question computes to '
+            f'{int(computed) if computed == int(computed) else computed}, '
+            f'but stated answer is {resolved}'
+        )
 
     return True, ''
 

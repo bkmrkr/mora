@@ -1,5 +1,8 @@
-"""Tests for question_validator — ported from kidtutor's 11 applicable rules."""
-from engine.question_validator import validate_question
+"""Tests for question_validator — 13 rules including math answer verification."""
+from engine.question_validator import (
+    validate_question, verify_math_answer,
+    _try_compute_answer, _resolve_answer_text, _parse_numeric, _safe_eval_expr,
+)
 
 
 def _q(question='What is 2 + 2?', correct_answer='4', options=None):
@@ -294,7 +297,7 @@ def test_accepts_question_with_colon():
 
 def test_accepts_question_with_imperative():
     ok, _ = validate_question(
-        _q(question='Calculate the sum of 5 and 3')
+        _q(question='Calculate the sum of 5 and 3', correct_answer='8')
     )
     assert ok
 
@@ -338,3 +341,268 @@ def test_empty_choices_list_accepted():
         _q(question='What is 2 + 2?', correct_answer='4', options=[])
     )
     assert ok
+
+
+# === Rule 13: Mathematical answer verification ===
+
+# --- _safe_eval_expr ---
+
+def test_safe_eval_simple_addition():
+    assert _safe_eval_expr('5 + 3') == 8
+
+def test_safe_eval_subtraction():
+    assert _safe_eval_expr('15 - 7') == 8
+
+def test_safe_eval_multiplication():
+    assert _safe_eval_expr('6 * 4') == 24
+
+def test_safe_eval_division():
+    assert _safe_eval_expr('12 / 4') == 3.0
+
+def test_safe_eval_chained():
+    assert _safe_eval_expr('5 + 3 + 2') == 10
+
+def test_safe_eval_division_by_zero():
+    assert _safe_eval_expr('5 / 0') is None
+
+def test_safe_eval_rejects_function_calls():
+    assert _safe_eval_expr('__import__("os")') is None
+
+def test_safe_eval_rejects_letters():
+    assert _safe_eval_expr('x + 1') is None
+
+def test_safe_eval_empty():
+    assert _safe_eval_expr('') is None
+
+
+# --- _parse_numeric ---
+
+def test_parse_numeric_integer():
+    assert _parse_numeric('42') == 42.0
+
+def test_parse_numeric_float():
+    assert _parse_numeric('3.14') == 3.14
+
+def test_parse_numeric_fraction():
+    assert abs(_parse_numeric('1/2') - 0.5) < 0.001
+
+def test_parse_numeric_word():
+    assert _parse_numeric('hello') is None
+
+def test_parse_numeric_empty():
+    assert _parse_numeric('') is None
+
+
+# --- _resolve_answer_text ---
+
+def test_resolve_letter_prefix():
+    assert _resolve_answer_text('D) 9', []) == '9'
+
+def test_resolve_letter_to_option():
+    opts = ['A) 7', 'B) 6', 'C) 8', 'D) 9']
+    assert _resolve_answer_text('D', opts) == '9'
+
+def test_resolve_plain_number():
+    assert _resolve_answer_text('42', []) == '42'
+
+def test_resolve_letter_b_to_option():
+    opts = ['A) 10', 'B) 15', 'C) 20', 'D) 25']
+    assert _resolve_answer_text('B', opts) == '15'
+
+
+# --- _try_compute_answer ---
+
+def test_compute_addition():
+    assert _try_compute_answer('What is 5 + 3?') == 8
+
+def test_compute_subtraction():
+    assert _try_compute_answer('What is 15 - 7?') == 8
+
+def test_compute_multiplication():
+    assert _try_compute_answer('What is 6 * 4?') == 24
+
+def test_compute_three_addends():
+    assert _try_compute_answer('What is 5 + 3 + 2?') == 10
+
+def test_compute_word_plus():
+    assert _try_compute_answer('What is 5 plus 3?') == 8
+
+def test_compute_word_minus():
+    assert _try_compute_answer('What is 15 minus 7?') == 8
+
+def test_compute_word_times():
+    assert _try_compute_answer('What is 3 times 4?') == 12
+
+def test_compute_word_divided_by():
+    assert _try_compute_answer('What is 12 divided by 3?') == 4.0
+
+def test_compute_word_three_addends():
+    assert _try_compute_answer('What is 2 plus 3 plus 4?') == 9
+
+def test_compute_more_than():
+    assert _try_compute_answer('What is 7 more than 15?') == 22
+
+def test_compute_less_than():
+    assert _try_compute_answer('What number is 7 less than 15?') == 8
+
+def test_compute_subtract_from():
+    assert _try_compute_answer('Subtract 3 from 10.') == 7
+
+def test_compute_sum_of():
+    assert _try_compute_answer('What is the sum of 6 and 8?') == 14
+
+def test_compute_add_and():
+    assert _try_compute_answer('Add 5 and 9.') == 14
+
+def test_compute_difference_between():
+    assert _try_compute_answer('What is the difference between 15 and 7?') == 8
+
+def test_compute_zero_plus_zero():
+    assert _try_compute_answer('What is 0 plus 0?') == 0
+
+def test_compute_missing_number_left_add():
+    assert _try_compute_answer('__ + 5 = 12') == 7
+
+def test_compute_missing_number_right_add():
+    assert _try_compute_answer('8 + __ = 15') == 7
+
+def test_compute_missing_number_left_sub():
+    assert _try_compute_answer('__ - 3 = 5') == 8
+
+def test_compute_missing_number_right_sub():
+    assert _try_compute_answer('10 - __ = 4') == 6
+
+def test_compute_missing_number_question_mark():
+    assert _try_compute_answer('? + 5 = 12') == 7
+
+def test_compute_equation_form():
+    assert _try_compute_answer('8 + 9 = ?') == 17
+
+def test_compute_unicode_minus():
+    assert _try_compute_answer('What is 15 − 7?') == 8
+
+def test_compute_endash_minus():
+    assert _try_compute_answer('What is 15 – 7?') == 8
+
+def test_compute_word_problem_unverifiable():
+    """Word problems without clear math expressions can't be verified."""
+    assert _try_compute_answer(
+        'Tom has 5 apples and gives 2 to Sam. How many does he have?'
+    ) is None
+
+def test_compute_comparison_unverifiable():
+    """Comparison questions can't be numerically verified."""
+    assert _try_compute_answer('Which is greater, 15 or 9?') is None
+
+def test_compute_10_more_than():
+    assert _try_compute_answer('What is 10 more than 45?') == 55
+
+def test_compute_10_less_than():
+    assert _try_compute_answer('What is 10 less than 50?') == 40
+
+
+# --- verify_math_answer (full integration) ---
+
+def test_verify_correct_addition():
+    ok, _ = verify_math_answer(_q('What is 5 + 3?', '8'))
+    assert ok
+
+def test_verify_wrong_addition():
+    ok, reason = verify_math_answer(_q('What is 5 + 3?', '9'))
+    assert not ok
+    assert 'computes to 8' in reason
+
+def test_verify_correct_subtraction():
+    ok, _ = verify_math_answer(_q('What is 15 - 7?', '8'))
+    assert ok
+
+def test_verify_wrong_subtraction():
+    """This is the exact bug from the screenshot: 15 - 7 = 9 (should be 8)."""
+    ok, reason = verify_math_answer(_q('What is 15 - 7?', '9'))
+    assert not ok
+    assert 'computes to 8' in reason
+
+def test_verify_wrong_less_than():
+    """The screenshot bug: 'What number is 7 less than 15?' answer D) 9."""
+    ok, reason = verify_math_answer(
+        _q('What number is 7 less than 15?', 'D',
+           options=['A) 7', 'B) 6', 'C) 8', 'D) 9'])
+    )
+    assert not ok
+    assert 'computes to 8' in reason
+
+def test_verify_correct_less_than():
+    ok, _ = verify_math_answer(
+        _q('What number is 7 less than 15?', 'C',
+           options=['A) 7', 'B) 6', 'C) 8', 'D) 9'])
+    )
+    assert ok
+
+def test_verify_mcq_letter_correct():
+    ok, _ = verify_math_answer(
+        _q('What is 5 + 3?', 'C',
+           options=['A) 6', 'B) 7', 'C) 8', 'D) 9'])
+    )
+    assert ok
+
+def test_verify_mcq_letter_wrong():
+    ok, reason = verify_math_answer(
+        _q('What is 5 + 3?', 'D',
+           options=['A) 6', 'B) 7', 'C) 8', 'D) 9'])
+    )
+    assert not ok
+
+def test_verify_non_numeric_answer_skipped():
+    """Non-numeric answers can't be verified — benefit of the doubt."""
+    ok, _ = verify_math_answer(
+        _q('Which shape has 4 sides?', 'square')
+    )
+    assert ok
+
+def test_verify_unparseable_question_skipped():
+    """Questions without extractable math — benefit of the doubt."""
+    ok, _ = verify_math_answer(
+        _q('Tom has 5 apples. He gives 2 away. How many left?', '3')
+    )
+    assert ok
+
+def test_verify_missing_number_correct():
+    ok, _ = verify_math_answer(_q('__ + 5 = 12', '7'))
+    assert ok
+
+def test_verify_missing_number_wrong():
+    ok, reason = verify_math_answer(_q('__ + 5 = 12', '8'))
+    assert not ok
+
+def test_verify_three_addends_correct():
+    ok, _ = verify_math_answer(_q('What is 5 + 3 + 2?', '10'))
+    assert ok
+
+def test_verify_three_addends_wrong():
+    ok, reason = verify_math_answer(_q('What is 5 + 3 + 2?', '11'))
+    assert not ok
+
+
+# --- Full validate_question with math check ---
+
+def test_validate_rejects_wrong_math():
+    """validate_question should reject questions with wrong answers."""
+    ok, reason = validate_question(
+        _q('What is 15 - 7?', '9')
+    )
+    assert not ok
+    assert 'math verification' in reason.lower()
+
+def test_validate_accepts_correct_math():
+    ok, _ = validate_question(
+        _q('What is 15 - 7?', '8')
+    )
+    assert ok
+
+def test_validate_rejects_wrong_mcq_math():
+    ok, reason = validate_question(
+        _q('What is 5 + 3?', 'D) 9',
+           options=['A) 6', 'B) 7', 'C) 8', 'D) 9'])
+    )
+    assert not ok
+    assert 'math verification' in reason.lower()

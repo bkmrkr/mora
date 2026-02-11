@@ -18,8 +18,10 @@ git add <files> && git commit -m "message" && git push origin main
 
 ## Testing
 
-- Run `python3 -m pytest tests/ -v` before committing
-- All tests must pass
+- **Run `python3 -m pytest tests/ -v` after every code change and before committing** — not just at the end, but after each file edit or logical step
+- All tests must pass before committing
+- When adding new features, write tests first or alongside the code
+- Test categories: models (DB CRUD), engine (pure functions), services (integration), persistence (DB state survives restarts), precache (dual caching)
 
 ## Architecture
 

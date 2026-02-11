@@ -1,6 +1,6 @@
-"""Tests for question_validator — 13 rules including math answer verification."""
+"""Tests for question_validator — 14 rules including math answer verification."""
 from engine.question_validator import (
-    validate_question, verify_math_answer,
+    validate_question, verify_math_answer, verify_explanation_vs_answer,
     _try_compute_answer, _resolve_answer_text, _parse_numeric, _safe_eval_expr,
 )
 
@@ -606,3 +606,108 @@ def test_validate_rejects_wrong_mcq_math():
     )
     assert not ok
     assert 'math verification' in reason.lower()
+
+
+# === Rule 14: Explanation vs answer cross-check ===
+
+def _qe(question='What is 2 + 2?', correct_answer='4', explanation='', options=None):
+    """Helper to build question dict with explanation."""
+    d = {'question': question, 'correct_answer': correct_answer, 'explanation': explanation}
+    if options is not None:
+        d['options'] = options
+    return d
+
+
+def test_expl_catches_screenshot_bug():
+    """The exact bug from the screenshot: answer says 3 but explanation computes 4."""
+    ok, reason = verify_explanation_vs_answer(
+        _qe(
+            question='Tommy has 5 apples. He gets some more and now has 9. How many did he get?',
+            correct_answer='A',
+            options=['A) 3', 'B) 4', 'C) 5', 'D) 6'],
+            explanation='So, 9 - 5 = 4 apples. Therefore, Tommy got 4 apples.',
+        )
+    )
+    assert not ok
+    assert 'explanation computes 4' in reason
+
+
+def test_expl_correct_match():
+    ok, _ = verify_explanation_vs_answer(
+        _qe(
+            correct_answer='B',
+            options=['A) 3', 'B) 4', 'C) 5', 'D) 6'],
+            explanation='9 - 5 = 4. Tommy got 4 apples.',
+        )
+    )
+    assert ok
+
+
+def test_expl_no_explanation_passes():
+    ok, _ = verify_explanation_vs_answer(
+        _qe(correct_answer='5', explanation='')
+    )
+    assert ok
+
+
+def test_expl_non_numeric_answer_passes():
+    ok, _ = verify_explanation_vs_answer(
+        _qe(correct_answer='square', explanation='A square has 4 = 4 sides.')
+    )
+    assert ok
+
+
+def test_expl_no_equals_in_explanation_passes():
+    ok, _ = verify_explanation_vs_answer(
+        _qe(correct_answer='4', explanation='Count the apples: four.')
+    )
+    assert ok
+
+
+def test_expl_multiple_equals_uses_last():
+    """When explanation has multiple =, the last one is the final answer."""
+    ok, reason = verify_explanation_vs_answer(
+        _qe(
+            correct_answer='5',
+            explanation='First, 10 - 3 = 7. Then 7 - 2 = 5.',
+        )
+    )
+    assert ok
+
+
+def test_expl_multiple_equals_mismatch():
+    ok, reason = verify_explanation_vs_answer(
+        _qe(
+            correct_answer='7',
+            explanation='First, 10 - 3 = 7. Then 7 - 2 = 5.',
+        )
+    )
+    assert not ok
+    assert 'explanation computes 5' in reason
+
+
+def test_expl_mcq_letter_resolved():
+    """MCQ letter answers should be resolved before comparison."""
+    ok, reason = verify_explanation_vs_answer(
+        _qe(
+            correct_answer='C',
+            options=['A) 10', 'B) 12', 'C) 15', 'D) 8'],
+            explanation='5 + 7 = 12. The answer is 12.',
+        )
+    )
+    assert not ok
+    assert 'explanation computes 12' in reason
+
+
+def test_validate_full_catches_explanation_mismatch():
+    """validate_question should reject when explanation contradicts answer."""
+    ok, reason = validate_question(
+        _qe(
+            question='Tommy has 5 apples and gets more. Now he has 9. How many did he get?',
+            correct_answer='A',
+            options=['A) 3', 'B) 4', 'C) 5', 'D) 6'],
+            explanation='9 - 5 = 4.',
+        )
+    )
+    assert not ok
+    assert 'explanation contradicts' in reason.lower()

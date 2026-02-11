@@ -22,7 +22,8 @@
 - Math answer verification (Rule 13): independently computes the correct answer for arithmetic questions and rejects LLM-generated questions where the answer is wrong — catches bugs like "7 less than 15 = 9" (should be 8)
 - Supports 15+ question patterns: direct expressions (5+3), word operations (5 plus 3), phrased patterns (7 less than 15, subtract 3 from 10, sum of 6 and 8), missing number equations (__ + 5 = 12), three addends, unicode dash variants
 - MCQ answer resolution: resolves letter answers (D) to option text (9) before verification
-- 63 new tests for math verifier (166 total, was 103)
+- Explanation vs answer cross-check (Rule 14): catches word problems where the LLM's explanation correctly computes the answer but the correct_answer field is wrong (e.g., explanation says "9 - 5 = 4" but answer says "3")
+- 72 new tests for math verifier + explanation cross-check (175 total, was 103)
 - Show original question text on the wrong-answer feedback page
 
 ### Changed

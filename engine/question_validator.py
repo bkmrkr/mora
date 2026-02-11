@@ -133,6 +133,11 @@ def validate_question(q_data, node_description=''):
     if not math_ok:
         return False, math_reason
 
+    # Rule 14: Explanation vs answer cross-check
+    expl_ok, expl_reason = verify_explanation_vs_answer(q_data)
+    if not expl_ok:
+        return False, expl_reason
+
     return True, ''
 
 
@@ -336,6 +341,41 @@ def verify_math_answer(q_data):
             f'{int(computed) if computed == int(computed) else computed}, '
             f'but stated answer is {resolved}'
         )
+
+    return True, ''
+
+
+def verify_explanation_vs_answer(q_data):
+    """Cross-check: does the explanation's own math agree with the stated answer?
+
+    Catches cases where the LLM sets correct_answer="3" but the explanation
+    correctly computes "9 - 5 = 4".
+
+    Returns (is_valid, reason).
+    """
+    explanation = (q_data.get('explanation') or '').strip()
+    answer = str(q_data.get('correct_answer') or '').strip()
+    options = q_data.get('options') or []
+
+    if not explanation:
+        return True, ''
+
+    # Resolve the stated answer to a number
+    resolved = _resolve_answer_text(answer, options)
+    stated_num = _parse_numeric(resolved)
+    if stated_num is None:
+        return True, ''  # Not numeric
+
+    # Find all "= N" patterns in the explanation (the last is usually the final answer)
+    eq_matches = re.findall(r'=\s*(\d+(?:\.\d+)?)', explanation)
+    if eq_matches:
+        final_computed = float(eq_matches[-1])
+        if abs(final_computed - stated_num) > 0.01:
+            return False, (
+                f'Explanation contradicts answer: explanation computes '
+                f'{int(final_computed) if final_computed == int(final_computed) else final_computed}, '
+                f'but stated answer is {resolved}'
+            )
 
     return True, ''
 

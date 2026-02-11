@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS student_skill (
     student_id INTEGER NOT NULL REFERENCES students(id),
     curriculum_node_id INTEGER NOT NULL REFERENCES curriculum_nodes(id),
     skill_rating REAL DEFAULT 800.0,
-    uncertainty REAL DEFAULT 350.0,
+    uncertainty REAL DEFAULT 500.0,
     mastery_level REAL DEFAULT 0.0,
     total_attempts INTEGER DEFAULT 0,
     correct_attempts INTEGER DEFAULT 0,

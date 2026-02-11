@@ -31,6 +31,7 @@
 - 13 unit tests for dual cache behavior (correct/wrong path selection, different difficulties, partial None handling, overwrites, default path)
 
 ### Changed
+- Faster calibration: base K 48→64, initial uncertainty 350→500, streak bonus at 2+ (was 3+), uncertainty decay 10%/attempt (was 5%), node advance after 2 correct at 85%+ (was 3) — app finds student's level in ~5 questions instead of 20+
 - Enabled threaded mode in Flask dev server for concurrent precache + answer requests
 - Increased max_generation_attempts from 2 to 3 — more retries since math verification rejects more bad questions
 - Switched default model from qwen3:4b to qwen2.5 — qwen3's thinking mode generates thousands of invisible tokens (22s/question), qwen2.5 responds in <1s with valid JSON

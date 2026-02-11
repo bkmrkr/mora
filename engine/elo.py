@@ -54,15 +54,15 @@ def update_skill(skill_rating, uncertainty, difficulty, is_correct,
     k = compute_k_factor(uncertainty, base_k, initial_uncertainty)
 
     # Streak bonus: when student is clearly above current level, ramp faster.
-    # Only applies when still uncertain (early assessment phase).
-    if streak >= 3 and uncertainty > 150:
+    # Kicks in after 2 consecutive correct while still calibrating.
+    if streak >= 2 and uncertainty > 100:
         k *= 2.0
 
     delta = k * (actual - expected)
     new_rating = skill_rating + delta
 
-    # Reduce uncertainty ~5% per attempt, floor at 50
-    new_uncertainty = max(uncertainty * 0.95, 50.0)
+    # Reduce uncertainty ~10% per attempt, floor at 50
+    new_uncertainty = max(uncertainty * 0.90, 50.0)
 
     return new_rating, new_uncertainty
 

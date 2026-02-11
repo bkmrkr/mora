@@ -55,7 +55,7 @@ def test_create_session():
 def test_student_skill_defaults():
     sk = student_skill.get(999, 999)
     assert sk['skill_rating'] == 800.0
-    assert sk['uncertainty'] == 350.0
+    assert sk['uncertainty'] == 500.0
 
 
 def test_student_skill_upsert():

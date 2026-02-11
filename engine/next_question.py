@@ -97,9 +97,9 @@ def select_focus_node(recent_analysis, curriculum_nodes, student_skills,
             acc = node_stats['accuracy']
             count = node_stats['count']
 
-            # Fast advance: if acing it (85%+) after 3+ attempts, move on.
+            # Fast advance: if acing it (85%+) after 2+ attempts, move on.
             # Don't waste time on stuff the student clearly knows.
-            if count >= 3 and acc >= 0.85:
+            if count >= 2 and acc >= 0.85:
                 next_node = _next_in_order(curriculum_nodes, current_node_id, student_skills)
                 if next_node:
                     return next_node

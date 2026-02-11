@@ -11,6 +11,10 @@
 - Three-layer question deduplication: session dedup (no repeats within session), global correct-answer dedup (never re-ask mastered questions), LLM prompt dedup
 - Difficulty score display (1-10 dots + P(correct) percentage) at bottom of question card
 - 41 new validator unit tests (95 total)
+- Local clock SVG question generator ported from kidtutor — generates analog clock faces with hour/minute hands, no LLM needed for clock-reading curriculum nodes
+- Two-panel session layout: left panel is the question, right panel shows previous answer result and per-node topic progress with mastery bars
+- Session stats in top bar (correct/total + accuracy %)
+- Global dedup model function `attempt.get_correct_texts()` for lifetime correct-answer tracking
 
 ### Changed
 - Renamed project from "Moriah" to "Mora" everywhere (templates, config, DB file, spec, CSS, tests)

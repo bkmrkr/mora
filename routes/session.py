@@ -22,6 +22,31 @@ def _compute_topic_mastery(student_id, topic_id):
     return round(total / len(nodes) * 100)
 
 
+def _get_topic_progress(student_id, topic_id):
+    """Per-node mastery data for the right panel progress display."""
+    nodes = node_model.get_for_topic(topic_id)
+    progress = []
+    for node in nodes:
+        sk = skill_model.get(student_id, node['id'])
+        progress.append({
+            'name': node['name'],
+            'mastery_pct': round(sk['mastery_level'] * 100),
+            'skill_rating': round(sk['skill_rating'], 1),
+            'total_attempts': sk['total_attempts'],
+            'mastered': elo.is_mastered(sk['mastery_level']),
+        })
+    return progress
+
+
+def _get_session_stats(session_id):
+    """Compute running session stats from attempts."""
+    attempts = attempt_model.get_for_session(session_id)
+    total = len(attempts)
+    correct = sum(1 for a in attempts if a['is_correct'])
+    accuracy = round(correct / total * 100) if total > 0 else 0
+    return {'total': total, 'correct': correct, 'accuracy': accuracy}
+
+
 @session_bp.route('/start', methods=['POST'])
 def start():
     student_id = int(request.form['student_id'])
@@ -48,6 +73,9 @@ def question(session_id):
         return redirect(url_for('session.end', session_id=session_id))
 
     topic_mastery = _compute_topic_mastery(student['id'], sess['topic_id'])
+    last_result = flask_session.get('last_result')
+    topic_progress = _get_topic_progress(student['id'], sess['topic_id'])
+    session_stats = _get_session_stats(session_id)
 
     return render_template(
         'session/question.html',
@@ -55,6 +83,9 @@ def question(session_id):
         student=student,
         question=current,
         topic_mastery=topic_mastery,
+        last_result=last_result,
+        topic_progress=topic_progress,
+        session_stats=session_stats,
     )
 
 

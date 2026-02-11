@@ -13,6 +13,7 @@ from engine import elo
 from engine import next_question as nq_engine
 from engine.question_validator import validate_question
 from ai import question_generator
+from ai.local_generators import is_clock_node, generate_clock_question
 from config.settings import SESSION_DEFAULTS
 
 logger = logging.getLogger(__name__)
@@ -82,54 +83,64 @@ def generate_next(session_id, student, topic_id):
     all_exclude = session_texts | global_correct_texts
     recent_text_list = list(all_exclude)
 
-    # --- Generate with validation + dedup retry ---
+    # --- Check for local generators (no LLM needed) ---
+    node_desc = focus_node.get('description', '')
     q_data = None
     model = None
     prompt = None
-    node_desc = focus_node.get('description', '')
 
-    for attempt_num in range(SESSION_DEFAULTS['max_generation_attempts']):
-        try:
-            q_data, model, prompt = question_generator.generate(
-                focus_node['name'],
-                node_desc,
-                topic['name'] if topic else '',
-                node_desc,
-                target_diff,
-                q_type,
-                recent_text_list,
-            )
-        except Exception as e:
-            logger.warning('Generation attempt %d failed: %s', attempt_num + 1, e)
-            q_data = None
-            continue
+    if is_clock_node(focus_node['name'], node_desc):
+        q_data, model, prompt = generate_clock_question(
+            focus_node['name'], node_desc, recent_text_list
+        )
+        if q_data:
+            q_type = 'mcq'  # clock questions are always MCQ
+            logger.info('Generated local clock question for "%s"', focus_node['name'])
 
-        if not q_data or not q_data.get('question'):
-            logger.warning('Generation attempt %d: empty question', attempt_num + 1)
-            q_data = None
-            continue
+    # --- Generate with validation + dedup retry (LLM path) ---
+    if not q_data:
+        for attempt_num in range(SESSION_DEFAULTS['max_generation_attempts']):
+            try:
+                q_data, model, prompt = question_generator.generate(
+                    focus_node['name'],
+                    node_desc,
+                    topic['name'] if topic else '',
+                    node_desc,
+                    target_diff,
+                    q_type,
+                    recent_text_list,
+                )
+            except Exception as e:
+                logger.warning('Generation attempt %d failed: %s', attempt_num + 1, e)
+                q_data = None
+                continue
 
-        # Validate the generated question
-        is_valid, reason = validate_question(q_data, node_desc)
-        if not is_valid:
-            logger.warning('Validation rejected (attempt %d): %s', attempt_num + 1, reason)
-            q_data = None
-            continue
+            if not q_data or not q_data.get('question'):
+                logger.warning('Generation attempt %d: empty question', attempt_num + 1)
+                q_data = None
+                continue
 
-        # Dedup check: reject if question already seen in session or globally
-        q_text = q_data['question'].strip()
-        if q_text in session_texts:
-            logger.warning('Session dedup rejected (attempt %d)', attempt_num + 1)
-            q_data = None
-            continue
+            # Validate the generated question
+            is_valid, reason = validate_question(q_data, node_desc)
+            if not is_valid:
+                logger.warning('Validation rejected (attempt %d): %s', attempt_num + 1, reason)
+                q_data = None
+                continue
 
-        if q_text in global_correct_texts:
-            logger.warning('Global dedup rejected (attempt %d)', attempt_num + 1)
-            q_data = None
-            continue
+            # Dedup check: reject if question already seen in session or globally
+            q_text = q_data['question'].strip()
+            if q_text in session_texts:
+                logger.warning('Session dedup rejected (attempt %d)', attempt_num + 1)
+                q_data = None
+                continue
 
-        # Passed all checks
-        break
+            if q_text in global_correct_texts:
+                logger.warning('Global dedup rejected (attempt %d)', attempt_num + 1)
+                q_data = None
+                continue
+
+            # Passed all checks
+            break
 
     if not q_data:
         flask_session['current_question'] = None
@@ -169,6 +180,7 @@ def generate_next(session_id, student, topic_id):
         'difficulty': target_diff,
         'difficulty_score': difficulty_score,
         'p_correct': round(p_correct * 100),
+        'clock_svg': q_data.get('clock_svg'),
     }
     flask_session['current_question'] = question_dict
     return question_dict

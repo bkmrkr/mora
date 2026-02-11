@@ -1,66 +1,130 @@
 {% extends "base.html" %}
 {% block title %}Mora — Question{% endblock %}
 {% block content %}
-<div class="session-container">
-    <div class="session-header">
-        <span class="student-name">{{ student.name }}</span>
-        <div class="topic-mastery-display">
-            <span class="mastery-pct">{{ topic_mastery }}%</span>
-            <div class="mastery-bar">
-                <div class="mastery-fill {% if topic_mastery >= 75 %}mastered{% endif %}"
-                     style="width: {{ topic_mastery }}%"></div>
-            </div>
-            <span class="mastery-label">Topic Mastery</span>
+<div class="session-top-bar">
+    <span class="student-name">{{ student.name }}</span>
+    <div class="topic-mastery-display">
+        <span class="mastery-pct">{{ topic_mastery }}%</span>
+        <div class="mastery-bar">
+            <div class="mastery-fill {% if topic_mastery >= 75 %}mastered{% endif %}"
+                 style="width: {{ topic_mastery }}%"></div>
         </div>
+        <span class="mastery-label">Topic Mastery</span>
     </div>
-
-    <div class="question-card">
-        <div class="question-meta">
-            <span class="node-badge">{{ question.node_name }}</span>
-            <span class="type-badge">{{ question.question_type }}</span>
-        </div>
-
-        <div class="question-text">{{ question.content }}</div>
-
-        <form action="{{ url_for('session.answer', session_id=session_id) }}" method="post"
-              id="answer-form">
-            <input type="hidden" name="response_time_s" id="response_time_s" value="0">
-
-            {% if question.question_type == 'mcq' and question.options %}
-            <div class="choices-grid">
-                {% for option in question.options %}
-                <button type="submit" name="answer" value="{{ option }}"
-                        class="choice-btn" data-key="{{ 'ABCD'[loop.index0] }}">
-                    <span class="choice-letter">{{ 'ABCD'[loop.index0] }}</span>
-                    <span class="choice-text">{{ option | strip_letter }}</span>
-                </button>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="form-group">
-                <textarea name="answer" id="answer-input" rows="3"
-                          placeholder="Type your answer..." required autofocus></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit Answer</button>
-            {% endif %}
-        </form>
-
-        <div class="difficulty-display">
-            <span class="difficulty-label">Difficulty:</span>
-            <span class="difficulty-dots">
-                {% for i in range(10) %}
-                <span class="difficulty-dot {% if i < question.difficulty_score %}filled{% endif %}"></span>
-                {% endfor %}
-            </span>
-            <span class="difficulty-value">{{ question.difficulty_score }}/10</span>
-            <span class="difficulty-chance">({{ question.p_correct }}% chance)</span>
-        </div>
-    </div>
-
-    <form action="{{ url_for('session.end', session_id=session_id) }}" method="get"
-          class="end-session-form">
-        <button type="submit" class="btn btn-secondary">End Session</button>
+    {% if session_stats and session_stats.total > 0 %}
+    <span class="session-stat">{{ session_stats.correct }}/{{ session_stats.total }} ({{ session_stats.accuracy }}%)</span>
+    {% endif %}
+    <form action="{{ url_for('session.end', session_id=session_id) }}" method="get" class="end-btn-form">
+        <button type="submit" class="btn btn-secondary btn-sm">End Session</button>
     </form>
+</div>
+
+<div class="two-panel-layout">
+    <!-- LEFT PANEL: Current Question -->
+    <div class="panel-left">
+        <div class="question-card">
+            {% if question.clock_svg %}
+            <div class="clock-visual">{{ question.clock_svg | safe }}</div>
+            {% endif %}
+
+            <div class="question-meta">
+                <span class="node-badge">{{ question.node_name }}</span>
+                <span class="type-badge">{{ question.question_type }}</span>
+            </div>
+
+            <div class="question-text">{{ question.content }}</div>
+
+            <form action="{{ url_for('session.answer', session_id=session_id) }}" method="post"
+                  id="answer-form">
+                <input type="hidden" name="response_time_s" id="response_time_s" value="0">
+
+                {% if question.question_type == 'mcq' and question.options %}
+                <div class="choices-grid">
+                    {% for option in question.options %}
+                    <button type="submit" name="answer" value="{{ option }}"
+                            class="choice-btn" data-key="{{ 'ABCD'[loop.index0] }}">
+                        <span class="choice-letter">{{ 'ABCD'[loop.index0] }}</span>
+                        <span class="choice-text">{{ option | strip_letter }}</span>
+                    </button>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="form-group">
+                    <textarea name="answer" id="answer-input" rows="3"
+                              placeholder="Type your answer..." required autofocus></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Answer</button>
+                {% endif %}
+            </form>
+
+            <div class="difficulty-display">
+                <span class="difficulty-label">Difficulty:</span>
+                <span class="difficulty-dots">
+                    {% for i in range(10) %}
+                    <span class="difficulty-dot {% if i < question.difficulty_score %}filled{% endif %}"></span>
+                    {% endfor %}
+                </span>
+                <span class="difficulty-value">{{ question.difficulty_score }}/10</span>
+                <span class="difficulty-chance">({{ question.p_correct }}% chance)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: Previous Result + Progress -->
+    <div class="panel-right">
+        {% if last_result %}
+        <div class="result-card {% if last_result.is_correct %}result-correct{% else %}result-wrong{% endif %}">
+            <div class="result-header">
+                {% if last_result.is_correct %}
+                <span class="result-icon correct">&#10004;</span>
+                <span class="result-label">Correct!</span>
+                {% else %}
+                <span class="result-icon wrong">&#10008;</span>
+                <span class="result-label">Wrong</span>
+                {% endif %}
+            </div>
+            <div class="result-question">{{ last_result.question_text[:80] }}{% if last_result.question_text|length > 80 %}...{% endif %}</div>
+            <div class="result-answers">
+                <div class="result-row">
+                    <span class="result-key">Your answer:</span>
+                    <span class="{% if last_result.is_correct %}correct-text{% else %}wrong-text{% endif %}">{{ last_result.student_answer }}</span>
+                </div>
+                {% if not last_result.is_correct %}
+                <div class="result-row">
+                    <span class="result-key">Correct:</span>
+                    <span class="correct-text">{{ last_result.correct_answer }}</span>
+                </div>
+                {% endif %}
+            </div>
+            <div class="result-meta">
+                <span>{{ last_result.node_name }}</span>
+                <span>{{ last_result.skill_rating }} ELO</span>
+            </div>
+        </div>
+        {% else %}
+        <div class="result-card result-empty">
+            <p>Answer a question to see results here.</p>
+        </div>
+        {% endif %}
+
+        <div class="progress-card">
+            <h3>Topic Progress</h3>
+            {% for node in topic_progress %}
+            <div class="progress-node">
+                <div class="progress-node-header">
+                    <span class="progress-node-name {% if node.mastered %}text-mastered{% endif %}">
+                        {{ node.name[:30] }}{% if node.name|length > 30 %}...{% endif %}
+                    </span>
+                    <span class="progress-node-pct">{{ node.mastery_pct }}%</span>
+                </div>
+                <div class="mastery-bar small">
+                    <div class="mastery-fill {% if node.mastered %}mastered{% endif %}"
+                         style="width: {{ node.mastery_pct }}%"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endblock %}
 {% block scripts %}

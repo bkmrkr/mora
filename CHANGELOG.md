@@ -27,6 +27,12 @@
 - Show original question text on the wrong-answer feedback page
 
 ### Added
+- **Persist all state in SQLite** — sessions survive server restarts:
+  - `skill_history` table: tracks every skill rating change over time, linked to the attempt that caused it
+  - `sessions.current_question_id` + `sessions.last_result_json`: active session state persisted to DB, restored on resume
+  - `attempts.skill_rating_before/after` + `attempts.curriculum_node_id`: full skill snapshot per attempt
+  - Auto-migration: existing DBs get new columns via ALTER TABLE on startup
+  - Question/feedback pages load from DB when flask_session is empty (after restart)
 - Dual question pre-caching: pre-generates TWO questions per page load — one for correct answer (harder difficulty) and one for wrong answer (easier difficulty). Uses ELO prediction to simulate post-answer skill ratings without DB writes, then generates at appropriate difficulty for each outcome.
 - 13 unit tests for dual cache behavior (correct/wrong path selection, different difficulties, partial None handling, overwrites, default path)
 

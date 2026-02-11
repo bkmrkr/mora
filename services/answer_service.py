@@ -72,8 +72,9 @@ def process_answer(student, current_question, student_answer,
         skill['correct_attempts'] + (1 if is_correct else 0),
     )
 
-    # Record attempt
-    attempt_model.create(
+    # Record attempt with skill snapshots
+    before_rating = skill['skill_rating']
+    attempt_id = attempt_model.create(
         question_id=current_question['question_id'],
         student_id=student_id,
         session_id=session_id,
@@ -81,6 +82,15 @@ def process_answer(student, current_question, student_answer,
         is_correct=1 if is_correct else 0,
         partial_score=partial_score,
         response_time_seconds=response_time_s,
+        curriculum_node_id=node_id,
+        skill_rating_before=round(before_rating, 1),
+        skill_rating_after=round(new_rating, 1),
+    )
+
+    # Record skill history for rating-over-time tracking
+    skill_model.record_history(
+        student_id, node_id, new_rating, new_uncertainty, mastery,
+        attempt_id=attempt_id,
     )
 
     return {

@@ -36,6 +36,20 @@ def end_session(session_id):
     )
 
 
+def update_current_question(session_id, question_id):
+    execute_db(
+        "UPDATE sessions SET current_question_id=? WHERE id=?",
+        (question_id, session_id),
+    )
+
+
+def update_last_result(session_id, result_json):
+    execute_db(
+        "UPDATE sessions SET last_result_json=? WHERE id=?",
+        (result_json, session_id),
+    )
+
+
 def get_for_student(student_id, limit=20):
     return query_db(
         """SELECT * FROM sessions WHERE student_id=?

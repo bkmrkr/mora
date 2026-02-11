@@ -41,6 +41,37 @@ def upsert(student_id, node_id, skill_rating, uncertainty, mastery_level,
     )
 
 
+def record_history(student_id, node_id, skill_rating, uncertainty,
+                    mastery_level, attempt_id=None):
+    """Insert a row into skill_history for tracking rating over time."""
+    execute_db(
+        """INSERT INTO skill_history
+           (student_id, curriculum_node_id, skill_rating, uncertainty,
+            mastery_level, attempt_id)
+           VALUES (?, ?, ?, ?, ?, ?)""",
+        (student_id, node_id, skill_rating, uncertainty,
+         mastery_level, attempt_id),
+    )
+
+
+def get_history(student_id, node_id=None, limit=100):
+    """Get skill rating history for a student, optionally filtered by node."""
+    if node_id:
+        return query_db(
+            """SELECT * FROM skill_history
+               WHERE student_id=? AND curriculum_node_id=?
+               ORDER BY timestamp""",
+            (student_id, node_id),
+        )
+    return query_db(
+        """SELECT * FROM skill_history
+           WHERE student_id=?
+           ORDER BY timestamp
+           LIMIT ?""",
+        (student_id, limit),
+    )
+
+
 def get_for_student(student_id):
     return query_db(
         "SELECT * FROM student_skill WHERE student_id=? ORDER BY curriculum_node_id",

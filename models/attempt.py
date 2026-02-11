@@ -3,14 +3,18 @@ from db.database import query_db, execute_db
 
 
 def create(question_id, student_id, session_id, answer_given, is_correct,
-           partial_score=None, response_time_seconds=None):
+           partial_score=None, response_time_seconds=None,
+           curriculum_node_id=None, skill_rating_before=None,
+           skill_rating_after=None):
     return execute_db(
         """INSERT INTO attempts
            (question_id, student_id, session_id, answer_given, is_correct,
-            partial_score, response_time_seconds)
-           VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            partial_score, response_time_seconds,
+            curriculum_node_id, skill_rating_before, skill_rating_after)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (question_id, student_id, session_id, answer_given, is_correct,
-         partial_score, response_time_seconds),
+         partial_score, response_time_seconds,
+         curriculum_node_id, skill_rating_before, skill_rating_after),
     )
 
 

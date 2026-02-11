@@ -1,4 +1,5 @@
 """Session routes — the core learning loop."""
+import json
 import logging
 
 from flask import (Blueprint, render_template, request, redirect,
@@ -9,11 +10,38 @@ from models import session as session_model
 from models import attempt as attempt_model
 from models import student_skill as skill_model
 from models import curriculum_node as node_model
+from models import question as question_model
 from services import question_service, answer_service
 from engine import elo
 
 logger = logging.getLogger(__name__)
 session_bp = Blueprint('session', __name__)
+
+
+def _load_question_from_db(question_id):
+    """Reconstruct a question_dict from the DB (for session resume after restart)."""
+    q = question_model.get_by_id(question_id)
+    if not q:
+        return None
+    node = node_model.get_by_id(q['curriculum_node_id'])
+    difficulty = q['difficulty'] or 0
+    norm_diff = max(0.0, min(1.0, (difficulty - 500) / 600))
+    difficulty_score = round(norm_diff * 9) + 1
+    p_correct = q['estimated_p_correct'] or 0
+    options = json.loads(q['options']) if q['options'] else None
+    return {
+        'question_id': q['id'],
+        'node_id': q['curriculum_node_id'],
+        'node_name': node['name'] if node else '',
+        'content': q['content'],
+        'question_type': q['question_type'],
+        'options': options,
+        'correct_answer': q['correct_answer'],
+        'explanation': q.get('explanation', ''),
+        'difficulty': difficulty,
+        'difficulty_score': difficulty_score,
+        'p_correct': round(p_correct * 100) if p_correct else 0,
+    }
 
 
 def _compute_topic_mastery(student_id, topic_id):
@@ -72,8 +100,15 @@ def question(session_id):
         return redirect(url_for('home.index'))
     student = student_model.get_by_id(sess['student_id'])
     current = flask_session.get('current_question')
+    if not current and sess.get('current_question_id'):
+        # Resume from DB after restart
+        current = _load_question_from_db(sess['current_question_id'])
+        if current:
+            flask_session['current_question'] = current
+            logger.info('Resumed question %d from DB for session %s',
+                        sess['current_question_id'], session_id)
     if not current:
-        # Always retry — sessions never auto-end
+        # Generate fresh
         question_service.generate_next(session_id, student, sess['topic_id'])
         current = flask_session.get('current_question')
     if not current:
@@ -112,6 +147,8 @@ def answer(session_id):
         return redirect(url_for('home.index'))
     student = student_model.get_by_id(sess['student_id'])
     current = flask_session.get('current_question')
+    if not current and sess.get('current_question_id'):
+        current = _load_question_from_db(sess['current_question_id'])
     if not current:
         return redirect(url_for('session.end', session_id=session_id))
 
@@ -138,6 +175,7 @@ def answer(session_id):
     result['mastery_delta'] = mastery_delta
 
     flask_session['last_result'] = result
+    session_model.update_last_result(session_id, json.dumps(result))
 
     # Try pre-cached question for the actual outcome
     cached = question_service.pop_cached(
@@ -145,6 +183,7 @@ def answer(session_id):
     )
     if cached:
         flask_session['current_question'] = cached
+        session_model.update_current_question(session_id, cached['question_id'])
     elif result['is_correct']:
         question_service.generate_next(session_id, student, sess['topic_id'])
 
@@ -159,8 +198,15 @@ def feedback(session_id):
     if not sess:
         return redirect(url_for('home.index'))
     student = student_model.get_by_id(sess['student_id'])
-    result = flask_session.get('last_result', {})
-    current = flask_session.get('current_question', {})
+    result = flask_session.get('last_result')
+    if not result and sess.get('last_result_json'):
+        result = json.loads(sess['last_result_json'])
+        flask_session['last_result'] = result
+    result = result or {}
+    current = flask_session.get('current_question')
+    if not current and sess.get('current_question_id'):
+        current = _load_question_from_db(sess['current_question_id'])
+    current = current or {}
 
     # Try to generate LLM explanation
     explanation = None
@@ -265,6 +311,8 @@ def precache(session_id):
     if not student:
         return '', 204
     current_question = flask_session.get('current_question')
+    if not current_question and sess.get('current_question_id'):
+        current_question = _load_question_from_db(sess['current_question_id'])
     if not current_question:
         return '', 204
     try:

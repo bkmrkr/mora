@@ -28,7 +28,9 @@ CREATE TABLE IF NOT EXISTS sessions (
     started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     ended_at DATETIME,
     total_questions INTEGER DEFAULT 0,
-    total_correct INTEGER DEFAULT 0
+    total_correct INTEGER DEFAULT 0,
+    current_question_id INTEGER REFERENCES questions(id),
+    last_result_json TEXT
 );
 
 CREATE TABLE IF NOT EXISTS questions (
@@ -51,10 +53,13 @@ CREATE TABLE IF NOT EXISTS attempts (
     question_id INTEGER NOT NULL REFERENCES questions(id),
     student_id INTEGER NOT NULL REFERENCES students(id),
     session_id TEXT REFERENCES sessions(id),
+    curriculum_node_id INTEGER REFERENCES curriculum_nodes(id),
     answer_given TEXT,
     is_correct INTEGER NOT NULL,
     partial_score REAL DEFAULT NULL,
     response_time_seconds REAL,
+    skill_rating_before REAL,
+    skill_rating_after REAL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -71,8 +76,22 @@ CREATE TABLE IF NOT EXISTS student_skill (
     UNIQUE(student_id, curriculum_node_id)
 );
 
+CREATE TABLE IF NOT EXISTS skill_history (
+    id INTEGER PRIMARY KEY,
+    student_id INTEGER NOT NULL REFERENCES students(id),
+    curriculum_node_id INTEGER NOT NULL REFERENCES curriculum_nodes(id),
+    skill_rating REAL NOT NULL,
+    uncertainty REAL NOT NULL,
+    mastery_level REAL NOT NULL,
+    attempt_id INTEGER REFERENCES attempts(id),
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_attempts_timestamp ON attempts(timestamp);
 CREATE INDEX IF NOT EXISTS idx_attempts_student ON attempts(student_id);
 CREATE INDEX IF NOT EXISTS idx_attempts_session ON attempts(session_id);
+CREATE INDEX IF NOT EXISTS idx_attempts_node ON attempts(curriculum_node_id);
 CREATE INDEX IF NOT EXISTS idx_student_skill_student ON student_skill(student_id);
 CREATE INDEX IF NOT EXISTS idx_curriculum_nodes_topic ON curriculum_nodes(topic_id);
+CREATE INDEX IF NOT EXISTS idx_skill_history_student ON skill_history(student_id);
+CREATE INDEX IF NOT EXISTS idx_skill_history_node ON skill_history(student_id, curriculum_node_id);

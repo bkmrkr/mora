@@ -10,6 +10,7 @@ from models import attempt as attempt_model
 from models import question as question_model
 from models import curriculum_node as node_model
 from models import topic as topic_model
+from models import session as session_model
 from engine import elo
 from engine import next_question as nq_engine
 from engine.question_validator import validate_question
@@ -293,4 +294,5 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
     }
     if store_in_session:
         flask_session['current_question'] = question_dict
+        session_model.update_current_question(session_id, question_id)
     return question_dict

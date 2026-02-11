@@ -19,6 +19,7 @@
 - 1st Grade Math curriculum seed script (`scripts/seed_1st_grade_math.py`) with 31 nodes across 5 domains (OA, NBT, Measurement, Data, Geometry), full prerequisite chains, NJ standards-aligned
 
 ### Changed
+- Result card shows score delta (+3.9 green / -16.3 red) and topic progress delta after each answer
 - Lowered initial skill rating from 1000 to 800 — students start with easiest questions, no prior knowledge assumed
 - Raised initial uncertainty from 300 to 350 — faster skill adaptation in early questions
 - Updated schema.sql defaults to match (800.0/350.0)

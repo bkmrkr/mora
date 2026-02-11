@@ -102,9 +102,24 @@ def answer(session_id):
     student_answer = request.form.get('answer', '').strip()
     response_time_s = float(request.form.get('response_time_s', 0))
 
+    # Capture before-state for delta display
+    node_id = current['node_id']
+    before_skill = skill_model.get(student['id'], node_id)
+    before_rating = round(before_skill['skill_rating'], 1)
+    before_mastery = _compute_topic_mastery(student['id'], sess['topic_id'])
+
     result = answer_service.process_answer(
         student, current, student_answer, response_time_s, session_id
     )
+
+    # Compute deltas
+    after_mastery = _compute_topic_mastery(student['id'], sess['topic_id'])
+    rating_delta = round(result['skill_rating'] - before_rating, 1)
+    mastery_delta = after_mastery - before_mastery
+    result['rating_delta'] = rating_delta
+    result['mastery_before'] = before_mastery
+    result['mastery_after'] = after_mastery
+    result['mastery_delta'] = mastery_delta
 
     if result['is_correct']:
         flask_session['last_result'] = result

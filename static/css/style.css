@@ -232,12 +232,24 @@ body {
 .result-key { font-weight: 600; color: var(--text-muted); min-width: 85px; }
 .result-meta {
     display: flex;
+    justify-content: space-between;
     gap: 1rem;
     font-size: 0.75rem;
     color: var(--text-muted);
     border-top: 1px solid var(--border);
     padding-top: 0.5rem;
 }
+.result-meta + .result-meta {
+    border-top: none;
+    padding-top: 0.2rem;
+}
+.delta {
+    font-weight: 600;
+    font-size: 0.7rem;
+    margin-left: 0.25rem;
+}
+.delta-up { color: #16a34a; }
+.delta-down { color: #dc2626; }
 
 /* Progress Card (right panel) */
 .progress-card {

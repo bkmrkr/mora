@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Moriah — Feedback{% endblock %}
+{% block content %}
+<div class="session-container">
+    <div class="feedback-card wrong">
+        <div class="feedback-header">
+            <span class="feedback-icon">&#10060;</span>
+            <h2>Not quite!</h2>
+        </div>
+
+        {% if explanation and explanation.encouragement %}
+        <p class="encouragement">{{ explanation.encouragement }}</p>
+        {% endif %}
+
+        <div class="answer-comparison">
+            <div class="answer-row">
+                <span class="label">Your answer:</span>
+                <span class="value wrong-text">{{ result.student_answer }}</span>
+            </div>
+            <div class="answer-row">
+                <span class="label">Correct answer:</span>
+                <span class="value correct-text">{{ result.correct_answer }}</span>
+            </div>
+        </div>
+
+        {% if explanation and explanation.explanation %}
+        <div class="explanation-box">
+            <h3>Explanation</h3>
+            <p>{{ explanation.explanation }}</p>
+        </div>
+        {% elif result.explanation %}
+        <div class="explanation-box">
+            <h3>Explanation</h3>
+            <p>{{ result.explanation }}</p>
+        </div>
+        {% endif %}
+
+        {% if explanation and explanation.key_concept %}
+        <div class="key-concept">
+            <strong>Key concept:</strong> {{ explanation.key_concept }}
+        </div>
+        {% endif %}
+
+        {% if explanation and explanation.tip %}
+        <div class="tip-box">
+            <strong>Tip:</strong> {{ explanation.tip }}
+        </div>
+        {% endif %}
+
+        <div class="skill-update">
+            <span>Skill: {{ result.node_name }}</span>
+            <span>Rating: {{ result.skill_rating }}</span>
+            <span>Mastery: {{ (result.mastery_level * 100)|round(1) }}%</span>
+        </div>
+
+        <form action="{{ url_for('session.next', session_id=session_id) }}" method="post">
+            <button type="submit" class="btn btn-primary">Next Question</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

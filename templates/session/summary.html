@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Moriah — Session Summary{% endblock %}
+{% block content %}
+<div class="summary-container">
+    <h1>Session Complete!</h1>
+    <p class="subtitle">Great work, {{ student.name }}!</p>
+
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-value">{{ total }}</div>
+            <div class="stat-label">Questions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ correct }}</div>
+            <div class="stat-label">Correct</div>
+        </div>
+        <div class="stat-card {% if accuracy >= 80 %}stat-good{% elif accuracy >= 60 %}stat-ok{% else %}stat-low{% endif %}">
+            <div class="stat-value">{{ accuracy }}%</div>
+            <div class="stat-label">Accuracy</div>
+        </div>
+    </div>
+
+    {% if skills_practiced %}
+    <div class="card">
+        <h2>Skills Practiced</h2>
+        <div class="skills-list">
+            {% for skill in skills_practiced %}
+            <div class="skill-row">
+                <span class="skill-name">{{ skill.name }}</span>
+                <div class="mastery-bar">
+                    <div class="mastery-fill {% if skill.mastered %}mastered{% endif %}"
+                         style="width: {{ (skill.mastery_level * 100)|round }}%"></div>
+                </div>
+                <span class="skill-rating">{{ skill.skill_rating }} ELO</span>
+                {% if skill.mastered %}
+                <span class="mastered-badge">Mastered!</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="summary-actions">
+        <a href="{{ url_for('home.pick_topic', student_id=student.id) }}"
+           class="btn btn-primary">Continue Learning</a>
+        <a href="{{ url_for('dashboard.overview', student_id=student.id) }}"
+           class="btn btn-secondary">View Progress</a>
+    </div>
+</div>
+{% endblock %}

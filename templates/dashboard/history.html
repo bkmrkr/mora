@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Moriah — {{ student.name }}'s History{% endblock %}
+{% block content %}
+<div class="dashboard-container">
+    <h1>{{ student.name }}'s Attempt History</h1>
+
+    {% if attempts %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Concept</th>
+                <th>Question</th>
+                <th>Your Answer</th>
+                <th>Correct?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in attempts %}
+            <tr class="{% if a.is_correct %}row-correct{% else %}row-wrong{% endif %}">
+                <td>{{ a.timestamp[:16] if a.timestamp else '—' }}</td>
+                <td>{{ a.node_name or '—' }}</td>
+                <td class="question-cell">{{ a.content[:60] }}{% if a.content|length > 60 %}...{% endif %}</td>
+                <td>{{ a.answer_given or '—' }}</td>
+                <td>{% if a.is_correct %}Yes{% else %}No{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        {% if page > 1 %}
+        <a href="{{ url_for('dashboard.history', student_id=student.id, page=page-1) }}"
+           class="btn btn-secondary">Previous</a>
+        {% endif %}
+        <span>Page {{ page }} / {{ total_pages }}</span>
+        {% if page < total_pages %}
+        <a href="{{ url_for('dashboard.history', student_id=student.id, page=page+1) }}"
+           class="btn btn-secondary">Next</a>
+        {% endif %}
+    </div>
+    {% else %}
+    <p>No attempts yet.</p>
+    {% endif %}
+
+    <a href="{{ url_for('dashboard.overview', student_id=student.id) }}"
+       class="btn btn-secondary">Back to Overview</a>
+</div>
+{% endblock %}

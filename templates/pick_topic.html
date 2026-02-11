@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Moriah — Pick Topic{% endblock %}
+{% block content %}
+<div class="pick-topic-container">
+    <h1>Hello, {{ student.name }}!</h1>
+    <p>Choose a topic to study, or create a new one.</p>
+
+    {% if topics %}
+    <div class="card">
+        <h2>Your Topics</h2>
+        {% for t in topics %}
+        <form action="{{ url_for('session.start') }}" method="post" class="topic-start-form">
+            <input type="hidden" name="student_id" value="{{ student.id }}">
+            <input type="hidden" name="topic_id" value="{{ t.id }}">
+            <button type="submit" class="btn btn-topic">
+                <span class="topic-name">{{ t.name }}</span>
+                {% if t.description %}
+                <span class="topic-desc">{{ t.description[:80] }}</span>
+                {% endif %}
+            </button>
+        </form>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h2>New Topic</h2>
+        <form action="{{ url_for('home.onboard') }}" method="post">
+            <input type="hidden" name="student_name" value="{{ student.name }}">
+            <div class="form-group">
+                <input type="text" name="topic_name"
+                       placeholder="Enter a new topic to study" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Curriculum</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

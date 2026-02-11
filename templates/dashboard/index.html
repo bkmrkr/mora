@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Moriah — Dashboard{% endblock %}
+{% block content %}
+<div class="dashboard-container">
+    <h1>Dashboard</h1>
+
+    {% if student_stats %}
+    <div class="student-cards">
+        {% for s in student_stats %}
+        <a href="{{ url_for('dashboard.overview', student_id=s.student.id) }}" class="card student-card-link">
+            <h3>{{ s.student.name }}</h3>
+            <div class="student-stats">
+                <span>{{ s.total_attempts }} attempts</span>
+                <span>{{ s.mastered_nodes }} mastered</span>
+                <span>{{ s.in_progress }} in progress</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No students yet. <a href="{{ url_for('home.index') }}">Start learning</a> to see progress here.</p>
+    {% endif %}
+</div>
+{% endblock %}

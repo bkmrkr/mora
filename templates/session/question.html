@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Moriah — Question{% endblock %}
+{% block content %}
+<div class="session-container">
+    <div class="session-header">
+        <span class="student-name">{{ student.name }}</span>
+        <span class="progress-text">Question {{ questions_done + 1 }} / {{ max_questions }}</span>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ (questions_done / max_questions * 100)|int }}%"></div>
+        </div>
+    </div>
+
+    <div class="question-card">
+        <div class="question-meta">
+            <span class="node-badge">{{ question.node_name }}</span>
+            <span class="type-badge">{{ question.question_type }}</span>
+        </div>
+
+        <div class="question-text">{{ question.content }}</div>
+
+        <form action="{{ url_for('session.answer', session_id=session_id) }}" method="post"
+              id="answer-form">
+            <input type="hidden" name="response_time_s" id="response_time_s" value="0">
+
+            {% if question.question_type == 'mcq' and question.options %}
+            <div class="choices-grid">
+                {% for option in question.options %}
+                <button type="submit" name="answer" value="{{ option }}"
+                        class="choice-btn" data-key="{{ 'ABCD'[loop.index0] }}">
+                    <span class="choice-letter">{{ 'ABCD'[loop.index0] }}</span>
+                    <span class="choice-text">{{ option }}</span>
+                </button>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="form-group">
+                <textarea name="answer" id="answer-input" rows="3"
+                          placeholder="Type your answer..." required autofocus></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Answer</button>
+            {% endif %}
+        </form>
+    </div>
+
+    <form action="{{ url_for('session.end', session_id=session_id) }}" method="get"
+          class="end-session-form">
+        <button type="submit" class="btn btn-secondary">End Session Early</button>
+    </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/session.js') }}"></script>
+{% endblock %}

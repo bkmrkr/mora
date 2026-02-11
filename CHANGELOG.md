@@ -15,8 +15,12 @@
 - Two-panel session layout: left panel is the question, right panel shows previous answer result and per-node topic progress with mastery bars
 - Session stats in top bar (correct/total + accuracy %)
 - Global dedup model function `attempt.get_correct_texts()` for lifetime correct-answer tracking
+- 1st Grade Math curriculum seed script (`scripts/seed_1st_grade_math.py`) with 31 nodes across 5 domains (OA, NBT, Measurement, Data, Geometry), full prerequisite chains, NJ standards-aligned
 
 ### Changed
+- Lowered initial skill rating from 1000 to 800 — students start with easiest questions, no prior knowledge assumed
+- Raised initial uncertainty from 300 to 350 — faster skill adaptation in early questions
+- Updated schema.sql defaults to match (800.0/350.0)
 - Renamed project from "Moriah" to "Mora" everywhere (templates, config, DB file, spec, CSS, tests)
 - Removed question limit — sessions now continue indefinitely until user clicks "End Session"
 - Added topic mastery percentage (0-100%) at top of question and feedback pages, updates after every answer

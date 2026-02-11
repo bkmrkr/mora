@@ -41,7 +41,7 @@ The codebase follows a strict layered architecture. Each layer only depends on l
 
 All settings live in `config/settings.py` and are importable as module-level dictionaries.
 
-**ELO_DEFAULTS**: initial_skill_rating is 1000.0, initial_uncertainty is 300.0, base_k_factor is 32.0, mastery_threshold is 0.75.
+**ELO_DEFAULTS**: initial_skill_rating is 800.0 (starts students with easy questions), initial_uncertainty is 350.0 (high uncertainty allows fast adaptation), base_k_factor is 32.0, mastery_threshold is 0.75.
 
 **DIFFICULTY_DEFAULTS**: target_success_rate is 0.80, recent_window is 30 attempts, elo_scale_factor is 400.0.
 
@@ -88,13 +88,13 @@ Each model file provides simple CRUD functions. Key behaviors:
 
 #### ELO Skill Model
 
-Each student has a separate skill record per curriculum node, consisting of a skill_rating (ELO-scale, starting at 1000) and an uncertainty value (starting at 300).
+Each student has a separate skill record per curriculum node, consisting of a skill_rating (ELO-scale, starting at 800) and an uncertainty value (starting at 350). The low initial rating ensures students begin with easy questions and work up — no prior knowledge is assumed.
 
 **Probability of correct answer**: `P(correct) = 1 / (1 + 10^((D - S) / 400))` where S is skill_rating and D is question difficulty, both on the ELO scale. When S equals D, the probability is exactly 0.5.
 
 **Target difficulty for 80% success**: Solve the probability formula for D given P = 0.8: `D = S + 400 * log10(1/0.8 - 1)`, which simplifies to approximately S minus 241. This means questions are targeted about 241 ELO points below the student's skill level.
 
-**K-factor**: Dynamic, calculated as `base_K * (uncertainty / initial_uncertainty)`. At the initial uncertainty of 300, K equals the base of 32. As uncertainty decreases, K shrinks, making the rating more stable.
+**K-factor**: Dynamic, calculated as `base_K * (uncertainty / initial_uncertainty)`. At the initial uncertainty of 350, K equals the base of 32. As uncertainty decreases, K shrinks, making the rating more stable.
 
 **Skill update after each attempt**: Compute the expected probability of a correct answer using the actual question difficulty. The actual outcome is 1.0 for correct or 0.0 for wrong. The rating change is `delta = K * (actual - expected)`. The new rating is the old rating plus delta. Uncertainty decays by multiplying by 0.95 after each attempt, with a floor of 50.
 
@@ -244,6 +244,22 @@ Paginated table of all attempts (30 per page) showing timestamp, concept name, q
 **JavaScript**: A single `session.js` file loaded on the question page. It starts a timer on page load and captures elapsed seconds into a hidden form field on submit. Adds keyboard event listeners for A/B/C/D keys that click the corresponding MCQ button. Auto-focuses the text input for non-MCQ questions.
 
 **Template filter**: The Flask app registers a custom Jinja2 filter called `strip_letter` that removes leading letter prefixes (like "A) " or "B. ") from MCQ option text, since the LLM sometimes includes them and the template already adds its own letter indicators.
+
+---
+
+### Seeded Curricula
+
+#### 1st Grade Math (NJ Standards)
+
+A pre-built curriculum with 31 hand-crafted nodes covering the full NJ first grade math standards. Seeded via `scripts/seed_1st_grade_math.py`. Five domains:
+
+- **Operations and Algebraic Thinking** (10 nodes): Addition/subtraction within 10, fluency, within 20, word problems (add-to, take-from, compare, three-addend), fact families, commutative/associative properties.
+- **Number and Operations in Base Ten** (8 nodes): Counting to 120, reading/writing numerals, place value (tens and ones), comparing two-digit numbers, mental addition/subtraction of 10, adding within 100.
+- **Measurement** (6 nodes): Ordering by length, indirect measurement, telling time to hour and half-hour (uses local clock SVG generator), organizing data, interpreting data.
+- **Data Literacy** (2 nodes): Organizing data into categories, interpreting tally charts and pictographs.
+- **Geometry** (5 nodes): 2D shapes, 3D shapes, composing shapes, partitioning circles/rectangles into halves/quarters.
+
+Nodes have prerequisite chains (e.g., Addition Within 10 → Subtraction Within 10 → Fluency → Addition Within 20). Clock-reading nodes include a CLOCK_VISUAL marker that triggers the local SVG generator instead of the LLM.
 
 ---
 

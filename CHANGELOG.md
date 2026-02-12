@@ -2,6 +2,18 @@
 
 ## [2026-02-11]
 
+### Fixed
+- **Server crash on session start**: `AttributeError: 'list' object has no attribute 'get'` — `parse_ai_json()` returned a JSON array from LLM but all callers assumed dict. Added `parse_ai_json_dict()` that enforces dict return, extracts first dict from arrays. Updated question_generator, answer_grader, and explainer.
+- **Answer normalization destroys fractions/percentages**: `_normalize()` regex `[^\w\s\d.-]` stripped `/`, `%`, `$` — caused "3/4" → "34" (false match), "50%" → "50". Fixed regex to preserve these characters.
+- **Validator crash on non-string LLM values**: LLM returning int as `correct_answer` or string as `options` crashed the validator. Added `str()` wrapping and list type guard.
+- **Missing node_description in feedback**: `explain()` call received empty string instead of node context. Propagated `node_description` through full pipeline (question_service → _load_question_from_db → answer_service → feedback route).
+
+### Added
+- `parse_ai_json_dict()` in `ai/json_utils.py` — type-safe JSON parsing guaranteeing dict return
+- Type guard in `question_service.py` — rejects non-dict generator results and retries
+- `scripts/validate_questions.py` — deterministic DB question validation against all 15 rules (no LLM calls), reports pass/fail grouped by rule
+- 82 new tests (447 total): json_utils_dict (12), answer_matching edge cases (14), answer_service integration (14), question_service with mocked generator (9), local clock generators (14), answer_grader mock (8), explainer mock (6), validator type safety (5)
+
 ### Added
 - Research paper (paper.md) situating Mora's design within educational research literature, identifying established foundations vs. novel contributions
 - Initial project structure: config, db, models, engine, ai, services, routes

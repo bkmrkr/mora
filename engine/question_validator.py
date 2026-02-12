@@ -96,10 +96,11 @@ def validate_question(q_data, node_description=''):
             return False, 'Correct answer not found in choices'
 
     # Rule 5: Answer not given away in question text
-    if len(answer) > 1 and not _answer_in_question_is_ok(question, answer, choices):
+    # Strip MCQ letter prefix (e.g., "C) x > -3" → "x > -3") before checking
+    answer_text = LETTER_PREFIX_RE.sub('', answer).strip()
+    if len(answer_text) > 1 and not _answer_in_question_is_ok(question, answer_text, choices):
         q_lower = question.lower()
-        a_lower = answer.lower()
-        if a_lower in q_lower:
+        if answer_text.lower() in q_lower:
             return False, 'Answer given away in question text'
 
     # Rule 6: No placeholder text
@@ -586,9 +587,10 @@ def _answer_in_question_is_ok(question, answer, choices):
 
     Math expressions, comparisons, and classification questions
     naturally contain the answer in the question text.
+    answer should already be stripped of MCQ letter prefix.
     """
     q_lower = question.lower()
-    a_lower = answer.lower()
+    a_lower = answer.lower().strip()
 
     if a_lower not in q_lower:
         return True  # answer not in question, no issue

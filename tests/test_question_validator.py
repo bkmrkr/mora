@@ -146,6 +146,29 @@ def test_single_char_answer_skips_giveaway_check():
     assert ok
 
 
+def test_rejects_answer_with_letter_prefix_in_question():
+    """Q#421 regression: 'Solve the inequality: x > -3' with answer 'C) x > -3'.
+    Letter prefix masked the giveaway — 'c) x > -3' not in question, but 'x > -3' is."""
+    ok, reason = validate_question(
+        _q(question='Solve the inequality: x > -3',
+           correct_answer='C) x > -3',
+           options=['A) x < -3', 'B) x <= -3', 'C) x > -3', 'D) x >= -3'])
+    )
+    assert not ok
+    assert 'given away' in reason.lower()
+
+
+def test_rejects_answer_with_letter_prefix_giveaway_simple():
+    """Same pattern: answer text (without letter) appears verbatim in question."""
+    ok, reason = validate_question(
+        _q(question='There are 14 dots on the page.',
+           correct_answer='B) 14',
+           options=['A) 12', 'B) 14', 'C) 16', 'D) 18'])
+    )
+    assert not ok
+    assert 'given away' in reason.lower()
+
+
 # --- Rule 6: No placeholder text ---
 
 def test_rejects_placeholder_text():

@@ -7,9 +7,10 @@
 - **Inequality number line SVG generator**: Local generator (no LLM) for "Solving Inequalities" nodes — shows actual number line diagrams with open/filled circles and colored solution regions instead of text descriptions. MCQ options are inequality expressions (x > -3), not visual descriptions
 - Validator Rules 16-17: reject text descriptions of visual diagrams ("open circle at", "shading to the right") and draw/graph/sketch imperatives — forces LLM to produce mathematical expressions
 - LLM prompt rules 15-17: use LaTeX notation, never describe visuals in text, don't ask students to graph/draw
-- 20 new tests for inequality generator and validator Rules 16-17 (472 total)
+- 22 new tests for inequality generator, validator Rules 16-17, and Rule 5 letter prefix regression (474 total)
 
 ### Fixed
+- **Rule 5 letter prefix bypass (Q#421)**: "Solve the inequality: x > -3" with answer "C) x > -3" passed Rule 5 because the letter prefix "C) " prevented the substring match. Now strips MCQ letter prefix before checking if answer text appears in question
 - **LaTeX escape crash**: LLM returns `\(\sqrt{16} \times \sqrt{9}\)` inside JSON — `\(`, `\s`, `\t` are invalid JSON escapes. Added `_fix_latex_escapes()` that double-escapes non-structural backslashes as fallback after raw parse fails
 - Request/response logging to `mora_debug.log` with daily rotation (3-day retention) — every click, form submission, and exception with full traceback
 - `parse_ai_json_dict()` error messages now include the raw LLM text for debugging

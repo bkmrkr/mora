@@ -26,6 +26,9 @@
             {% if question.clock_svg %}
             <div class="clock-visual">{{ question.clock_svg | safe }}</div>
             {% endif %}
+            {% if question.number_line_svg %}
+            <div class="diagram-visual">{{ question.number_line_svg | safe }}</div>
+            {% endif %}
 
             <div class="question-meta">
                 <span class="node-badge">{{ question.node_name }}</span>

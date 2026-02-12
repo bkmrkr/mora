@@ -1467,3 +1467,69 @@ def test_extract_results_empty():
 def test_extract_results_the_answer_is():
     results = _extract_explanation_results('After computing, the answer is 42.')
     assert results == [42.0]
+
+
+# =====================================================================
+# Rule 16: Reject text descriptions of visual diagrams
+# =====================================================================
+
+def test_rule16_rejects_open_circle_in_question():
+    q = _q('Which inequality has an open circle at -3 on the number line?', 'B')
+    valid, reason = validate_question(q)
+    assert not valid
+    assert 'visual' in reason.lower()
+
+
+def test_rule16_rejects_shading_in_choices():
+    q = _q(
+        'Which represents x > -3?', 'A',
+        options=[
+            'A) The number line shows an open circle at -3 and shading to the right',
+            'B) Closed circle at -3, left shading',
+            'C) Open circle, left shading',
+            'D) Closed circle, right shading',
+        ],
+    )
+    valid, reason = validate_question(q)
+    assert not valid
+
+
+def test_rule16_accepts_normal_inequality():
+    q = _q('Solve for x: 2x + 1 > 5.', 'x > 2')
+    valid, _ = validate_question(q)
+    assert valid
+
+
+def test_rule16_accepts_math_expression():
+    q = _q('What is 5 + 3?', '8')
+    valid, _ = validate_question(q)
+    assert valid
+
+
+# =====================================================================
+# Rule 17: Reject draw/graph/sketch/plot imperatives
+# =====================================================================
+
+def test_rule17_rejects_graph_it():
+    q = _q('Solve the equation, then graph it on a number line.', '3')
+    valid, reason = validate_question(q)
+    assert not valid
+    assert 'visual' in reason.lower()
+
+
+def test_rule17_rejects_draw_the():
+    q = _q('Draw the number line for the solution.', '5')
+    valid, reason = validate_question(q)
+    assert not valid
+
+
+def test_rule17_rejects_sketch():
+    q = _q('Sketch a graph of the following equation.', 'parabola')
+    valid, reason = validate_question(q)
+    assert not valid
+
+
+def test_rule17_accepts_solve():
+    q = _q('Solve for x: 3x - 2 = 7.', '3')
+    valid, _ = validate_question(q)
+    assert valid

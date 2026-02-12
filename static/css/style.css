@@ -287,6 +287,14 @@ body {
     justify-content: center;
     margin-bottom: 1rem;
 }
+.diagram-visual {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
 
 .session-header {
     display: flex;

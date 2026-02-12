@@ -15,7 +15,8 @@ from engine import elo
 from engine import next_question as nq_engine
 from engine.question_validator import validate_question
 from ai import question_generator
-from ai.local_generators import is_clock_node, generate_clock_question
+from ai.local_generators import (is_clock_node, generate_clock_question,
+                                 is_inequality_node, generate_inequality_question)
 from config.settings import SESSION_DEFAULTS
 
 logger = logging.getLogger(__name__)
@@ -214,8 +215,16 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
             focus_node['name'], node_desc, recent_text_list
         )
         if q_data:
-            q_type = 'mcq'  # clock questions are always MCQ
+            q_type = 'mcq'
             logger.info('Generated local clock question for "%s"', focus_node['name'])
+
+    if not q_data and is_inequality_node(focus_node['name'], node_desc):
+        q_data, model, prompt = generate_inequality_question(
+            focus_node['name'], node_desc, recent_text_list
+        )
+        if q_data:
+            q_type = 'mcq'
+            logger.info('Generated local inequality question for "%s"', focus_node['name'])
 
     # --- Generate with validation + dedup retry (LLM path) ---
     if not q_data:
@@ -308,6 +317,7 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
         'difficulty_score': difficulty_score,
         'p_correct': round(p_correct * 100),
         'clock_svg': q_data.get('clock_svg'),
+        'number_line_svg': q_data.get('number_line_svg'),
         'node_description': node_desc,
     }
     if store_in_session:

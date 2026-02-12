@@ -1,6 +1,6 @@
 """Local question generators that don't need an LLM — ported from kidtutor.
 
-Currently supports: analog clock reading questions with SVG visuals.
+Supports: analog clock reading, inequality number line diagrams.
 """
 import math
 import random
@@ -8,6 +8,10 @@ import random
 # Keywords that trigger clock question generation
 CLOCK_KEYWORDS = {'clock', 'telling time', 'tell time', 'analog time',
                   'read time', 'reading time', 'reading clocks', 'analog clock'}
+
+# Keywords that trigger inequality number line generation
+INEQUALITY_KEYWORDS = {'inequality', 'inequalities', 'number line',
+                       'number lines', 'graphing inequalities'}
 
 
 def is_clock_node(node_name, node_description=''):
@@ -158,4 +162,177 @@ def _generate_clock_svg(hour, minute, size=200):
     parts.append(f'<circle cx="{cx}" cy="{cy}" r="4" fill="#2C3E50"/>')
     parts.append('</svg>')
 
+    return '\n'.join(parts)
+
+
+# ---------------------------------------------------------------------------
+# Inequality number line generator
+# ---------------------------------------------------------------------------
+
+def is_inequality_node(node_name, node_description=''):
+    """Check if a curriculum node is about inequalities / number lines."""
+    text = (node_name + ' ' + (node_description or '')).lower()
+    return any(kw in text for kw in INEQUALITY_KEYWORDS)
+
+
+_OPERATORS = ['>', '<', '>=', '<=']
+_OP_LABELS = {'>': '>', '<': '<', '>=': '\u2265', '<=': '\u2264'}
+
+
+def generate_inequality_question(node_name, node_description='',
+                                 recent_questions=None):
+    """Generate an inequality question with a number line SVG diagram.
+
+    Returns (question_dict, 'local-inequality', description_string).
+    """
+    recent_set = set(recent_questions or [])
+
+    # Try to find a combination not recently used
+    candidates = [(op, val) for op in _OPERATORS for val in range(-5, 6)]
+    random.shuffle(candidates)
+
+    op, boundary = candidates[0]
+    for o, v in candidates:
+        q_key = f"Which inequality does this number line represent? [x {o} {v}]"
+        if q_key not in recent_set:
+            op, boundary = o, v
+            break
+
+    # Build correct answer and distractors
+    correct = f"x {_OP_LABELS[op]} {boundary}"
+    # Distractors: same boundary, different operators
+    other_ops = [o for o in _OPERATORS if o != op]
+    distractors = [f"x {_OP_LABELS[o]} {boundary}" for o in other_ops]
+    choices = distractors[:3] + [correct]
+    random.shuffle(choices)
+
+    # Generate SVG
+    svg = _generate_number_line_svg(op, boundary)
+
+    # Explanation
+    circle_type = 'filled' if op in ('>=', '<=') else 'open'
+    direction = 'right' if op in ('>', '>=') else 'left'
+    explanation = (
+        f"The {circle_type} circle at {boundary} means the value {boundary} "
+        f"{'is' if circle_type == 'filled' else 'is not'} included. "
+        f"The shading goes to the {direction}, representing all values "
+        f"{'greater than' if direction == 'right' else 'less than'}"
+        f"{' or equal to' if op in ('>=', '<=') else ''} {boundary}."
+    )
+
+    q_data = {
+        'question': f"Which inequality does this number line represent? "
+                    f"[x {op} {boundary}]",
+        'correct_answer': correct,
+        'options': choices,
+        'explanation': explanation,
+        'number_line_svg': svg,
+    }
+
+    return q_data, 'local-inequality', f'Inequality node: {node_name}'
+
+
+def _generate_number_line_svg(operator, boundary, width=420, height=80):
+    """Generate a number line SVG for an inequality.
+
+    Shows a horizontal line with tick marks, an open/filled circle at the
+    boundary, and a colored region + arrow for the solution set.
+    """
+    # Layout
+    margin = 30
+    line_y = 35
+    label_y = 60
+    usable = width - 2 * margin
+
+    # Range: show boundary +/- 4, at least -5 to 5
+    low = min(boundary - 4, -5)
+    high = max(boundary + 4, 5)
+    n_ticks = high - low + 1
+    spacing = usable / (n_ticks - 1)
+
+    def x_for(val):
+        return margin + (val - low) * spacing
+
+    bx = x_for(boundary)
+    is_inclusive = operator in ('>=', '<=')
+    goes_right = operator in ('>', '>=')
+    color = '#3498DB'
+
+    parts = [
+        f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
+        f'xmlns="http://www.w3.org/2000/svg">',
+    ]
+
+    # Main line with arrow tips
+    parts.append(
+        f'<line x1="{margin - 15}" y1="{line_y}" x2="{width - margin + 15}" '
+        f'y2="{line_y}" stroke="#2C3E50" stroke-width="1.5"/>'
+    )
+    # Left arrow
+    parts.append(
+        f'<polygon points="{margin - 15},{line_y} {margin - 7},{line_y - 5} '
+        f'{margin - 7},{line_y + 5}" fill="#2C3E50"/>'
+    )
+    # Right arrow
+    parts.append(
+        f'<polygon points="{width - margin + 15},{line_y} '
+        f'{width - margin + 7},{line_y - 5} '
+        f'{width - margin + 7},{line_y + 5}" fill="#2C3E50"/>'
+    )
+
+    # Tick marks and labels
+    for val in range(low, high + 1):
+        x = x_for(val)
+        tick_h = 8 if val == 0 else 5
+        parts.append(
+            f'<line x1="{x:.1f}" y1="{line_y - tick_h}" '
+            f'x2="{x:.1f}" y2="{line_y + tick_h}" '
+            f'stroke="#2C3E50" stroke-width="1.5"/>'
+        )
+        font_weight = 'bold' if val == 0 else 'normal'
+        parts.append(
+            f'<text x="{x:.1f}" y="{label_y}" text-anchor="middle" '
+            f'font-size="12" font-family="sans-serif" fill="#2C3E50" '
+            f'font-weight="{font_weight}">{val}</text>'
+        )
+
+    # Solution region (thick colored line with arrow)
+    if goes_right:
+        parts.append(
+            f'<line x1="{bx:.1f}" y1="{line_y}" '
+            f'x2="{width - margin + 12:.1f}" y2="{line_y}" '
+            f'stroke="{color}" stroke-width="4" stroke-linecap="round"/>'
+        )
+        # Arrow head
+        ax = width - margin + 12
+        parts.append(
+            f'<polygon points="{ax},{line_y} {ax - 8},{line_y - 5} '
+            f'{ax - 8},{line_y + 5}" fill="{color}"/>'
+        )
+    else:
+        parts.append(
+            f'<line x1="{margin - 12:.1f}" y1="{line_y}" '
+            f'x2="{bx:.1f}" y2="{line_y}" '
+            f'stroke="{color}" stroke-width="4" stroke-linecap="round"/>'
+        )
+        # Arrow head
+        ax = margin - 12
+        parts.append(
+            f'<polygon points="{ax},{line_y} {ax + 8},{line_y - 5} '
+            f'{ax + 8},{line_y + 5}" fill="{color}"/>'
+        )
+
+    # Boundary circle (open or filled)
+    if is_inclusive:
+        parts.append(
+            f'<circle cx="{bx:.1f}" cy="{line_y}" r="6" '
+            f'fill="{color}" stroke="{color}" stroke-width="2"/>'
+        )
+    else:
+        parts.append(
+            f'<circle cx="{bx:.1f}" cy="{line_y}" r="6" '
+            f'fill="white" stroke="{color}" stroke-width="2.5"/>'
+        )
+
+    parts.append('</svg>')
     return '\n'.join(parts)

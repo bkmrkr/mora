@@ -166,6 +166,16 @@ def validate_question(q_data, node_description=''):
     if not arith_ok:
         return False, arith_reason
 
+    # Rule 16: Reject text descriptions of visual diagrams
+    desc_ok, desc_reason = _check_visual_descriptions(question, choices)
+    if not desc_ok:
+        return False, desc_reason
+
+    # Rule 17: Reject "graph/draw/sketch/plot" imperatives
+    draw_ok, draw_reason = _check_draw_imperatives(question)
+    if not draw_ok:
+        return False, draw_reason
+
     return True, ''
 
 
@@ -606,3 +616,51 @@ def _answer_in_question_is_ok(question, answer, choices):
         return True
 
     return False
+
+
+# ---------------------------------------------------------------------------
+# Rules 16-17: Visual description and draw-imperative checks
+# ---------------------------------------------------------------------------
+
+# Text descriptions of visual diagrams — student can't see these
+VISUAL_DESCRIPTION_PATTERNS = [
+    'open circle at', 'closed circle at', 'filled circle at',
+    'shading to the right', 'shading to the left',
+    'arrow pointing', 'number line shows', 'graph shows',
+    'the line passes through', 'the curve passes through',
+    'dashed line', 'solid line at', 'dotted line',
+]
+
+# Imperatives asking students to produce visual output
+DRAW_IMPERATIVE_PATTERNS = [
+    'graph it', 'graph the', 'draw the', 'draw a',
+    'sketch the', 'sketch a', 'plot the', 'plot a',
+    'then graph', 'and graph', 'then draw', 'and draw',
+    'then sketch', 'then plot',
+]
+
+
+def _check_visual_descriptions(question, choices):
+    """Rule 16: Reject questions/options that describe visuals in text."""
+    q_lower = question.lower()
+    for pattern in VISUAL_DESCRIPTION_PATTERNS:
+        if pattern in q_lower:
+            return False, f'Question describes visual in text: "{pattern}"'
+
+    # Also check MCQ options — text descriptions of diagrams as choices
+    for choice in choices:
+        c_lower = choice.lower()
+        for pattern in VISUAL_DESCRIPTION_PATTERNS:
+            if pattern in c_lower:
+                return False, f'Choice describes visual in text: "{pattern}"'
+
+    return True, ''
+
+
+def _check_draw_imperatives(question):
+    """Rule 17: Reject questions asking students to graph/draw/sketch/plot."""
+    q_lower = question.lower()
+    for pattern in DRAW_IMPERATIVE_PATTERNS:
+        if pattern in q_lower:
+            return False, f'Question asks student to produce visual: "{pattern}"'
+    return True, ''

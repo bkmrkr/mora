@@ -37,7 +37,10 @@ Rules:
 11. Never write "[shows X items]" or "[image of...]" — only real question text.
 12. NEVER use "All of the above" or "None of the above" as choices.
 13. The question must end with a question mark, colon, period, or start with an imperative verb.
-14. Keep the correct answer concise — under 200 characters."""
+14. Keep the correct answer concise — under 200 characters.
+15. Use LaTeX notation for math expressions: \\(\\sqrt{16}\\), \\(\\frac{1}{2}\\), \\(x^2\\).
+16. NEVER describe visual elements in words — don't write "open circle at -3 and shading to the right" or "the number line shows". Write the mathematical expression instead.
+17. Do NOT ask students to "graph", "draw", "sketch", or "plot" anything."""
 
 
 def generate(node_name, node_description, topic_name, skill_description,

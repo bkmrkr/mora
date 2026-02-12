@@ -1,7 +1,7 @@
 """Tests for question_validator — 15 rules including math answer verification."""
 from engine.question_validator import (
     validate_question, verify_math_answer, verify_explanation_vs_answer,
-    verify_explanation_arithmetic,
+    verify_explanation_arithmetic, _extract_explanation_results,
     _try_compute_answer, _resolve_answer_text, _parse_numeric, _safe_eval_expr,
 )
 
@@ -1211,3 +1211,259 @@ def test_validate_addition_word_problem_correct():
         'explanation': '4 + 3 = 7.',
     })
     assert ok
+
+
+# ==========================================================================
+# THE EXACT Q363 BUG: Multi-step question, intermediate answer as correct
+# ==========================================================================
+
+def test_q363_bug_compute_multiply_then_divide():
+    """_try_compute_answer should handle 'multiplying X by Y then dividing by Z'."""
+    result = _try_compute_answer(
+        'What is the result of multiplying 3 by 4 and then dividing by 2?'
+    )
+    assert result == 6.0
+
+
+def test_q363_bug_rule13_rejects_intermediate_answer():
+    """Rule 13 should catch answer=12 when the question computes to 6."""
+    ok, reason = verify_math_answer({
+        'question': 'What is the result of multiplying 3 by 4 and then dividing by 2?',
+        'correct_answer': 'C) 12',
+        'options': ['A) 6', 'B) 8', 'C) 12', 'D) 24'],
+    })
+    assert not ok
+    assert 'computes to 6' in reason
+
+
+def test_q363_bug_rule14_catches_natural_language_explanation():
+    """Rule 14 should parse 'to get 12' and 'which is 6' as results."""
+    ok, reason = verify_explanation_vs_answer({
+        'question': 'What is the result of multiplying 3 by 4 and then dividing by 2?',
+        'correct_answer': 'C) 12',
+        'options': ['A) 6', 'B) 8', 'C) 12', 'D) 24'],
+        'explanation': 'First, multiply 3 by 4 to get 12. Then divide 12 by 2 to obtain the result, which is 6.',
+    })
+    assert not ok
+    assert 'explanation computes 6' in reason
+
+
+def test_q363_bug_full_validation_rejects():
+    """Full validate_question should reject the exact Q363 bug."""
+    ok, reason = validate_question({
+        'question': 'What is the result of multiplying 3 by 4 and then dividing by 2?',
+        'correct_answer': 'C) 12',
+        'options': ['A) 6', 'B) 8', 'C) 12', 'D) 24'],
+        'explanation': 'First, multiply 3 by 4 to get 12. Then divide 12 by 2 to obtain the result, which is 6.',
+    })
+    assert not ok
+
+
+def test_q363_bug_correct_answer_accepted():
+    """Same question with correct answer=6 passes."""
+    ok, _ = validate_question({
+        'question': 'What is the result of multiplying 3 by 4 and then dividing by 2?',
+        'correct_answer': 'A) 6',
+        'options': ['A) 6', 'B) 8', 'C) 12', 'D) 24'],
+        'explanation': 'First, multiply 3 by 4 to get 12. Then divide 12 by 2 to obtain the result, which is 6.',
+    })
+    assert ok
+
+
+# === Q299/301 BUG: "sum of X, Y, and Z" with wrong answer ===
+
+def test_q301_bug_compute_sum_of_three():
+    """_try_compute_answer should handle 'sum of 5, 6, and 3'."""
+    result = _try_compute_answer('What is the sum of 5, 6, and 3?')
+    assert result == 14
+
+
+def test_q301_bug_rule13_rejects_wrong_sum():
+    """Rule 13 should reject answer=12 when sum of 5+6+3 = 14."""
+    ok, reason = verify_math_answer({
+        'question': 'What is the sum of 5, 6, and 3?',
+        'correct_answer': 'B) 12',
+        'options': ['A) 10', 'B) 12', 'C) 14', 'D) 15'],
+    })
+    assert not ok
+    assert 'computes to 14' in reason
+
+
+# === Unicode operator handling ===
+
+def test_compute_unicode_multiplication():
+    """× (multiplication sign) should be handled."""
+    assert _try_compute_answer('What is 3 × 4?') == 12
+
+
+def test_compute_unicode_division():
+    """÷ (division sign) should be handled."""
+    assert _try_compute_answer('What is 12 ÷ 3?') == 4.0
+
+
+def test_compute_unicode_multi_step():
+    """3 × 4 ÷ 2 should be computed as (3*4)/2 = 6."""
+    assert _try_compute_answer('What is 3 × 4 ÷ 2?') == 6.0
+
+
+def test_verify_unicode_operators_correct():
+    ok, _ = verify_math_answer({
+        'question': 'What is 3 × 4?',
+        'correct_answer': '12',
+    })
+    assert ok
+
+
+def test_verify_unicode_operators_wrong():
+    ok, reason = verify_math_answer({
+        'question': 'What is 3 × 4?',
+        'correct_answer': '8',
+    })
+    assert not ok
+    assert 'computes to 12' in reason
+
+
+# === New _try_compute_answer patterns ===
+
+def test_compute_multiplying_by():
+    assert _try_compute_answer('What do you get multiplying 5 by 3?') == 15
+
+
+def test_compute_multiply_by():
+    assert _try_compute_answer('Multiply 7 by 8.') == 56
+
+
+def test_compute_dividing_by():
+    assert _try_compute_answer('What is the result of dividing 20 by 4?') == 5.0
+
+
+def test_compute_divide_by():
+    assert _try_compute_answer('Divide 15 by 3.') == 5.0
+
+
+def test_compute_divide_then_multiply():
+    """Reverse order: divide first then multiply."""
+    result = _try_compute_answer(
+        'What is the result of dividing 12 by 4 and then multiplying by 5?'
+    )
+    assert result == 15.0
+
+
+def test_compute_product_of():
+    assert _try_compute_answer('What is the product of 6 and 7?') == 42
+
+
+def test_compute_sum_of_two():
+    assert _try_compute_answer('What is the sum of 15 and 8?') == 23
+
+
+def test_compute_sum_of_four():
+    """sum of A, B, C, and D should work."""
+    assert _try_compute_answer('What is the sum of 2, 3, 4, and 5?') == 14
+
+
+# === Natural language explanation result extraction (Rule 14) ===
+
+def test_expl_natural_language_to_get():
+    """'to get N' should be extracted as a result."""
+    ok, reason = verify_explanation_vs_answer({
+        'correct_answer': '5',
+        'explanation': 'Add 2 and 3 to get 5.',
+    })
+    assert ok
+
+
+def test_expl_natural_language_to_get_mismatch():
+    ok, reason = verify_explanation_vs_answer({
+        'correct_answer': '6',
+        'explanation': 'Add 2 and 3 to get 5.',
+    })
+    assert not ok
+    assert 'explanation computes 5' in reason
+
+
+def test_expl_natural_language_which_is():
+    """'which is N' should be extracted."""
+    ok, reason = verify_explanation_vs_answer({
+        'correct_answer': '8',
+        'explanation': 'The result, which is 6, is the final answer.',
+    })
+    assert not ok
+    assert 'explanation computes 6' in reason
+
+
+def test_expl_natural_language_the_result_is():
+    ok, reason = verify_explanation_vs_answer({
+        'correct_answer': '10',
+        'explanation': 'After adding, the result is 8.',
+    })
+    assert not ok
+    assert 'explanation computes 8' in reason
+
+
+def test_expl_natural_language_leaving():
+    ok, _ = verify_explanation_vs_answer({
+        'correct_answer': '3',
+        'explanation': 'Subtract 2 from 5, leaving 3.',
+    })
+    assert ok
+
+
+def test_expl_natural_language_you_get():
+    ok, reason = verify_explanation_vs_answer({
+        'correct_answer': '10',
+        'explanation': 'Divide 20 by 2 and you get 10.',
+    })
+    assert ok
+
+
+def test_expl_natural_language_multi_step_last_wins():
+    """With multiple natural language results, the last is the final answer."""
+    ok, reason = verify_explanation_vs_answer({
+        'correct_answer': '12',
+        'explanation': 'First multiply to get 12. Then divide to get 6.',
+    })
+    assert not ok
+    assert 'explanation computes 6' in reason
+
+
+def test_expl_mixed_equals_and_natural():
+    """Mix of = and natural language — last result wins."""
+    ok, reason = verify_explanation_vs_answer({
+        'correct_answer': '10',
+        'explanation': '5 + 3 = 8. Then add 2 to get 10.',
+    })
+    assert ok
+
+
+# === Direct tests for _extract_explanation_results ===
+
+def test_extract_results_equals_only():
+    results = _extract_explanation_results('3 + 4 = 7')
+    assert results == [7.0]
+
+
+def test_extract_results_natural_language_only():
+    results = _extract_explanation_results(
+        'First multiply to get 12. Then divide to obtain the result, which is 6.'
+    )
+    assert 12.0 in results
+    assert 6.0 in results
+    assert results[-1] == 6.0  # last is final answer
+
+
+def test_extract_results_mixed():
+    results = _extract_explanation_results('5 + 3 = 8. Then add 2 to get 10.')
+    assert 8.0 in results
+    assert 10.0 in results
+    assert results[-1] == 10.0
+
+
+def test_extract_results_empty():
+    results = _extract_explanation_results('Count the apples: there are four.')
+    assert results == []
+
+
+def test_extract_results_the_answer_is():
+    results = _extract_explanation_results('After computing, the answer is 42.')
+    assert results == [42.0]

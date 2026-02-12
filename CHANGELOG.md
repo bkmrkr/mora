@@ -63,6 +63,11 @@
 - Visual context detection (Rule 6b): rejects LLM questions containing phrases like "which is longer", "look at the picture", "use the graph"
 
 ### Fixed
+- **LLM intermediate answer bug (Q363)**: LLM set correct_answer to an intermediate computation step instead of the final answer (e.g., "3×4÷2" → answer "12" instead of "6"). Root cause: three validator gaps:
+  - Rule 13 couldn't parse "multiplying X by Y then dividing by Z" or unicode operators (`×`, `÷`)
+  - Rule 14 only found `= N` patterns, missed natural language ("to get 12", "which is 6")
+  - Rule 13 couldn't parse "sum of X, Y, and Z" (comma-separated addends)
+  - Fix: added unicode normalization, 7 new computation patterns (multiply/divide by, multi-step chains, product of, sum of N items), natural language result extraction in Rule 14. 33 new validator tests (365 total)
 - **Double-submit race condition**: double-clicking an MCQ button sent two POSTs — first POST advanced to the next question, second POST checked the old answer against the new question's correct answer. Fix: 4-layer defense:
   - Server-side: `question_id` in form, reject submissions where form `question_id` != current question
   - Client-side: disable all choice buttons after first click, block keyboard shortcuts after submission

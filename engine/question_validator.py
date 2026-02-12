@@ -210,6 +210,9 @@ def _try_compute_answer(question_text):
     """
     q = _DASH_RE.sub('-', question_text.lower().strip())
 
+    # Normalize unicode math operators
+    q = q.replace('×', '*').replace('÷', '/')
+
     # Skip comparison questions — they pick between values, not compute
     if any(w in q for w in ('which is bigger', 'which is larger',
                              'which is smaller', 'which is greater',
@@ -218,7 +221,7 @@ def _try_compute_answer(question_text):
         return None
 
     # --- Direct arithmetic expressions ---
-    # "5 + 3", "15 - 7", "5 + 3 + 2", "8 * 4", "12 / 3"
+    # "5 + 3", "15 - 7", "5 + 3 + 2", "8 * 4", "12 / 3", "3 × 4 ÷ 2"
     expr_match = re.search(r'(\d+(?:\s*[+\-*/]\s*\d+)+)', q)
     if expr_match:
         result = _safe_eval_expr(expr_match.group(1))
@@ -246,6 +249,47 @@ def _try_compute_answer(question_text):
     m = re.search(r'(\d+)\s+divided\s+by\s+(\d+)', q)
     if m and int(m.group(2)) != 0:
         return int(m.group(1)) / int(m.group(2))
+
+    # --- Multi-step natural language operations ---
+    # "multiply A by B and/then divide by C" → (A * B) / C
+    m = re.search(
+        r'multipl(?:y|ying)\s+(\d+)\s+by\s+(\d+)'
+        r'.*?divid(?:e|ing)\s+(?:(?:the\s+result|it|that)\s+)?by\s+(\d+)',
+        q,
+    )
+    if m and int(m.group(3)) != 0:
+        return (int(m.group(1)) * int(m.group(2))) / int(m.group(3))
+
+    # "divide A by B and/then multiply by C" → (A / B) * C
+    m = re.search(
+        r'divid(?:e|ing)\s+(\d+)\s+by\s+(\d+)'
+        r'.*?multipl(?:y|ying)\s+(?:(?:the\s+result|it|that)\s+)?by\s+(\d+)',
+        q,
+    )
+    if m and int(m.group(2)) != 0:
+        return (int(m.group(1)) / int(m.group(2))) * int(m.group(3))
+
+    # "multiply/multiplying A by B" → A * B (single step)
+    m = re.search(r'multipl(?:y|ying)\s+(\d+)\s+by\s+(\d+)', q)
+    if m:
+        return int(m.group(1)) * int(m.group(2))
+
+    # "divide/dividing A by B" → A / B (single step)
+    m = re.search(r'divid(?:e|ing)\s+(\d+)\s+by\s+(\d+)', q)
+    if m and int(m.group(2)) != 0:
+        return int(m.group(1)) / int(m.group(2))
+
+    # "product of A and B" → A * B
+    m = re.search(r'product\s+of\s+(\d+)\s+and\s+(\d+)', q)
+    if m:
+        return int(m.group(1)) * int(m.group(2))
+
+    # "sum of A, B, and C" → A + B + C (comma-separated three+ addends)
+    m = re.search(r'sum\s+of\s+([\d,\s]+and\s+\d+)', q)
+    if m:
+        nums = re.findall(r'\d+', m.group(1))
+        if len(nums) >= 2:
+            return sum(int(n) for n in nums)
 
     # --- Phrased patterns ---
     # "N more than M" → M + N
@@ -416,11 +460,47 @@ def verify_math_answer(q_data):
     return True, ''
 
 
+def _extract_explanation_results(explanation):
+    """Extract all computed results from an explanation — both math notation and natural language.
+
+    Returns a list of floats in order of appearance. The last is typically the final answer.
+    Handles:
+      - "= N" patterns: "5 + 3 = 8"
+      - "to get N", "to obtain N", "giving N", "leaving N"
+      - "which is N", "the result is N", "the answer is N"
+      - "you get N", "equals N", "we get N"
+    """
+    results = []
+
+    # Math notation: "= N"
+    for m in re.finditer(r'=\s*(\d+(?:\.\d+)?)', explanation):
+        results.append((m.start(), float(m.group(1))))
+
+    # Natural language result patterns
+    nl_patterns = [
+        r'to\s+get\s+(\d+(?:\.\d+)?)',
+        r'to\s+obtain\s+(\d+(?:\.\d+)?)',
+        r'(?:which|that)\s+is\s+(\d+(?:\.\d+)?)',
+        r'the\s+(?:result|answer)\s+is\s+(\d+(?:\.\d+)?)',
+        r'(?:giving|leaves?|leaving)\s+(\d+(?:\.\d+)?)',
+        r'(?:you|we)\s+get\s+(\d+(?:\.\d+)?)',
+        r'equals?\s+(\d+(?:\.\d+)?)',
+    ]
+    for pat in nl_patterns:
+        for m in re.finditer(pat, explanation, re.IGNORECASE):
+            results.append((m.start(), float(m.group(1))))
+
+    # Sort by position in text and return just the values
+    results.sort(key=lambda x: x[0])
+    return [v for _, v in results]
+
+
 def verify_explanation_vs_answer(q_data):
     """Cross-check: does the explanation's own math agree with the stated answer?
 
     Catches cases where the LLM sets correct_answer="3" but the explanation
-    correctly computes "9 - 5 = 4".
+    correctly computes "9 - 5 = 4". Also catches natural language explanations
+    like "divide 12 by 2 to obtain the result, which is 6" vs answer "12".
 
     Returns (is_valid, reason).
     """
@@ -437,10 +517,10 @@ def verify_explanation_vs_answer(q_data):
     if stated_num is None:
         return True, ''  # Not numeric
 
-    # Find all "= N" patterns in the explanation (the last is usually the final answer)
-    eq_matches = re.findall(r'=\s*(\d+(?:\.\d+)?)', explanation)
-    if eq_matches:
-        final_computed = float(eq_matches[-1])
+    # Extract all results from the explanation (math and natural language)
+    results = _extract_explanation_results(explanation)
+    if results:
+        final_computed = results[-1]
         if abs(final_computed - stated_num) > 0.01:
             return False, (
                 f'Explanation contradicts answer: explanation computes '

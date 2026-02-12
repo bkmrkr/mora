@@ -63,6 +63,8 @@
 - Visual context detection (Rule 6b): rejects LLM questions containing phrases like "which is longer", "look at the picture", "use the graph"
 
 ### Fixed
+- **Empty MCQ answer bug (Q365)**: `btn.disabled = true` in JS submit handler stripped the clicked button's value from form data — browser excludes disabled buttons from submission. Fix: removed `disabled`, using CSS `pointer-events: none` via `.submitting` class instead. Added server-side guard to reject empty answers.
+- **Wrong question on feedback page**: After answering, `current_question` was already set to the NEXT question — feedback page showed wrong question text and generated explanation for the wrong question. Fix: feedback route now uses `result` data (answered question) instead of `current_question` (next question).
 - **LLM intermediate answer bug (Q363)**: LLM set correct_answer to an intermediate computation step instead of the final answer (e.g., "3×4÷2" → answer "12" instead of "6"). Root cause: three validator gaps:
   - Rule 13 couldn't parse "multiplying X by Y then dividing by Z" or unicode operators (`×`, `÷`)
   - Rule 14 only found `= N` patterns, missed natural language ("to get 12", "which is 6")

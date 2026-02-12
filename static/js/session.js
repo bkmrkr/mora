@@ -18,9 +18,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const elapsed = (Date.now() - startTime) / 1000;
             timeField.value = elapsed.toFixed(1);
 
-            // Disable all choice buttons to prevent further clicks
+            // Visually disable buttons — do NOT set btn.disabled=true because
+            // that strips the clicked button's value from the form data.
+            // The CSS class uses pointer-events:none to block further clicks.
             document.querySelectorAll('.choice-btn').forEach(function(btn) {
-                btn.disabled = true;
                 btn.classList.add('submitting');
             });
         });

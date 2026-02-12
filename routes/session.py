@@ -166,6 +166,12 @@ def answer(session_id):
     student_answer = request.form.get('answer', '').strip()
     response_time_s = float(request.form.get('response_time_s', 0))
 
+    # Guard: reject empty MCQ answers (browser bug where disabled button
+    # strips value from form data, or other submission glitches).
+    if not student_answer:
+        logger.warning('Empty answer submitted for session %s — re-showing question', session_id)
+        return redirect(url_for('session.question', session_id=session_id))
+
     # Capture before-state for delta display
     node_id = current['node_id']
     before_skill = skill_model.get(student['id'], node_id)
@@ -220,26 +226,32 @@ def feedback(session_id):
         result = json.loads(sess['last_result_json'])
         flask_session['last_result'] = result
     result = result or {}
-    current = flask_session.get('current_question')
-    if not current and sess.get('current_question_id'):
-        current = _load_question_from_db(sess['current_question_id'])
-    current = current or {}
 
-    # Try to generate LLM explanation
+    # Build answered-question context from result data (NOT current_question,
+    # which is already the NEXT question after answer() processed the submission).
+    answered_question = {
+        'question_id': result.get('question_id'),
+        'content': result.get('question_text', ''),
+        'correct_answer': result.get('correct_answer', ''),
+        'node_name': result.get('node_name', ''),
+        'explanation': result.get('explanation', ''),
+    }
+
+    # Try to generate LLM explanation for the answered question
     explanation = None
-    if current:
+    if answered_question.get('content'):
         try:
             from ai.explainer import explain
             explanation, _, _ = explain(
-                current.get('content', ''),
-                current.get('correct_answer', ''),
+                answered_question['content'],
+                answered_question['correct_answer'],
                 result.get('student_answer', ''),
-                current.get('node_name', ''),
+                answered_question['node_name'],
                 '',
             )
         except Exception:
             explanation = {
-                'explanation': f"The correct answer was: {current.get('correct_answer', '')}",
+                'explanation': f"The correct answer was: {answered_question['correct_answer']}",
                 'encouragement': 'Keep going!',
             }
 
@@ -250,7 +262,7 @@ def feedback(session_id):
         session_id=session_id,
         student=student,
         result=result,
-        question=current,
+        question=answered_question,
         explanation=explanation,
         topic_mastery=topic_mastery,
     )

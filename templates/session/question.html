@@ -36,7 +36,7 @@
                 <span class="qid-badge">Q#{{ question.question_id }}</span>
             </div>
 
-            <div class="question-text">{{ question.content }}</div>
+            <div class="question-text">{{ question.content | render_math }}</div>
 
             <form action="{{ url_for('session.answer', session_id=session_id) }}" method="post"
                   id="answer-form">
@@ -49,7 +49,7 @@
                     <button type="submit" name="answer" value="{{ option }}"
                             class="choice-btn" data-key="{{ 'ABCD'[loop.index0] }}">
                         <span class="choice-letter">{{ 'ABCD'[loop.index0] }}</span>
-                        <span class="choice-text">{{ option | strip_letter }}</span>
+                        <span class="choice-text">{{ option | strip_letter | render_math }}</span>
                     </button>
                     {% endfor %}
                 </div>
@@ -88,16 +88,16 @@
                 <span class="result-label">Wrong</span>
                 {% endif %}
             </div>
-            <div class="result-question">{{ last_result.question_text[:80] }}{% if last_result.question_text|length > 80 %}...{% endif %}</div>
+            <div class="result-question">{{ last_result.question_text[:80] | render_math }}{% if last_result.question_text|length > 80 %}...{% endif %}</div>
             <div class="result-answers">
                 <div class="result-row">
                     <span class="result-key">Your answer:</span>
-                    <span class="{% if last_result.is_correct %}correct-text{% else %}wrong-text{% endif %}">{{ last_result.student_answer }}</span>
+                    <span class="{% if last_result.is_correct %}correct-text{% else %}wrong-text{% endif %}">{{ last_result.student_answer | render_math }}</span>
                 </div>
                 {% if not last_result.is_correct %}
                 <div class="result-row">
                     <span class="result-key">Correct:</span>
-                    <span class="correct-text">{{ last_result.correct_answer }}</span>
+                    <span class="correct-text">{{ last_result.correct_answer | render_math }}</span>
                 </div>
                 {% endif %}
             </div>

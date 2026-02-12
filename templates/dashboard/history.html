@@ -20,7 +20,7 @@
             <tr class="{% if a.is_correct %}row-correct{% else %}row-wrong{% endif %}">
                 <td>{{ a.timestamp[:16] if a.timestamp else '—' }}</td>
                 <td>{{ a.node_name or '—' }}</td>
-                <td class="question-cell">{{ a.content[:60] }}{% if a.content|length > 60 %}...{% endif %}</td>
+                <td class="question-cell">{{ a.content[:60] | render_math }}{% if a.content|length > 60 %}...{% endif %}</td>
                 <td>{{ a.answer_given or '—' }}</td>
                 <td>{% if a.is_correct %}Yes{% else %}No{% endif %}</td>
             </tr>

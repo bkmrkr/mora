@@ -27,42 +27,42 @@
         {% if question and question.content %}
         <div class="original-question">
             <span class="label">Question:</span>
-            <span class="value">{{ question.content }}</span>
+            <span class="value">{{ question.content | render_math }}</span>
         </div>
         {% endif %}
 
         <div class="answer-comparison">
             <div class="answer-row">
                 <span class="label">Your answer:</span>
-                <span class="value wrong-text">{{ result.student_answer }}</span>
+                <span class="value wrong-text">{{ result.student_answer | render_math }}</span>
             </div>
             <div class="answer-row">
                 <span class="label">Correct answer:</span>
-                <span class="value correct-text">{{ result.correct_answer }}</span>
+                <span class="value correct-text">{{ result.correct_answer | render_math }}</span>
             </div>
         </div>
 
         {% if explanation and explanation.explanation %}
         <div class="explanation-box">
             <h3>Explanation</h3>
-            <p>{{ explanation.explanation }}</p>
+            <p>{{ explanation.explanation | render_math }}</p>
         </div>
         {% elif result.explanation %}
         <div class="explanation-box">
             <h3>Explanation</h3>
-            <p>{{ result.explanation }}</p>
+            <p>{{ result.explanation | render_math }}</p>
         </div>
         {% endif %}
 
         {% if explanation and explanation.key_concept %}
         <div class="key-concept">
-            <strong>Key concept:</strong> {{ explanation.key_concept }}
+            <strong>Key concept:</strong> {{ explanation.key_concept | render_math }}
         </div>
         {% endif %}
 
         {% if explanation and explanation.tip %}
         <div class="tip-box">
-            <strong>Tip:</strong> {{ explanation.tip }}
+            <strong>Tip:</strong> {{ explanation.tip | render_math }}
         </div>
         {% endif %}
 

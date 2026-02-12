@@ -3,11 +3,13 @@
 ## [2026-02-12]
 
 ### Added
-- **KaTeX math rendering**: LaTeX expressions from LLM (`\(\sqrt{16}\)`, `\(\frac{1}{2}\)`) now render as actual math symbols in the browser via KaTeX CDN auto-render
+- **Server-side math rendering**: LaTeX expressions rendered to SVG images server-side via matplotlib's mathtext (Computer Modern font, textbook look). Replaces KaTeX CDN — works offline, no flash of raw LaTeX, no internet required. Applied to question text, MCQ options, answers, explanations, and feedback via `| render_math` Jinja filter. LRU-cached (512 expressions), thread-safe
+- **KaTeX math rendering** (replaced): ~~LaTeX expressions from LLM rendered via KaTeX CDN auto-render~~ — superseded by server-side matplotlib rendering above
 - **Inequality number line SVG generator**: Local generator (no LLM) for "Solving Inequalities" nodes — shows actual number line diagrams with open/filled circles and colored solution regions instead of text descriptions. MCQ options are inequality expressions (x > -3), not visual descriptions
 - Validator Rules 16-17: reject text descriptions of visual diagrams ("open circle at", "shading to the right") and draw/graph/sketch imperatives — forces LLM to produce mathematical expressions
 - LLM prompt rules 15-17: use LaTeX notation, never describe visuals in text, don't ask students to graph/draw
-- 22 new tests for inequality generator, validator Rules 16-17, and Rule 5 letter prefix regression (474 total)
+- 17 new tests for math renderer: expression rendering, delimiter handling, cache, thread safety, fallback (491 total)
+- 22 new tests for inequality generator, validator Rules 16-17, and Rule 5 letter prefix regression
 
 ### Fixed
 - **Rule 5 letter prefix bypass (Q#421)**: "Solve the inequality: x > -3" with answer "C) x > -3" passed Rule 5 because the letter prefix "C) " prevented the substring match. Now strips MCQ letter prefix before checking if answer text appears in question

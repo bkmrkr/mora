@@ -43,6 +43,14 @@ def create_app():
         """Remove leading letter prefix like 'A) ' or 'B. ' from MCQ options."""
         return re.sub(r'^[A-Da-d][).\s]+\s*', '', str(text))
 
+    from markupsafe import Markup
+    from services.math_renderer import render_math_in_text
+
+    @app.template_filter('render_math')
+    def render_math_filter(text):
+        """Replace LaTeX expressions with server-rendered SVG images."""
+        return Markup(render_math_in_text(str(text)))
+
     # --- Request/response logging ---
     req_logger = logging.getLogger('mora.requests')
 

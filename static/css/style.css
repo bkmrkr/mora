@@ -669,3 +669,21 @@ body {
 
 /* Topic start form */
 .topic-start-form { margin-bottom: 0; }
+
+/* Server-rendered math (inline SVG images from matplotlib) */
+img.math-inline {
+    height: 1.2em;
+    vertical-align: -0.3em;
+    display: inline;
+    margin: 0 0.1em;
+}
+img.math-display {
+    display: block;
+    margin: 0.75em auto;
+    max-height: 3em;
+}
+code.math-fallback {
+    font-family: 'Computer Modern', 'Latin Modern Math', serif;
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+}

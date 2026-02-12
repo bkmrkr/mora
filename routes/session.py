@@ -152,6 +152,17 @@ def answer(session_id):
     if not current:
         return redirect(url_for('session.end', session_id=session_id))
 
+    # Guard: reject stale form submissions (double-click / browser retry).
+    # The form includes question_id — if it doesn't match current_question,
+    # this is a stale POST from a previous page load.
+    submitted_qid = request.form.get('question_id', type=int)
+    if submitted_qid and submitted_qid != current.get('question_id'):
+        logger.warning(
+            'Stale answer submission: form question_id=%d, current=%d — ignoring',
+            submitted_qid, current.get('question_id', -1),
+        )
+        return redirect(url_for('session.question', session_id=session_id))
+
     student_answer = request.form.get('answer', '').strip()
     response_time_s = float(request.form.get('response_time_s', 0))
 

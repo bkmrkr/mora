@@ -30,12 +30,14 @@
             <div class="question-meta">
                 <span class="node-badge">{{ question.node_name }}</span>
                 <span class="type-badge">{{ question.question_type }}</span>
+                <span class="qid-badge">Q#{{ question.question_id }}</span>
             </div>
 
             <div class="question-text">{{ question.content }}</div>
 
             <form action="{{ url_for('session.answer', session_id=session_id) }}" method="post"
                   id="answer-form">
+                <input type="hidden" name="question_id" value="{{ question.question_id }}">
                 <input type="hidden" name="response_time_s" id="response_time_s" value="0">
 
                 {% if question.question_type == 'mcq' and question.options %}
@@ -97,7 +99,7 @@
                 {% endif %}
             </div>
             <div class="result-meta">
-                <span>{{ last_result.node_name }}</span>
+                <span>{{ last_result.node_name }}{% if last_result.question_id %} (Q#{{ last_result.question_id }}){% endif %}</span>
                 <span>{{ last_result.skill_rating }} ELO
                     {% if last_result.rating_delta is defined %}
                     <span class="delta {% if last_result.rating_delta >= 0 %}delta-up{% else %}delta-down{% endif %}">

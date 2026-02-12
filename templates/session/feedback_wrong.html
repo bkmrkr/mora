@@ -70,6 +70,9 @@
             <span>Skill: {{ result.node_name }}</span>
             <span>Rating: {{ result.skill_rating }}</span>
             <span>Mastery: {{ (result.mastery_level * 100)|round(1) }}%</span>
+            {% if question and question.question_id %}
+            <span>Q#{{ question.question_id }}</span>
+            {% endif %}
         </div>
 
         <form action="{{ url_for('session.next_question', session_id=session_id) }}" method="post">

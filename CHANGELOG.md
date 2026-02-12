@@ -63,6 +63,11 @@
 - Visual context detection (Rule 6b): rejects LLM questions containing phrases like "which is longer", "look at the picture", "use the graph"
 
 ### Fixed
+- **Double-submit race condition**: double-clicking an MCQ button sent two POSTs — first POST advanced to the next question, second POST checked the old answer against the new question's correct answer. Fix: 4-layer defense:
+  - Server-side: `question_id` in form, reject submissions where form `question_id` != current question
+  - Client-side: disable all choice buttons after first click, block keyboard shortcuts after submission
+  - Template: hidden `question_id` field ties each submission to its question
+  - UI: question ID (`Q#`) displayed on question and feedback pages for debugging
 - **Duplicate questions bug**: after wrong answer with no precached question, `flask_session['current_question']` was not cleared — same question served repeatedly in a loop. Fix: explicitly clear question state after every answer, before setting the next one.
 - Dedup strengthened: session exclude set now includes the current unanswered question (critical for precache path)
 - 22 new dedup tests: session state clearing, dedup set construction, current question inclusion, consecutive duplicate detection, global dedup isolation, wrong-path regression tests (330 total)

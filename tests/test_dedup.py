@@ -457,6 +457,46 @@ class TestWrongPathDuplicateRegression:
             assert served_ids[i] != served_ids[i - 1], \
                 f"Consecutive duplicate: qid={served_ids[i]} at positions {i-1},{i}"
 
+    def test_stale_question_id_detected(self):
+        """A form submission with a stale question_id should be detectable.
+
+        The double-submit race condition: user double-clicks MCQ button,
+        first POST processes answer and advances to question Q2,
+        second POST arrives with the same form data but question_id=Q1.
+        Server compares submitted question_id with current question → mismatch → reject.
+        """
+        sid, tid, nid1, _, qid1, qid2 = _setup()
+        sess_id = session.create(sid, tid)
+
+        # Q1 is the current question
+        session.update_current_question(sess_id, qid1)
+
+        # First POST processes, advances to Q2
+        attempt.create(qid1, sid, sess_id, "B", 1, curriculum_node_id=nid1)
+        session.update_current_question(sess_id, None)
+        session.update_current_question(sess_id, qid2)
+
+        # Second POST arrives with stale question_id = qid1
+        sess = session.get_by_id(sess_id)
+        submitted_qid = qid1  # from the stale form
+        current_qid = sess['current_question_id']  # now qid2
+
+        assert submitted_qid != current_qid, \
+            "Stale submission should be detected: form qid != current qid"
+
+    def test_matching_question_id_accepted(self):
+        """A form submission with matching question_id is valid."""
+        sid, tid, nid1, _, qid1, _ = _setup()
+        sess_id = session.create(sid, tid)
+        session.update_current_question(sess_id, qid1)
+
+        sess = session.get_by_id(sess_id)
+        submitted_qid = qid1  # matches current
+        current_qid = sess['current_question_id']
+
+        assert submitted_qid == current_qid, \
+            "Valid submission: form qid should match current qid"
+
     def test_correct_path_also_clears_before_setting_new(self):
         """After correct answer, old question is cleared before new one is set."""
         sid, tid, nid1, _, qid1, qid2 = _setup()

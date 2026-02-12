@@ -1,5 +1,14 @@
 # Mora Changelog
 
+## [Unreleased]
+
+### Fixed
+- **Difficulty always near zero**: Questions were too easy because normalization used wrong ELO range (500-1100 instead of 400-1200). Changed formula from `(diff-500)/600` to `(diff-400)/800`. Now skill=800 gives norm=0.20, skill=1000 gives norm=0.45
+- **ELO config drift**: Initial uncertainty was 500 (spec says 350), base K was 64 (spec says 32), schema default was 500 (spec says 350). All corrected to match spec — skill updates now faster and more accurate
+
+### Changed
+- Difficulty normalization now consistent across: LLM prompt, question display, and session route
+
 ## [2026-02-12]
 
 ### Added
@@ -16,6 +25,8 @@
 - **LaTeX escape crash**: LLM returns `\(\sqrt{16} \times \sqrt{9}\)` inside JSON — `\(`, `\s`, `\t` are invalid JSON escapes. Added `_fix_latex_escapes()` that double-escapes non-structural backslashes as fallback after raw parse fails
 - Request/response logging to `mora_debug.log` with daily rotation (3-day retention) — every click, form submission, and exception with full traceback
 - `parse_ai_json_dict()` error messages now include the raw LLM text for debugging
+- **Difficulty normalization bug (root cause of easy questions)**: The ELO difficulty was being normalized incorrectly. Formula `(target - 500) / 600` mapped skill 800 to difficulty 0.10 (nearly easiest). Changed to `(target - 400) / 800` which maps skill 800 → 0.20, skill 1000 → 0.45. Questions will now scale properly from easy to hard. Updated in question_generator.py and routes/session.py
+- **Initial uncertainty in schema**: Changed default from 500 to 350 to match spec. Updated schema.sql and test
 
 ## [2026-02-11]
 

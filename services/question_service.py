@@ -301,7 +301,9 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
     )
 
     # Compute difficulty score (1-10) for display
-    norm_diff = max(0.0, min(1.0, (target_diff - 500) / 600))
+    # Use 400-1200 range to map ELO difficulty to 0-1
+    # This gives skill=800 → ~0.2 (easy but not trivial), skill=1200 → ~0.7 (challenging)
+    norm_diff = max(0.0, min(1.0, (target_diff - 400) / 800))
     difficulty_score = round(norm_diff * 9) + 1
 
     question_dict = {

@@ -50,7 +50,10 @@ def generate(node_name, node_description, topic_name, skill_description,
     Returns (question_dict, model_used, prompt_used).
     """
     # Map ELO difficulty to 0-1 scale for the prompt
-    norm_difficulty = max(0.0, min(1.0, (target_difficulty_elo - 500) / 600))
+    # ELO 400 = 0.0 (easiest), ELO 1200 = 1.0 (hardest)
+    # Formula: (target - 400) / 800
+    # At skill 800: target=559 → norm=0.20; at skill 1000: target=759 → norm=0.45
+    norm_difficulty = max(0.0, min(1.0, (target_difficulty_elo - 400) / 800))
 
     recent_str = "\n".join(f"- {q}" for q in (recent_questions or [])[:20]) or "None"
 

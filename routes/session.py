@@ -25,7 +25,8 @@ def _load_question_from_db(question_id):
         return None
     node = node_model.get_by_id(q['curriculum_node_id'])
     difficulty = q['difficulty'] or 0
-    norm_diff = max(0.0, min(1.0, (difficulty - 500) / 600))
+    # Match LLM normalization: ELO 400=0, ELO 1200=1
+    norm_diff = max(0.0, min(1.0, (difficulty - 400) / 800))
     difficulty_score = round(norm_diff * 9) + 1
     p_correct = q['estimated_p_correct'] or 0
     options = json.loads(q['options']) if q['options'] else None

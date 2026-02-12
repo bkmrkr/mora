@@ -2,7 +2,7 @@
 import logging
 
 from ai.ollama_client import ask
-from ai.json_utils import parse_ai_json
+from ai.json_utils import parse_ai_json_dict
 
 logger = logging.getLogger(__name__)
 
@@ -34,4 +34,4 @@ Concept: {node_name} — {node_description}
 Explain clearly. Return JSON only."""
 
     text, model, prompt = ask(EXPLAIN_PROMPT, user_prompt, temperature=0.5)
-    return parse_ai_json(text), model, prompt
+    return parse_ai_json_dict(text), model, prompt

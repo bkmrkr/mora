@@ -2,7 +2,7 @@
 import logging
 
 from ai.ollama_client import ask
-from ai.json_utils import parse_ai_json
+from ai.json_utils import parse_ai_json_dict
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +62,7 @@ def generate(node_name, node_description, topic_name, skill_description,
 Return JSON only."""
 
     text, model, prompt = ask(SYSTEM_PROMPT, user_prompt)
-    q_data = parse_ai_json(text)
+    q_data = parse_ai_json_dict(text)
 
     logger.info('Generated %s question for "%s" at difficulty %.2f',
                 question_type, node_name, norm_difficulty)

@@ -60,9 +60,11 @@ def validate_question(q_data, node_description=''):
     Returns:
         (is_valid, reason) — reason is '' if valid.
     """
-    question = (q_data.get('question') or '').strip()
-    answer = (q_data.get('correct_answer') or '').strip()
+    question = str(q_data.get('question') or '').strip()
+    answer = str(q_data.get('correct_answer') or '').strip()
     choices = q_data.get('options') or []
+    if not isinstance(choices, list):
+        choices = []
 
     # Rule 1: Question text minimum length
     if len(question) < MIN_QUESTION_LENGTH:

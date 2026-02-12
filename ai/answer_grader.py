@@ -2,7 +2,7 @@
 import logging
 
 from ai.ollama_client import ask
-from ai.json_utils import parse_ai_json
+from ai.json_utils import parse_ai_json_dict
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ Topic context: {node_description}
 Grade this answer. Return JSON only."""
 
     text, model, prompt = ask(GRADING_PROMPT, user_prompt, temperature=0.3)
-    result = parse_ai_json(text)
+    result = parse_ai_json_dict(text)
 
     is_correct = bool(result.get('is_correct', False))
     partial_score = float(result.get('partial_score', 1.0 if is_correct else 0.0))

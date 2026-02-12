@@ -37,3 +37,20 @@ def parse_ai_json(text):
                 continue
 
     raise json.JSONDecodeError("No valid JSON found in response", cleaned, 0)
+
+
+def parse_ai_json_dict(text):
+    """Parse JSON from LLM response, guaranteeing a dict return.
+
+    If the LLM returns a JSON array, extracts the first dict element.
+    Raises ValueError if result cannot be coerced to a dict.
+    """
+    result = parse_ai_json(text)
+    if isinstance(result, dict):
+        return result
+    if isinstance(result, list):
+        for item in result:
+            if isinstance(item, dict):
+                return item
+        raise ValueError(f"LLM returned JSON array with no dict elements")
+    raise ValueError(f"LLM returned {type(result).__name__}, expected dict")

@@ -235,7 +235,13 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
                 q_data = None
                 continue
 
-            if not q_data or not q_data.get('question'):
+            if not isinstance(q_data, dict):
+                logger.warning('Generation attempt %d: non-dict result (%s)',
+                               attempt_num + 1, type(q_data).__name__)
+                q_data = None
+                continue
+
+            if not q_data.get('question'):
                 logger.warning('Generation attempt %d: empty question', attempt_num + 1)
                 q_data = None
                 continue
@@ -302,6 +308,7 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
         'difficulty_score': difficulty_score,
         'p_correct': round(p_correct * 100),
         'clock_svg': q_data.get('clock_svg'),
+        'node_description': node_desc,
     }
     if store_in_session:
         flask_session['current_question'] = question_dict

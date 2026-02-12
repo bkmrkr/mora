@@ -41,6 +41,7 @@ def _load_question_from_db(question_id):
         'difficulty': difficulty,
         'difficulty_score': difficulty_score,
         'p_correct': round(p_correct * 100) if p_correct else 0,
+        'node_description': node.get('description', '') if node else '',
     }
 
 
@@ -247,7 +248,7 @@ def feedback(session_id):
                 answered_question['correct_answer'],
                 result.get('student_answer', ''),
                 answered_question['node_name'],
-                '',
+                result.get('node_description', ''),
             )
         except Exception:
             explanation = {

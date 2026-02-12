@@ -93,7 +93,7 @@ def _check_mcq(student, correct, options=None):
 def _normalize(text):
     """Lowercase, strip whitespace and punctuation."""
     text = str(text).strip().lower()
-    text = re.sub(r'[^\w\s\d.-]', '', text)
+    text = re.sub(r'[^\w\s\d./%$-]', '', text)
     return text.strip()
 
 

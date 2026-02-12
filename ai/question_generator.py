@@ -62,6 +62,7 @@ def generate(node_name, node_description, topic_name, skill_description,
 Return JSON only."""
 
     text, model, prompt = ask(SYSTEM_PROMPT, user_prompt)
+    logger.info('Raw LLM response for "%s": %s', node_name, text[:500])
     q_data = parse_ai_json_dict(text)
 
     logger.info('Generated %s question for "%s" at difficulty %.2f',

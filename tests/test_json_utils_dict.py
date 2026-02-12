@@ -1,6 +1,6 @@
 """Tests for parse_ai_json_dict() — guarantees dict return from LLM output."""
 import pytest
-from ai.json_utils import parse_ai_json_dict
+from ai.json_utils import parse_ai_json_dict, parse_ai_json, _fix_latex_escapes
 
 
 def test_dict_passthrough():
@@ -61,3 +61,44 @@ def test_whitespace_only_raises():
 def test_surrounding_text():
     text = 'Here is the answer:\n{"x": 1}\nDone.'
     assert parse_ai_json_dict(text) == {"x": 1}
+
+
+# --- LaTeX escape handling ---
+
+def test_latex_sqrt_and_times():
+    r"""LLM returns \(\sqrt{16} \times \sqrt{9}\) — invalid JSON escapes."""
+    raw = r'{"question": "Simplify: \(\sqrt{16} \times \sqrt{9}\)", "correct_answer": "12"}'
+    result = parse_ai_json_dict(raw)
+    assert result['correct_answer'] == '12'
+    assert 'sqrt' in result['question']
+
+
+def test_latex_frac():
+    r"""LLM returns \frac{1}{2} — \f is a valid JSON escape (formfeed)."""
+    raw = r'{"question": "What is \frac{1}{2}?", "correct_answer": "0.5"}'
+    result = parse_ai_json_dict(raw)
+    assert result['correct_answer'] == '0.5'
+
+
+def test_latex_newline_in_explanation():
+    r"""LLM uses \n inside LaTeX which is also a valid JSON escape."""
+    raw = r'{"question": "Q?", "correct_answer": "4", "explanation": "Step 1\nStep 2"}'
+    # This is valid JSON (\n = newline) — should parse normally
+    result = parse_ai_json_dict(raw)
+    assert result['correct_answer'] == '4'
+
+
+def test_fix_escapes_preserves_quotes():
+    r"""\" must stay as \" for JSON to parse."""
+    raw = r'{"key": "value with \"quotes\""}'
+    fixed = _fix_latex_escapes(raw)
+    result = parse_ai_json(fixed)
+    assert 'quotes' in result['key']
+
+
+def test_fix_escapes_preserves_backslash():
+    r"""\\ must stay as \\."""
+    raw = r'{"key": "path\\to\\file"}'
+    fixed = _fix_latex_escapes(raw)
+    result = parse_ai_json(fixed)
+    assert 'path' in result['key']

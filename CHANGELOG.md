@@ -1,5 +1,19 @@
 # Mora Changelog
 
+## [2026-02-12]
+
+### Added
+- **KaTeX math rendering**: LaTeX expressions from LLM (`\(\sqrt{16}\)`, `\(\frac{1}{2}\)`) now render as actual math symbols in the browser via KaTeX CDN auto-render
+- **Inequality number line SVG generator**: Local generator (no LLM) for "Solving Inequalities" nodes — shows actual number line diagrams with open/filled circles and colored solution regions instead of text descriptions. MCQ options are inequality expressions (x > -3), not visual descriptions
+- Validator Rules 16-17: reject text descriptions of visual diagrams ("open circle at", "shading to the right") and draw/graph/sketch imperatives — forces LLM to produce mathematical expressions
+- LLM prompt rules 15-17: use LaTeX notation, never describe visuals in text, don't ask students to graph/draw
+- 20 new tests for inequality generator and validator Rules 16-17 (472 total)
+
+### Fixed
+- **LaTeX escape crash**: LLM returns `\(\sqrt{16} \times \sqrt{9}\)` inside JSON — `\(`, `\s`, `\t` are invalid JSON escapes. Added `_fix_latex_escapes()` that double-escapes non-structural backslashes as fallback after raw parse fails
+- Request/response logging to `mora_debug.log` with daily rotation (3-day retention) — every click, form submission, and exception with full traceback
+- `parse_ai_json_dict()` error messages now include the raw LLM text for debugging
+
 ## [2026-02-11]
 
 ### Fixed

@@ -185,6 +185,12 @@ def validate_question(q_data, node_description=''):
     if not dist_ok:
         return False, dist_reason
 
+    # Rule 19: Check for multiple correct answers in context
+    # Example: "Which is even: 13, 24, 37, 48, 59?" has TWO correct answers (24 AND 48)
+    multi_ok, multi_reason = _check_multiple_correct_answers(question, answer, choices)
+    if not multi_ok:
+        return False, multi_reason
+
     return True, ''
 
 
@@ -640,6 +646,101 @@ def _answer_in_question_is_ok(question, answer, choices):
         return True
 
     return False
+
+
+# ---------------------------------------------------------------------------
+# Rule 19: Multiple correct answers check
+# ---------------------------------------------------------------------------
+
+
+def _check_multiple_correct_answers(question, answer, choices):
+    """Rule 19: Reject questions where context allows multiple correct answers.
+
+    Examples:
+    - "Which is even: 13, 24, 37, 48, 59?" → Both 24 AND 48 are correct (ambiguous!)
+    - "Name a color: red, blue, green" → Any color mentioned is correct (ambiguous!)
+
+    Returns (is_valid, reason).
+    """
+    q_lower = question.lower()
+    answer_text = LETTER_PREFIX_RE.sub('', answer).strip()
+
+    # Extract all numbers mentioned in the question using regex
+    # Look for sequences like "24, 37, 48" or "13, 24, 37"
+    number_pattern = r'\d+'
+    numbers_in_question = [int(m) for m in re.findall(number_pattern, question)]
+
+    if not numbers_in_question:
+        return True, ''  # No numbers mentioned, can't have multiple answers
+
+    # Try to parse the correct answer as a number
+    try:
+        correct_num = int(re.search(r'\d+', answer_text).group()) if re.search(r'\d+', answer_text) else None
+    except (ValueError, AttributeError):
+        return True, ''  # Answer not numeric, skip this check
+
+    if correct_num is None:
+        return True, ''
+
+    # Check if question contains "which is", "which are", "name", "list" - all suggest multiple possible answers
+    ambiguous_phrases = [
+        'which is even', 'which is odd', 'which is prime',
+        'which is divisible', 'which is a multiple',
+        'which of these', 'which one',
+        'what color', 'what number', 'what digit',
+        'name', 'list', 'find all'
+    ]
+
+    has_ambiguous_phrasing = any(phrase in q_lower for phrase in ambiguous_phrases)
+
+    if not has_ambiguous_phrasing:
+        return True, ''
+
+    # Count how many numbers in the question satisfy the same property as the answer
+    # For "even" questions: count even numbers
+    # For "odd" questions: count odd numbers
+    # For "divisible by X" questions: count numbers divisible by X
+
+    if any(word in q_lower for word in ['even']):
+        matching_count = sum(1 for n in numbers_in_question if n % 2 == 0)
+    elif any(word in q_lower for word in ['odd']):
+        matching_count = sum(1 for n in numbers_in_question if n % 2 == 1)
+    elif 'prime' in q_lower:
+        # Simplified prime check
+        def is_prime(n):
+            if n < 2:
+                return False
+            for i in range(2, int(n ** 0.5) + 1):
+                if n % i == 0:
+                    return False
+            return True
+        matching_count = sum(1 for n in numbers_in_question if is_prime(n))
+    elif 'divisible' in q_lower:
+        # Extract divisor from question like "divisible by 3"
+        m = re.search(r'divisible by (\d+)', q_lower)
+        if m:
+            divisor = int(m.group(1))
+            matching_count = sum(1 for n in numbers_in_question if n % divisor == 0)
+        else:
+            return True, ''
+    else:
+        # Can't determine the property, allow it
+        return True, ''
+
+    # If more than one number matches the property, it's ambiguous
+    if matching_count > 1:
+        matching_numbers = [
+            n for n in numbers_in_question
+            if (any(word in q_lower for word in ['even']) and n % 2 == 0) or
+               (any(word in q_lower for word in ['odd']) and n % 2 == 1)
+        ]
+        return False, (
+            f'Rule 19: Multiple correct answers in context. '
+            f'Question mentions {matching_count} numbers that satisfy the condition '
+            f'(found {matching_numbers}), but only one should match.'
+        )
+
+    return True, ''
 
 
 # ---------------------------------------------------------------------------

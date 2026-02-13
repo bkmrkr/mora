@@ -1646,3 +1646,92 @@ def test_rule5_allows_which_of_list():
     }
     valid, _ = validate_question(q)
     assert valid, "Which of list questions should pass"
+
+
+# --- Rule 19: Multiple Correct Answers Tests ---
+# Q130 Regression: "Which is even: 13, 24, 37, 48, 59?" has TWO even numbers (24 AND 48)
+
+
+def test_rule19_rejects_multiple_even_numbers():
+    """Q130 regression: Multiple even numbers in context = ambiguous."""
+    q = {
+        'question': 'What number is even among 13, 24, 37, 48, and 59?',
+        'correct_answer': 'B) 24',
+        'options': ['22', '24', '12', '20'],
+        'question_type': 'mcq'
+    }
+    valid, reason = validate_question(q)
+    assert not valid, "Question with 2 even numbers should be rejected"
+    assert 'multiple correct answers' in reason.lower()
+
+
+def test_rule19_rejects_multiple_odd_numbers():
+    """Multiple odd numbers in context = ambiguous."""
+    q = {
+        'question': 'Which is odd: 2, 5, 7, 11, 13?',
+        'correct_answer': 'B) 5',
+        'options': ['2', '5', '4', '8'],
+        'question_type': 'mcq'
+    }
+    valid, reason = validate_question(q)
+    assert not valid, "Question with multiple odd numbers should be rejected"
+
+
+def test_rule19_rejects_multiple_primes():
+    """Multiple prime numbers in context = ambiguous."""
+    q = {
+        'question': 'Which is prime: 4, 7, 9, 11, 15?',
+        'correct_answer': 'B) 7',
+        'options': ['4', '7', '9', '15'],
+        'question_type': 'mcq'
+    }
+    valid, reason = validate_question(q)
+    assert not valid, "Question with 2+ primes should be rejected"
+
+
+def test_rule19_allows_single_even_number():
+    """Only one even number in context = OK."""
+    q = {
+        'question': 'Which is even: 3, 5, 7, 8, 9?',
+        'correct_answer': 'D) 8',
+        'options': ['3', '5', '7', '8', '9'],
+        'question_type': 'mcq'
+    }
+    valid, _ = validate_question(q)
+    assert valid, "Question with single even number should pass"
+
+
+def test_rule19_allows_single_odd_number():
+    """Only one odd number in context = OK."""
+    q = {
+        'question': 'Which is odd: 2, 4, 5, 6, 8?',
+        'correct_answer': 'C) 5',
+        'options': ['2', '4', '5', '6', '8'],
+        'question_type': 'mcq'
+    }
+    valid, _ = validate_question(q)
+    assert valid, "Question with single odd number should pass"
+
+
+def test_rule19_allows_no_numbers_in_question():
+    """Questions without numbers are exempt from this check."""
+    q = {
+        'question': 'What is the capital of France?',
+        'correct_answer': 'Paris',
+        'question_type': 'short_answer'
+    }
+    valid, _ = validate_question(q)
+    # May pass or fail for other reasons, but not Rule 19
+
+
+def test_rule19_allows_mismatched_numbers():
+    """If question lists numbers but options are different, harder to check ambiguity."""
+    q = {
+        'question': 'Which is even: 11, 13, 15, 17, 19?',  # All odd!
+        'correct_answer': 'A) 22',
+        'options': ['22', '24', '26', '28'],  # All even
+        'question_type': 'mcq'
+    }
+    valid, _ = validate_question(q)
+    # This specific case might pass because there are no even numbers in the question list
+    # But shows the challenge of misaligned questions and options

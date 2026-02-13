@@ -2,7 +2,8 @@
 import pytest
 from ai.distractors import (
     compute_distractors, insert_distractors, _parse_number,
-    _numeric_distractors, _format_number
+    _numeric_distractors, _format_number, _multi_value_distractors,
+    _text_distractors
 )
 
 
@@ -83,3 +84,83 @@ class TestInsertDistractors:
         result = insert_distractors(q)
         # Options should remain None for non-MCQ
         assert result.get('options') is None
+
+
+class TestMultiValueDistractors:
+    """Test handling of multi-value answers like '2, 3' (for systems of equations, etc)."""
+
+    def test_multi_value_distractors_basic(self):
+        """Test generating distractors for '2, 3'."""
+        distractors = _multi_value_distractors('2, 3')
+        assert len(distractors) >= 2
+        # Should not include the correct answer
+        assert '2, 3' not in distractors
+
+    def test_multi_value_distractors_not_duplicates(self):
+        """Ensure generated distractors are not identical."""
+        distractors = _multi_value_distractors('2, 3')
+        assert len(distractors) == len(set(distractors)), \
+            f"Distractors have duplicates: {distractors}"
+
+    def test_multi_value_includes_off_by_one(self):
+        """Off-by-one should be among the distractors."""
+        distractors = _multi_value_distractors('2, 3')
+        # Should have something like '3, 4' or '1, 2'
+        assert any('3' in d or '1' in d for d in distractors)
+
+    def test_compute_distractors_multi_value(self):
+        """Test full compute_distractors for multi-value answer."""
+        distractors = compute_distractors('2, 3', num_options=4)
+        assert len(distractors) == 3
+        assert '2, 3' not in distractors
+        # All distractors should be unique
+        assert len(distractors) == len(set(distractors)), \
+            f"Computed distractors have duplicates: {distractors}"
+
+    def test_insert_distractors_multi_value(self):
+        """Test that multi-value answers get proper options without duplicates."""
+        q = {
+            'question': 'Solve x^2 - 5x + 6 = 0',
+            'correct_answer': '2, 3',
+            'question_type': 'mcq'
+        }
+        result = insert_distractors(q)
+
+        # Should have exactly 4 options
+        assert len(result['options']) == 4
+        # All options should be unique
+        assert len(result['options']) == len(set(result['options'])), \
+            f"Options have duplicates: {result['options']}"
+        # Correct answer should be in options
+        assert any('2, 3' in opt for opt in result['options'])
+        # No option should be just '0' repeated
+        zero_count = sum(1 for opt in result['options'] if opt == '0')
+        assert zero_count <= 1, f"Too many '0' options: {result['options']}"
+
+    def test_insert_distractors_no_all_zeros(self):
+        """Regression test for Q491 bug: ensure not all options are '0'."""
+        q = {
+            'question': 'Solve x^2 - 5x + 6 = 0 by factoring.',
+            'correct_answer': '2, 3',
+            'question_type': 'mcq'
+        }
+        result = insert_distractors(q)
+        options = result['options']
+
+        # Count how many options are just '0'
+        zero_count = sum(1 for opt in options if opt == '0')
+
+        # Should have at most 1 option with '0' (as one of the distractors)
+        assert zero_count <= 1, \
+            f"Too many '0' options (bug like Q491): {options}"
+
+        # Better: verify all options are distinct
+        assert len(set(options)) == len(options), \
+            f"Duplicate options found: {options}"
+
+    def test_text_distractors_multi_value(self):
+        """Test _text_distractors directly for multi-value answers."""
+        result = _text_distractors('2, 3')
+        assert isinstance(result, list)
+        assert len(result) > 0
+        assert '2, 3' not in result

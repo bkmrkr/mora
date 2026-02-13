@@ -27,9 +27,13 @@ def compute_distractors(correct_answer, num_options=4):
         # Fall back to text-based distractors
         distractors = _text_distractors(correct_str)
 
-    # Ensure we have enough distractors
-    while len(distractors) < num_options - 1:
-        distractors.append(_fallback_distractor(correct_str))
+    # Ensure we have enough distractors (avoid duplicates)
+    attempts = 0
+    while len(distractors) < num_options - 1 and attempts < 10:
+        new_distractor = _fallback_distractor(correct_str, exclude=set(distractors) | {correct_str})
+        if new_distractor not in distractors and new_distractor != correct_str:
+            distractors.append(new_distractor)
+        attempts += 1
 
     # Shuffle and return (num_options - 1) distractors
     random.shuffle(distractors)
@@ -132,6 +136,72 @@ def _format_number(num, is_integer):
     return f"{num:.2f}".rstrip('0').rstrip('.')
 
 
+def _multi_value_distractors(correct):
+    """Generate distractors for multi-value answers like '2, 3'.
+
+    Strategies:
+    - Off-by-one for each value
+    - Swapped order
+    - Only first value
+    - Only second value
+    """
+    distractors = []
+
+    # Parse comma-separated values
+    parts = [p.strip() for p in correct.split(',')]
+    if len(parts) < 2:
+        return distractors
+
+    # Try to extract numeric values
+    nums = []
+    for part in parts:
+        # Extract just the number part (e.g., "2" from "x=2")
+        m = re.search(r'-?\d+\.?\d*', part)
+        if m:
+            nums.append(float(m.group()))
+        else:
+            return distractors  # Can't parse, give up
+
+    if not nums or len(nums) != len(parts):
+        return distractors
+
+    # Strategy 1: Off-by-one for each value
+    for offset in [1, -1]:
+        variant_parts = []
+        for i, part in enumerate(parts):
+            new_num = nums[i] + offset
+            # Reconstruct the part (e.g., "x=3" from "x=2" with offset 1)
+            if '=' in part:
+                var_name = part.split('=')[0].strip()
+                variant_parts.append(f"{var_name} = {int(new_num) if new_num == int(new_num) else new_num}")
+            else:
+                variant_parts.append(str(int(new_num)) if new_num == int(new_num) else str(new_num))
+        variant = ', '.join(variant_parts)
+        if variant != correct:
+            distractors.append(variant)
+
+    # Strategy 2: Swapped order
+    if len(nums) == 2:
+        swapped_parts = [parts[1], parts[0]]
+        swapped = ', '.join(swapped_parts)
+        if swapped != correct:
+            distractors.append(swapped)
+
+    # Strategy 3: Only first value
+    if len(nums) >= 2:
+        first_only = parts[0]
+        if first_only != correct:
+            distractors.append(first_only)
+
+    # Strategy 4: Only second value
+    if len(nums) >= 2:
+        second_only = parts[1]
+        if second_only != correct:
+            distractors.append(second_only)
+
+    return distractors
+
+
 def _text_distractors(correct):
     """Generate text-based distractors for non-numeric answers."""
     # Common wrong answers for common question types
@@ -144,6 +214,12 @@ def _text_distractors(correct):
     # For yes/no
     if correct.lower() in ('yes', 'no'):
         return ['Yes', 'No'] if correct.lower() == 'no' else ['No', 'Yes']
+
+    # For multi-value answers like "2, 3"
+    if ',' in correct:
+        distractors = _multi_value_distractors(correct)
+        if distractors:
+            return distractors
 
     # For common mistakes in word problems
     # If answer is a number in word form, return numeric version
@@ -159,18 +235,33 @@ def _text_distractors(correct):
     return distractors
 
 
-def _fallback_distractor(correct):
-    """Generate a fallback distractor when others fail."""
-    # Common fallback: offer 1, 2, 3, 4 for numeric questions
+def _fallback_distractor(correct, exclude=None):
+    """Generate a fallback distractor when others fail.
+
+    Args:
+        correct: The correct answer (to avoid)
+        exclude: Set of values to exclude
+    """
+    if exclude is None:
+        exclude = set()
+
+    # Common fallback: offer sequential options for numeric answers
     num = _parse_number(correct)
     if num is not None:
-        for i in [1, 2, 3, 4]:
+        for i in [1, 2, 3, 4, -1, -2, -3, -4]:
             val = num + i
-            if val != num:
-                return str(int(val)) if val == int(val) else f"{val:.2f}"
+            formatted = str(int(val)) if val == int(val) else f"{val:.2f}"
+            if formatted not in exclude and formatted != correct:
+                return formatted
 
-    # Ultimate fallback
-    return "0"
+    # Fallback for text answers: try simple variants
+    fallbacks = ['0', 'false', 'False', 'no', 'No', '1', 'unknown']
+    for fb in fallbacks:
+        if fb not in exclude and fb != correct:
+            return fb
+
+    # Last resort: return something unique
+    return f"option_{random.randint(1000, 9999)}"
 
 
 def insert_distractors(question_data):

@@ -82,8 +82,11 @@ def validate_question(q_data, node_description=''):
 
     # Rule 4: Correct answer must be among choices (if provided)
     if choices:
-        answer_lower = answer.lower().strip()
-        choice_lowers = [c.strip().lower() for c in choices]
+        # Strip letter prefixes from answer before comparing (e.g., "A) Paris" → "Paris")
+        answer_stripped = LETTER_PREFIX_RE.sub('', answer).strip()
+        answer_lower = answer_stripped.lower()
+        # Strip letter prefixes from choices before comparing (e.g., "A) 12" → "12")
+        choice_lowers = [LETTER_PREFIX_RE.sub('', c).strip().lower() for c in choices]
         # Also check just the letter (A, B, C, D)
         letter_match = answer_lower in ('a', 'b', 'c', 'd')
         text_match = answer_lower in choice_lowers

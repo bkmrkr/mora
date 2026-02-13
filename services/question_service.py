@@ -14,6 +14,7 @@ from models import session as session_model
 from engine import elo
 from engine import next_question as nq_engine
 from engine.question_validator import validate_question
+from engine.question_similarity import is_similar_to_any
 from ai import question_generator
 from ai.distractors import insert_distractors
 from ai.local_generators import (is_clock_node, generate_clock_question,
@@ -288,6 +289,17 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
 
             if q_text in global_correct_texts:
                 logger.warning('Global dedup rejected (attempt %d)', attempt_num + 1)
+                q_data = None
+                continue
+
+            # Layer 3: Similarity check against correctly-answered questions
+            # Avoid similar follow-up questions after correct answers (e.g., don't ask "5+3" then "5+2")
+            is_similar, similar_to, similarity_score = is_similar_to_any(
+                q_text, list(global_correct_texts), threshold=0.7
+            )
+            if is_similar:
+                logger.warning('Similarity dedup rejected (attempt %d, score=%.2f)',
+                             attempt_num + 1, similarity_score)
                 q_data = None
                 continue
 

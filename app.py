@@ -4,6 +4,7 @@ import logging.handlers
 import os
 import re
 import traceback
+import argparse
 
 from flask import Flask, request as flask_request
 
@@ -86,5 +87,8 @@ def create_app():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('port', type=int, nargs='?', default=5002)
+    args = parser.parse_args()
     app = create_app()
-    app.run(debug=True, host='0.0.0.0', port=5002, threaded=True)
+    app.run(debug=True, host='0.0.0.0', port=args.port, threaded=True)

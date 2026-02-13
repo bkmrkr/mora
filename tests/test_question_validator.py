@@ -1636,6 +1636,32 @@ def test_rule5_rejects_which_inequality_with_bracketed_answer():
     assert 'answer' in reason.lower()
 
 
+def test_rule5_rejects_clock_time_in_brackets():
+    """Clock time questions shouldn't show answer in brackets."""
+    q = {
+        'question': 'What time does this clock show? [7:15]',
+        'correct_answer': 'B) 7:15',
+        'options': ['7:15', '7:45', '6:15', '8:15'],
+        'question_type': 'mcq'
+    }
+    valid, reason = validate_question(q)
+    assert not valid, "Clock time with bracket answer should fail"
+    assert 'answer' in reason.lower()
+
+
+def test_rule5_rejects_fraction_in_brackets():
+    """Fraction questions shouldn't show answer in brackets."""
+    q = {
+        'question': 'What fraction of the circle is shaded? [1/4]',
+        'correct_answer': 'B) 1/4',
+        'options': ['1/4', '1/2', '3/4', '1'],
+        'question_type': 'mcq'
+    }
+    valid, reason = validate_question(q)
+    assert not valid, "Fraction with bracket answer should fail"
+    assert 'answer' in reason.lower()
+
+
 def test_rule5_allows_which_of_list():
     """'Which of these' questions naturally have answers in options."""
     q = {

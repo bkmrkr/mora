@@ -7,7 +7,8 @@ MCQ_LETTERS = ['A', 'B', 'C', 'D']
 MCQ_OPTION_FORMAT = '{letter}) {text}'
 
 # Similarity detection threshold (0-1)
-SIMILARITY_THRESHOLD = 0.7
+# 0.85 allows natural difficulty progressions (e.g., "3x5" → "3x4") while blocking true duplicates
+SIMILARITY_THRESHOLD = 0.85
 
 # Question types
 QUESTION_TYPE_MCQ = 'mcq'

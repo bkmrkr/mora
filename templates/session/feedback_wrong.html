@@ -5,10 +5,10 @@
     <div class="session-header">
         <span class="student-name">{{ student.name }}</span>
         <div class="topic-mastery-display">
-            <span class="mastery-pct">{{ topic_mastery }}%</span>
+            <span class="mastery-pct">{{ "%.1f"|format(topic_mastery) }}%</span>
             <div class="mastery-bar">
-                <div class="mastery-fill {% if topic_mastery >= 75 %}mastered{% endif %}"
-                     style="width: {{ topic_mastery }}%"></div>
+                <div class="mastery-fill {% if topic_mastery|float >= 75 %}mastered{% endif %}"
+                     style="width: {{ "%.1f"|format(topic_mastery) }}%"></div>
             </div>
             <span class="mastery-label">Topic Mastery</span>
         </div>

@@ -217,7 +217,7 @@ class TestConstants:
     def test_similarity_threshold_value(self):
         """Should have valid similarity threshold."""
         assert 0 < SIMILARITY_THRESHOLD < 1
-        assert SIMILARITY_THRESHOLD == 0.7
+        assert SIMILARITY_THRESHOLD == 0.85
 
     def test_question_type_mcq_value(self):
         """Should have MCQ question type constant."""

@@ -4,7 +4,7 @@
 <div class="session-top-bar">
     <span class="student-name">{{ student.name }}</span>
     <div class="topic-mastery-display">
-        <span class="mastery-pct">{{ topic_mastery }}%</span>
+        <span class="mastery-pct">{{ "%.1f"|format(topic_mastery) }}%</span>
         <div class="mastery-bar">
             <div class="mastery-fill {% if topic_mastery >= 75 %}mastered{% endif %}"
                  style="width: {{ topic_mastery }}%"></div>
@@ -158,7 +158,7 @@
                     <span class="progress-node-name {% if node.mastered %}text-mastered{% endif %}">
                         {{ node.name[:30] }}{% if node.name|length > 30 %}...{% endif %}
                     </span>
-                    <span class="progress-node-pct">{{ node.mastery_pct }}%</span>
+                    <span class="progress-node-pct">{{ "%.1f"|format(node.mastery_pct) }}%</span>
                 </div>
                 <div class="mastery-bar small">
                     <div class="mastery-fill {% if node.mastered %}mastered{% endif %}"

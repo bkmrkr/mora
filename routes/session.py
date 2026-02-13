@@ -47,12 +47,16 @@ def _load_question_from_db(question_id):
 
 
 def _compute_topic_mastery(student_id, topic_id):
-    """Average mastery_level across all curriculum nodes for a topic, as 0-100."""
+    """Average mastery_level across all curriculum nodes for a topic, as 0-100.
+
+    Returns float with 1 decimal place for precise delta tracking.
+    """
     nodes = node_model.get_for_topic(topic_id)
     if not nodes:
-        return 0
+        return 0.0
     total = sum(skill_model.get(student_id, n['id'])['mastery_level'] for n in nodes)
-    return round(total / len(nodes) * 100)
+    # Return with 1 decimal place for precision
+    return round(total / len(nodes) * 100, 1)
 
 
 def _get_topic_progress(student_id, topic_id):
@@ -61,9 +65,11 @@ def _get_topic_progress(student_id, topic_id):
     progress = []
     for node in nodes:
         sk = skill_model.get(student_id, node['id'])
+        # Use 1 decimal place for more precision in display
+        mastery_pct = round(sk['mastery_level'] * 100, 1)
         progress.append({
             'name': node['name'],
-            'mastery_pct': round(sk['mastery_level'] * 100),
+            'mastery_pct': mastery_pct,
             'skill_rating': round(sk['skill_rating'], 1),
             'total_attempts': sk['total_attempts'],
             'mastered': elo.is_mastered(sk['mastery_level']),

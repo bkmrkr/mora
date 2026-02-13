@@ -7,8 +7,10 @@ from engine.question_options import SIMILARITY_THRESHOLD
 def normalize_question_text(text):
     """Normalize question text for comparison.
 
-    Removes numbers, variable names, and case differences to find semantic similarity.
-    Example: "What is 5 + 3?" → "what is ?"
+    Removes numbers and single-letter variable names, but keeps content words
+    that differentiate questions (like "items", "stars", "candies").
+    Example: "What is 5 + 3?" → "what is ? + ?"
+    Example: "If you have 3 groups with 5 items..." → "if you have ? groups with ? items"
     """
     if not text:
         return ""
@@ -16,10 +18,15 @@ def normalize_question_text(text):
     # Convert to lowercase
     text = text.lower()
 
-    # Remove numbers (0-9, decimals, fractions)
+    # Replace numbers (0-9, decimals, fractions) with placeholder
     text = re.sub(r'\d+\.?\d*', '?', text)
-    text = re.sub(r'[a-z]', '', text)  # Remove variable names
-    text = re.sub(r'\s+', ' ', text)   # Normalize whitespace
+
+    # Remove only single-letter variable names (standalone a-z)
+    # Keep multi-letter words that differentiate questions
+    text = re.sub(r'\b[a-z]\b', '', text)
+
+    # Normalize whitespace
+    text = re.sub(r'\s+', ' ', text)
 
     return text.strip()
 

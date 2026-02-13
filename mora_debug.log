@@ -7678,3 +7678,217 @@ werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on 
 2026-02-12 23:33:02,253 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
 2026-02-12 23:33:02,268 [WARNING] werkzeug:  * Debugger is active!
 2026-02-12 23:33:02,273 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:41:50,752 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:42:09,174 [INFO] mora.requests: >>> GET /  form={}
+2026-02-12 23:42:09,180 [INFO] mora.requests: <<< GET /  status=200  location=-
+2026-02-12 23:42:09,180 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:42:09] "GET / HTTP/1.1" 200 -
+2026-02-12 23:43:15,631 [INFO] mora.requests: >>> POST /session/start  form={'student_id': '1', 'topic_id': '1'}
+2026-02-12 23:43:17,486 [INFO] ai.ollama_client: Ollama qwen2.5 — 315 chars, 91 tokens, 1.8s
+2026-02-12 23:43:17,486 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "If you have 3 groups with 5 items in each group, how many items do you have in total?",
+  "correct_answer": "15",
+  "explanation": "Multiplying the number of groups by the number of items in each group gives \(3 \times 5 = 15\). This can also be visualized as an array with 3 rows and 5 columns."
+}
+2026-02-12 23:43:17,486 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:43:17,492 [WARNING] services.question_service: Similarity dedup rejected (attempt 1, score=1.00)
+2026-02-12 23:43:19,129 [INFO] ai.ollama_client: Ollama qwen2.5 — 379 chars, 114 tokens, 1.6s
+2026-02-12 23:43:19,129 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "If you have 3 groups with 5 stars in each group, how many stars do you have in total?",
+  "correct_answer": "15",
+  "explanation": "To solve this problem, you can add the number of stars in each group: \(5 + 5 + 5 = 15\). Alternatively, since there are 3 groups and each contains 5 stars, you can multiply these numbers to find the total: \(3 \times 5 = 15\)."
+}
+2026-02-12 23:43:19,130 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:43:19,130 [WARNING] services.question_service: Similarity dedup rejected (attempt 2, score=1.00)
+2026-02-12 23:43:20,418 [INFO] ai.ollama_client: Ollama qwen2.5 — 327 chars, 88 tokens, 1.3s
+2026-02-12 23:43:20,419 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "If you have 3 groups with 4 items in each group, how many items do you have in total?",
+  "correct_answer": "12",
+  "explanation": "This question tests understanding of multiplication as repeated addition and visualizing it through an array. There are 3 groups, each containing 4 items: \(3 \times 4 = 12\)."
+}
+2026-02-12 23:43:20,419 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:43:20,421 [WARNING] services.question_service: Similarity dedup rejected (attempt 3, score=1.00)
+2026-02-12 23:43:20,421 [INFO] mora.requests: <<< POST /session/start  status=302  location=/session/b29f7d4d-728b-4c0d-b7a9-9df93a6f8311/question
+2026-02-12 23:43:20,422 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:43:20] "[32mPOST /session/start HTTP/1.1[0m" 302 -
+2026-02-12 23:43:20,423 [INFO] mora.requests: >>> POST /session/b29f7d4d-728b-4c0d-b7a9-9df93a6f8311/question  form={}
+2026-02-12 23:43:20,426 [ERROR] mora.requests: !!! POST /session/b29f7d4d-728b-4c0d-b7a9-9df93a6f8311/question  EXCEPTION:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 891, in dispatch_request
+    self.raise_routing_exception(req)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 500, in raise_routing_exception
+    raise request.routing_exception  # type: ignore[misc]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/ctx.py", line 362, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/werkzeug/routing/map.py", line 624, in match
+    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None
+werkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.
+
+2026-02-12 23:43:20,426 [INFO] mora.requests: <<< POST /session/b29f7d4d-728b-4c0d-b7a9-9df93a6f8311/question  status=500  location=-
+2026-02-12 23:43:20,426 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:43:20] "[35m[1mPOST /session/b29f7d4d-728b-4c0d-b7a9-9df93a6f8311/question HTTP/1.1[0m" 500 -
+2026-02-12 23:43:32,002 [INFO] mora.requests: >>> POST /session/start  form={'student_id': '1', 'topic_id': '1'}
+2026-02-12 23:43:33,219 [INFO] ai.ollama_client: Ollama qwen2.5 — 264 chars, 79 tokens, 1.2s
+2026-02-12 23:43:33,219 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "If you have 3 groups with 4 candies in each group, how many candies do you have in total?",
+  "correct_answer": "12",
+  "explanation": "Multiplication as repeated addition: 3 groups of 4 candies is the same as adding 4 + 4 + 4, which equals 12."
+}
+2026-02-12 23:43:33,219 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:43:33,221 [WARNING] services.question_service: Similarity dedup rejected (attempt 1, score=1.00)
+2026-02-12 23:43:34,286 [INFO] ai.ollama_client: Ollama qwen2.5 — 201 chars, 70 tokens, 1.1s
+2026-02-12 23:43:34,286 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "What is the result of multiplying 3 by 4 using repeated addition?",
+  "correct_answer": "12",
+  "explanation": "Multiplying 3 by 4 means adding 3 four times: \(3 + 3 + 3 + 3 = 12\)."
+}
+2026-02-12 23:43:34,286 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:43:34,287 [WARNING] services.question_service: Similarity dedup rejected (attempt 2, score=1.00)
+2026-02-12 23:43:35,489 [INFO] ai.ollama_client: Ollama qwen2.5 — 275 chars, 81 tokens, 1.2s
+2026-02-12 23:43:35,489 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "If you have 3 groups with 5 stars in each group, how many stars do you have in total?",
+  "correct_answer": "15",
+  "explanation": "To find the total number of stars, multiply the number of groups by the number of stars in each group: \(3 \times 5 = 15\)."
+}
+2026-02-12 23:43:35,489 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:43:35,490 [WARNING] services.question_service: Similarity dedup rejected (attempt 3, score=1.00)
+2026-02-12 23:43:35,490 [INFO] mora.requests: <<< POST /session/start  status=302  location=/session/59577bc4-4648-4246-b1dd-460436d16f9b/question
+2026-02-12 23:43:35,490 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:43:35] "[32mPOST /session/start HTTP/1.1[0m" 302 -
+2026-02-12 23:43:35,491 [INFO] mora.requests: >>> POST /session/59577bc4-4648-4246-b1dd-460436d16f9b/question  form={}
+2026-02-12 23:43:35,491 [ERROR] mora.requests: !!! POST /session/59577bc4-4648-4246-b1dd-460436d16f9b/question  EXCEPTION:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 891, in dispatch_request
+    self.raise_routing_exception(req)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 500, in raise_routing_exception
+    raise request.routing_exception  # type: ignore[misc]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/ctx.py", line 362, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/werkzeug/routing/map.py", line 624, in match
+    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None
+werkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.
+
+2026-02-12 23:43:35,491 [INFO] mora.requests: <<< POST /session/59577bc4-4648-4246-b1dd-460436d16f9b/question  status=500  location=-
+2026-02-12 23:43:35,492 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:43:35] "[35m[1mPOST /session/59577bc4-4648-4246-b1dd-460436d16f9b/question HTTP/1.1[0m" 500 -
+2026-02-12 23:43:40,111 [INFO] mora.requests: >>> GET /session/226b0094-55d9-4c1a-a128-8112fd62894d/question  form={}
+2026-02-12 23:43:40,112 [INFO] routes.session: Resumed question 136 from DB for session 226b0094-55d9-4c1a-a128-8112fd62894d
+2026-02-12 23:43:40,122 [INFO] mora.requests: <<< GET /session/226b0094-55d9-4c1a-a128-8112fd62894d/question  status=200  location=-
+2026-02-12 23:43:40,122 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:43:40] "GET /session/226b0094-55d9-4c1a-a128-8112fd62894d/question HTTP/1.1" 200 -
+2026-02-12 23:44:46,987 [INFO] mora.requests: >>> GET /pick-topic/1  form={}
+2026-02-12 23:44:46,989 [INFO] mora.requests: <<< GET /pick-topic/1  status=200  location=-
+2026-02-12 23:44:46,989 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:44:46] "GET /pick-topic/1 HTTP/1.1" 200 -
+2026-02-12 23:45:00,720 [INFO] mora.requests: >>> POST /session/start  form={'student_id': '1', 'topic_id': '1'}
+2026-02-12 23:45:02,054 [INFO] ai.ollama_client: Ollama qwen2.5 — 261 chars, 86 tokens, 1.3s
+2026-02-12 23:45:02,054 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "If you have 3 groups with 5 items in each group, what is the total number of items?",
+  "correct_answer": "15",
+  "explanation": "To solve this problem, we can use multiplication as repeated addition: \(3 \times 5 = 3 + 3 + 3 + 3 + 3 = 15\)."
+}
+2026-02-12 23:45:02,054 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:45:02,055 [WARNING] services.question_service: Similarity dedup rejected (attempt 1, score=1.00)
+2026-02-12 23:45:03,560 [INFO] ai.ollama_client: Ollama qwen2.5 — 371 chars, 104 tokens, 1.5s
+2026-02-12 23:45:03,560 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "If you have 3 groups with 5 items in each group, what is the total number of items?",
+  "correct_answer": "15",
+  "explanation": "To solve this problem, we use multiplication as repeated addition. You can think of it as adding 5 three times: \(5 + 5 + 5 = 15\). Alternatively, you can set up an array with 3 rows and 5 columns to visualize the groups."
+}
+2026-02-12 23:45:03,560 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:45:03,564 [WARNING] services.question_service: Similarity dedup rejected (attempt 2, score=1.00)
+2026-02-12 23:45:04,677 [INFO] ai.ollama_client: Ollama qwen2.5 — 248 chars, 74 tokens, 1.1s
+2026-02-12 23:45:04,677 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "If you have 3 groups with 5 items in each group, how many items do you have in total?",
+  "correct_answer": "15",
+  "explanation": "Multiplying the number of groups by the number of items in each group gives \(3 \times 5 = 15\)."
+}
+2026-02-12 23:45:04,678 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:45:04,679 [WARNING] services.question_service: Similarity dedup rejected (attempt 3, score=1.00)
+2026-02-12 23:45:04,679 [INFO] mora.requests: <<< POST /session/start  status=302  location=/session/61f1702c-19bf-449c-8d50-02c80bf81088/question
+2026-02-12 23:45:04,679 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:45:04] "[32mPOST /session/start HTTP/1.1[0m" 302 -
+2026-02-12 23:45:10,475 [INFO] mora.requests: >>> GET /session/61f1702c-19bf-449c-8d50-02c80bf81088/question  form={}
+2026-02-12 23:45:12,121 [INFO] ai.ollama_client: Ollama qwen2.5 — 375 chars, 109 tokens, 1.6s
+2026-02-12 23:45:12,121 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "If you have 3 groups with 5 items in each group, how many items do you have in total?",
+  "correct_answer": "15",
+  "explanation": "To find the total number of items, we can use multiplication as repeated addition. So, 3 groups of 5 items is the same as adding 5 three times: \(5 + 5 + 5 = 15\). An array representing this would have 3 rows and 5 columns."
+}
+2026-02-12 23:45:12,121 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:45:12,122 [WARNING] services.question_service: Similarity dedup rejected (attempt 1, score=1.00)
+2026-02-12 23:45:13,770 [INFO] ai.ollama_client: Ollama qwen2.5 — 384 chars, 113 tokens, 1.6s
+2026-02-12 23:45:13,771 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "If you have 3 groups with 5 stars in each group, how many stars do you have in total?",
+  "correct_answer": "15",
+  "explanation": "To find the total number of stars, we can use multiplication as repeated addition. We add 5 stars three times: \(5 + 5 + 5 = 15\). Alternatively, we can multiply the number of groups by the number in each group: \(3 \times 5 = 15\)."
+}
+2026-02-12 23:45:13,771 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:45:13,773 [WARNING] services.question_service: Similarity dedup rejected (attempt 2, score=1.00)
+2026-02-12 23:45:15,261 [INFO] ai.ollama_client: Ollama qwen2.5 — 360 chars, 101 tokens, 1.5s
+2026-02-12 23:45:15,261 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "If you have 3 groups with 5 stars in each group, how many stars do you have in total?",
+  "correct_answer": "15",
+  "explanation": "This question asks for the total number of stars when there are 3 groups and each group has 5 stars. To find the total, multiply the number of groups by the number of stars in each group: \(3 \times 5 = 15\)."
+}
+2026-02-12 23:45:15,261 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:45:15,262 [WARNING] services.question_service: Similarity dedup rejected (attempt 3, score=1.00)
+2026-02-12 23:45:15,266 [INFO] mora.requests: <<< GET /session/61f1702c-19bf-449c-8d50-02c80bf81088/question  status=200  location=-
+2026-02-12 23:45:15,266 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:45:15] "GET /session/61f1702c-19bf-449c-8d50-02c80bf81088/question HTTP/1.1" 200 -
+2026-02-12 23:45:15,902 [INFO] mora.requests: >>> GET /session/61f1702c-19bf-449c-8d50-02c80bf81088/question  form={}
+2026-02-12 23:45:17,010 [INFO] ai.ollama_client: Ollama qwen2.5 — 243 chars, 74 tokens, 1.1s
+2026-02-12 23:45:17,010 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "If you have 3 groups with 5 items in each group, how many items do you have in total?",
+  "correct_answer": "15",
+  "explanation": "Multiplying the number of groups by the number of items in each group: \(3 \times 5 = 15\)."
+}
+2026-02-12 23:45:17,010 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:45:17,011 [WARNING] services.question_service: Similarity dedup rejected (attempt 1, score=1.00)
+2026-02-12 23:45:18,203 [INFO] ai.ollama_client: Ollama qwen2.5 — 283 chars, 81 tokens, 1.2s
+2026-02-12 23:45:18,204 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "If you have 3 groups with 4 candies in each group, how many candies do you have in total?",
+  "correct_answer": "12",
+  "explanation": "To find the total number of candies, multiply the number of groups by the number of candies in each group. \(3 \times 4 = 12\)."
+}
+2026-02-12 23:45:18,204 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:45:18,206 [WARNING] services.question_service: Similarity dedup rejected (attempt 2, score=1.00)
+2026-02-12 23:45:19,331 [INFO] ai.ollama_client: Ollama qwen2.5 — 244 chars, 76 tokens, 1.1s
+2026-02-12 23:45:19,332 [INFO] ai.question_generator: Raw LLM response for "Multiplication Introduction": {
+  "question": "If you have 3 groups with 4 candies in each group, how many candies do you have in total?",
+  "correct_answer": "12",
+  "explanation": "Multiplication as repeated addition: 3 groups of 4 is the same as adding 4 + 4 + 4 = 12."
+}
+2026-02-12 23:45:19,332 [INFO] ai.question_generator: Generated mcq question for "Multiplication Introduction" at difficulty 0.42
+2026-02-12 23:45:19,333 [WARNING] services.question_service: Similarity dedup rejected (attempt 3, score=1.00)
+2026-02-12 23:45:19,337 [INFO] mora.requests: <<< GET /session/61f1702c-19bf-449c-8d50-02c80bf81088/question  status=200  location=-
+2026-02-12 23:45:19,337 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:45:19] "GET /session/61f1702c-19bf-449c-8d50-02c80bf81088/question HTTP/1.1" 200 -
+2026-02-12 23:49:29,307 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/engine/question_similarity.py', reloading
+2026-02-12 23:49:29,369 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:49:29,599 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:49:29,616 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:49:29,620 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:50:01,154 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/routes/session.py', reloading
+2026-02-12 23:50:01,221 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:50:01,467 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:50:01,484 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:50:01,488 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:50:21,910 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/routes/session.py', reloading
+2026-02-12 23:50:21,979 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:50:22,262 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:50:22,280 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:50:22,285 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:51:00,925 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/engine/question_options.py', reloading
+2026-02-12 23:51:00,994 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:51:01,226 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:51:01,243 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:51:01,247 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:51:15,495 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/tests/test_question_options.py', reloading
+2026-02-12 23:51:15,552 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:51:15,780 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:51:15,795 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:51:15,799 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:54:13,069 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/tests/test_topic_mastery.py', reloading
+2026-02-12 23:54:13,133 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:54:13,378 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:54:13,394 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:54:13,399 [INFO] werkzeug:  * Debugger PIN: 134-150-250

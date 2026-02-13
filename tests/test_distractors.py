@@ -67,7 +67,8 @@ class TestComputeDistractors:
 class TestInsertDistractors:
     def test_adds_options_to_mcq(self):
         q = {'question': 'What is 7 + 5?', 'correct_answer': '12', 'question_type': 'mcq'}
-        result = insert_distractors(q)
+        result, success, reason = insert_distractors(q)
+        assert success, reason
         assert result['options'] is not None
         assert len(result['options']) == 4
         # Correct answer should be in options
@@ -75,13 +76,14 @@ class TestInsertDistractors:
 
     def test_adds_letter_prefix(self):
         q = {'question': 'What is 7 + 5?', 'correct_answer': '12', 'question_type': 'mcq'}
-        result = insert_distractors(q)
+        result, success, reason = insert_distractors(q)
+        assert success, reason
         # correct_answer should now have letter prefix
         assert ')' in result['correct_answer']
 
     def test_skips_non_mcq(self):
         q = {'question': 'What is 7 + 5?', 'correct_answer': '12', 'question_type': 'short_answer'}
-        result = insert_distractors(q)
+        result, success, reason = insert_distractors(q)
         # Options should remain None for non-MCQ
         assert result.get('options') is None
 
@@ -124,7 +126,8 @@ class TestMultiValueDistractors:
             'correct_answer': '2, 3',
             'question_type': 'mcq'
         }
-        result = insert_distractors(q)
+        result, success, reason = insert_distractors(q)
+        assert success, reason
 
         # Should have exactly 4 options
         assert len(result['options']) == 4
@@ -144,7 +147,8 @@ class TestMultiValueDistractors:
             'correct_answer': '2, 3',
             'question_type': 'mcq'
         }
-        result = insert_distractors(q)
+        result, success, reason = insert_distractors(q)
+        assert success, reason
         options = result['options']
 
         # Count how many options are just '0'

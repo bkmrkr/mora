@@ -291,12 +291,17 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
                 q_data = None
                 continue
 
+            # Compute distractors for MCQ (after validation, before storing)
+            if q_type == 'mcq' and q_data:
+                q_data, success, reason = insert_distractors(q_data)
+                if not success:
+                    logger.warning('Distractor generation failed (attempt %d): %s',
+                                   attempt_num + 1, reason)
+                    q_data = None
+                    continue
+
             # Passed all checks
             break
-
-    # Compute distractors for MCQ (after validation, before storing)
-    if q_type == 'mcq' and q_data:
-        q_data = insert_distractors(q_data)
 
     if not q_data:
         if store_in_session:

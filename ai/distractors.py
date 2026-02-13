@@ -238,17 +238,37 @@ def _text_distractors(correct):
     return distractors
 
 
-def _fallback_distractor(correct, exclude=None):
-    """Generate a fallback distractor when others fail.
+def _smart_fallback(correct, exclude=None):
+    """Generate fallback distractor or return None if impossible.
+
+    Detects non-Latin scripts, LaTeX, and other complex answer types
+    and returns None rather than generating nonsensical fallbacks.
 
     Args:
-        correct: The correct answer (to avoid)
+        correct: The correct answer
         exclude: Set of values to exclude
+
+    Returns:
+        A sensible fallback string, or None if cannot generate meaningful distractor
     """
     if exclude is None:
         exclude = set()
 
-    # Common fallback: offer sequential options for numeric answers
+    # Detect non-Latin scripts where we can't generate meaningful distractors
+    has_hebrew = bool(re.search(r'[\u0590-\u05FF]', correct))
+    has_arabic = bool(re.search(r'[\u0600-\u06FF]', correct))
+    has_chinese = bool(re.search(r'[\u4e00-\u9fff]', correct))
+    has_CJK = bool(re.search(r'[\u3040-\u309F\uAC00-\uD7AF]', correct))  # Japanese, Korean
+
+    # Detect LaTeX/math notation
+    has_latex = bool(re.search(r'\\[a-z]+\{', correct))
+    has_math_symbols = any(s in correct for s in ['≥', '≤', '÷', '×', 'π', '∑', '∫'])
+
+    # If complex answer type, we can't generate sensible fallbacks
+    if any([has_hebrew, has_arabic, has_chinese, has_CJK, has_latex, has_math_symbols]):
+        return None
+
+    # For simple text/numeric answers, use regular fallbacks
     num = _parse_number(correct)
     if num is not None:
         for i in [1, 2, 3, 4, -1, -2, -3, -4]:
@@ -257,14 +277,28 @@ def _fallback_distractor(correct, exclude=None):
             if formatted not in exclude and formatted != correct:
                 return formatted
 
-    # Fallback for text answers: try simple variants
-    fallbacks = ['0', 'false', 'False', 'no', 'No', '1', 'unknown']
+    # Simple text fallbacks
+    fallbacks = ['0', '1', 'no', 'unknown']
     for fb in fallbacks:
         if fb not in exclude and fb != correct:
             return fb
 
-    # Last resort: return something unique
-    return f"option_{random.randint(1000, 9999)}"
+    return None
+
+
+def _fallback_distractor(correct, exclude=None):
+    """Generate a fallback distractor when others fail.
+
+    Calls _smart_fallback() which returns None if impossible.
+
+    Args:
+        correct: The correct answer (to avoid)
+        exclude: Set of values to exclude
+
+    Returns:
+        A fallback string, or None if cannot generate meaningful one
+    """
+    return _smart_fallback(correct, exclude)
 
 
 def insert_distractors(question_data):
@@ -272,17 +306,21 @@ def insert_distractors(question_data):
 
     If the question already has options, replace them with computed ones.
     If it's MCQ type but has no options, generate them.
+
+    Returns:
+        (question_data, success: bool, reason: str) tuple.
+        success=False if distractors cannot be generated meaningfully.
     """
     import re
     LETTER_PREFIX_RE = re.compile(r'^[A-Da-d][).\s]+\s*')
 
     q_type = question_data.get('question_type', 'mcq')
     if q_type != 'mcq':
-        return question_data
+        return question_data, True, ''
 
     correct = question_data.get('correct_answer', '')
     if not correct:
-        return question_data
+        return question_data, True, ''
 
     # Strip any existing letter prefix from correct answer
     correct = LETTER_PREFIX_RE.sub('', correct).strip()
@@ -293,6 +331,7 @@ def insert_distractors(question_data):
     # Build options: put correct at random position
     correct_index = random.randint(0, 3)
     options = []
+    fallback_count = 0
 
     for i in range(4):
         if i == correct_index:
@@ -301,7 +340,21 @@ def insert_distractors(question_data):
             if computed:
                 options.append(computed.pop(0))
             else:
-                options.append(_fallback_distractor(correct))
+                fb = _fallback_distractor(correct, exclude=set(options))
+                if fb is None:
+                    return question_data, False, \
+                        f"Cannot generate meaningful distractors for answer: {correct}"
+                fallback_count += 1
+                options.append(fb)
+
+    # Reject if too many fallbacks used
+    if fallback_count >= 2:
+        return question_data, False, \
+            f"Used {fallback_count} generic fallbacks (cannot generate sensible options)"
+
+    # Check for duplicate options (should not happen after our fixes, but safety check)
+    if len(set(options)) != len(options):
+        return question_data, False, "Generated duplicate options"
 
     question_data['options'] = options
 
@@ -309,4 +362,4 @@ def insert_distractors(question_data):
     letters = ['A', 'B', 'C', 'D']
     question_data['correct_answer'] = f"{letters[correct_index]}) {correct}"
 
-    return question_data
+    return question_data, True, ''

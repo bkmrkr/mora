@@ -45,6 +45,17 @@ CREATE TABLE IF NOT EXISTS questions (
     estimated_p_correct REAL,
     generated_prompt TEXT,
     model_used TEXT,
+    quality_flags INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Track question quality reports
+CREATE TABLE IF NOT EXISTS question_reports (
+    id INTEGER PRIMARY KEY,
+    question_id INTEGER NOT NULL REFERENCES questions(id),
+    student_id INTEGER REFERENCES students(id),
+    reason TEXT NOT NULL,
+    details TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

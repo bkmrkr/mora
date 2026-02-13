@@ -2010,3 +2010,38 @@ KeyError: '/mp-b_5z5t_6'
 2026-02-12 23:03:48,235 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:03:48] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
 2026-02-12 23:03:48,236 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
 2026-02-12 23:03:48,236 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:03:48] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:08:08,628 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/ai/distractors.py', reloading
+2026-02-12 23:08:08,675 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:08:08,914 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:08:08,933 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:08:08,937 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:08:17,098 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/ai/distractors.py', reloading
+2026-02-12 23:08:17,163 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:08:17,402 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:08:17,417 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:08:17,421 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:08:27,595 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/services/question_service.py', reloading
+2026-02-12 23:08:27,671 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:08:27,923 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:08:27,940 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:08:27,944 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:08:34,065 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/engine/question_validator.py', reloading
+2026-02-12 23:08:34,122 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:08:34,361 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:08:34,376 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:08:34,381 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:08:53,677 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/engine/question_validator.py', reloading
+2026-02-12 23:08:53,732 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:08:53,979 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:08:53,995 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:08:54,000 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:09:03,147 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/tests/test_distractors.py', reloading
+2026-02-12 23:09:03,206 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:09:03,444 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:09:03,459 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:09:03,463 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:09:11,600 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/tests/test_distractors.py', reloading
+2026-02-12 23:09:11,658 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:09:11,901 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:09:11,915 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:09:11,919 [INFO] werkzeug:  * Debugger PIN: 134-150-250

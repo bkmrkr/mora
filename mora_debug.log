@@ -4901,3 +4901,417 @@ werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on 
 }
 2026-02-12 23:03:58,077 [INFO] ai.question_generator: Generated mcq question for "Subtraction Within 10" at difficulty 0.00
 2026-02-12 23:03:58,082 [INFO] services.question_service: Pre-cached correct-path question (diff=361, node=Subtraction Within 10)
+2026-02-12 23:03:59,014 [INFO] ai.ollama_client: Ollama qwen2.5 — 190 chars, 62 tokens, 0.9s
+2026-02-12 23:03:59,014 [INFO] ai.question_generator: Raw LLM response for "Subtraction Within 10": {
+  "question": "If you have 6 cookies and eat 1 cookie, how many cookies are left?:",
+  "correct_answer": "5",
+  "explanation": "Start with 6 cookies. Subtract 1 cookie eaten: 6 - 1 = 5."
+}
+2026-02-12 23:03:59,014 [INFO] ai.question_generator: Generated mcq question for "Subtraction Within 10" at difficulty 0.00
+2026-02-12 23:03:59,019 [INFO] services.question_service: Pre-cached wrong-path question (diff=361, node=Subtraction Within 10)
+2026-02-12 23:03:59,019 [INFO] mora.requests: <<< POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache  status=204  location=-
+2026-02-12 23:03:59,019 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:03:59] "[35m[1mPOST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache HTTP/1.1[0m" 204 -
+2026-02-12 23:04:02,596 [INFO] mora.requests: >>> POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer  form={'question_id': '639', 'response_time_s': '6.4', 'answer': '5'}
+2026-02-12 23:04:02,619 [INFO] services.question_service: Pre-cache hit (correct path) for student 1 session c333ef7e-01f1-40d5-aff7-44cd1868f9e7 (diff=361)
+2026-02-12 23:04:02,620 [INFO] mora.requests: <<< POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer  status=302  location=/session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question
+2026-02-12 23:04:02,620 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:02] "[32mPOST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer HTTP/1.1[0m" 302 -
+2026-02-12 23:04:02,625 [INFO] mora.requests: >>> GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question  form={}
+2026-02-12 23:04:02,634 [INFO] mora.requests: <<< GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question  status=200  location=-
+2026-02-12 23:04:02,634 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:02] "GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question HTTP/1.1" 200 -
+2026-02-12 23:04:02,639 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:04:02,639 [INFO] mora.requests: >>> GET /static/js/session.js  form={}
+2026-02-12 23:04:02,639 [INFO] mora.requests: <<< GET /static/js/session.js  status=304  location=-
+2026-02-12 23:04:02,639 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:02] "[36mGET /static/js/session.js HTTP/1.1[0m" 304 -
+2026-02-12 23:04:02,640 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:04:02,640 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:02] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:04:02,642 [INFO] mora.requests: >>> POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache  form={}
+2026-02-12 23:04:02,644 [INFO] services.question_service: Pre-caching dual: current=627, if_correct=628, if_wrong=623
+2026-02-12 23:04:03,673 [INFO] ai.ollama_client: Ollama qwen2.5 — 200 chars, 65 tokens, 1.0s
+2026-02-12 23:04:03,673 [INFO] ai.question_generator: Raw LLM response for "Subtraction Within 10": {
+  "question": "If you have 9 stickers and give away 5 stickers, how many stickers do you have left?",
+  "correct_answer": "4",
+  "explanation": "Start with 9 stickers. Give away 5: \(9 - 5 = 4\)."
+}
+2026-02-12 23:04:03,673 [INFO] ai.question_generator: Generated mcq question for "Subtraction Within 10" at difficulty 0.00
+2026-02-12 23:04:03,678 [INFO] services.question_service: Pre-cached correct-path question (diff=362, node=Subtraction Within 10)
+2026-02-12 23:04:04,734 [INFO] ai.ollama_client: Ollama qwen2.5 — 213 chars, 71 tokens, 1.1s
+2026-02-12 23:04:04,734 [INFO] ai.question_generator: Raw LLM response for "Subtraction Within 10": {
+  "question": "There are 5 birds on a tree. 3 fly away. How many birds are left on the tree?",
+  "correct_answer": "2",
+  "explanation": "Start with 5 birds, then subtract the 3 that flew away: \(5 - 3 = 2\)."
+}
+2026-02-12 23:04:04,734 [INFO] ai.question_generator: Generated mcq question for "Subtraction Within 10" at difficulty 0.00
+2026-02-12 23:04:04,740 [INFO] services.question_service: Pre-cached wrong-path question (diff=357, node=Subtraction Within 10)
+2026-02-12 23:04:04,740 [INFO] mora.requests: <<< POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache  status=204  location=-
+2026-02-12 23:04:04,740 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:04] "[35m[1mPOST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache HTTP/1.1[0m" 204 -
+2026-02-12 23:04:05,908 [INFO] mora.requests: >>> POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer  form={'question_id': '640', 'response_time_s': '3.3', 'answer': '4'}
+2026-02-12 23:04:05,931 [INFO] services.question_service: Pre-cache hit (correct path) for student 1 session c333ef7e-01f1-40d5-aff7-44cd1868f9e7 (diff=362)
+2026-02-12 23:04:05,931 [INFO] mora.requests: <<< POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer  status=302  location=/session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question
+2026-02-12 23:04:05,932 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:05] "[32mPOST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer HTTP/1.1[0m" 302 -
+2026-02-12 23:04:05,935 [INFO] mora.requests: >>> GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question  form={}
+2026-02-12 23:04:05,944 [INFO] mora.requests: <<< GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question  status=200  location=-
+2026-02-12 23:04:05,944 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:05] "GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question HTTP/1.1" 200 -
+2026-02-12 23:04:05,949 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:04:05,949 [INFO] mora.requests: >>> GET /static/js/session.js  form={}
+2026-02-12 23:04:05,950 [INFO] mora.requests: <<< GET /static/js/session.js  status=304  location=-
+2026-02-12 23:04:05,950 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:05] "[36mGET /static/js/session.js HTTP/1.1[0m" 304 -
+2026-02-12 23:04:05,950 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:04:05,950 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:05] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:04:05,953 [INFO] mora.requests: >>> POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache  form={}
+2026-02-12 23:04:05,954 [INFO] services.question_service: Pre-caching dual: current=628, if_correct=629, if_wrong=624
+2026-02-12 23:04:07,735 [INFO] ai.ollama_client: Ollama qwen2.5 — 152 chars, 66 tokens, 1.8s
+2026-02-12 23:04:07,735 [INFO] ai.question_generator: Raw LLM response for "Three Addends": {
+  "question": "What is the sum of 5, 6, and 3?",
+  "correct_answer": "14",
+  "explanation": "First, add 5+6 to get 11. Then, add 3 to 11 to get 14."
+}
+2026-02-12 23:04:07,735 [INFO] ai.question_generator: Generated mcq question for "Three Addends" at difficulty 0.26
+2026-02-12 23:04:07,740 [INFO] services.question_service: Pre-cached correct-path question (diff=607, node=Three Addends)
+2026-02-12 23:04:08,856 [INFO] ai.ollama_client: Ollama qwen2.5 — 218 chars, 75 tokens, 1.1s
+2026-02-12 23:04:08,856 [INFO] ai.question_generator: Raw LLM response for "Three Addends": {
+  "question": "What number should be added to 7 and 5 to make the sum equal to 15?",
+  "correct_answer": "3",
+  "explanation": "First, add 7 and 5 to get 12. Then, find the difference between 15 and 12 which is 3."
+}
+2026-02-12 23:04:08,856 [INFO] ai.question_generator: Generated mcq question for "Three Addends" at difficulty 0.26
+2026-02-12 23:04:08,861 [INFO] services.question_service: Pre-cached wrong-path question (diff=607, node=Three Addends)
+2026-02-12 23:04:08,861 [INFO] mora.requests: <<< POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache  status=204  location=-
+2026-02-12 23:04:08,861 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:08] "[35m[1mPOST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache HTTP/1.1[0m" 204 -
+2026-02-12 23:04:12,194 [INFO] mora.requests: >>> POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer  form={'question_id': '642', 'response_time_s': '6.2', 'answer': '4'}
+2026-02-12 23:04:12,212 [INFO] services.question_service: Pre-cache hit (correct path) for student 1 session c333ef7e-01f1-40d5-aff7-44cd1868f9e7 (diff=607)
+2026-02-12 23:04:12,213 [INFO] mora.requests: <<< POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer  status=302  location=/session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question
+2026-02-12 23:04:12,213 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:12] "[32mPOST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer HTTP/1.1[0m" 302 -
+2026-02-12 23:04:12,217 [INFO] mora.requests: >>> GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question  form={}
+2026-02-12 23:04:12,224 [INFO] mora.requests: <<< GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question  status=200  location=-
+2026-02-12 23:04:12,224 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:12] "GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question HTTP/1.1" 200 -
+2026-02-12 23:04:12,229 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:04:12,229 [INFO] mora.requests: >>> GET /static/js/session.js  form={}
+2026-02-12 23:04:12,229 [INFO] mora.requests: <<< GET /static/js/session.js  status=304  location=-
+2026-02-12 23:04:12,229 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:12] "[36mGET /static/js/session.js HTTP/1.1[0m" 304 -
+2026-02-12 23:04:12,230 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:04:12,230 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:12] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:04:12,232 [INFO] mora.requests: >>> POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache  form={}
+2026-02-12 23:04:12,234 [INFO] services.question_service: Pre-caching dual: current=748, if_correct=754, if_wrong=741
+2026-02-12 23:04:14,284 [INFO] ai.ollama_client: Ollama qwen2.5 — 240 chars, 94 tokens, 2.0s
+2026-02-12 23:04:14,284 [INFO] ai.question_generator: Raw LLM response for "Three Addends": {
+  "question": "What is the sum of 5, 7, and 2?",
+  "correct_answer": "14",
+  "explanation": "First, find the sum of any two numbers, such as (5+7)+2 = 12+2 = 14. Alternatively, you can add them in a different order: (7+2)+5 = 9+5 = 14."
+}
+2026-02-12 23:04:14,284 [INFO] ai.question_generator: Generated mcq question for "Three Addends" at difficulty 0.27
+2026-02-12 23:04:14,289 [INFO] services.question_service: Pre-cached correct-path question (diff=613, node=Three Addends)
+2026-02-12 23:04:15,981 [INFO] ai.ollama_client: Ollama qwen2.5 — 208 chars, 70 tokens, 1.7s
+2026-02-12 23:04:15,981 [INFO] ai.question_generator: Raw LLM response for "Three Addends": {
+  "question": "If you have 5 candies, 3 cookies, and 2 chocolates, how many treats do you have in total?",
+  "correct_answer": "10",
+  "explanation": "Add the number of each type of treat: 5 + 3 + 2 = 10"
+}
+2026-02-12 23:04:15,981 [INFO] ai.question_generator: Generated mcq question for "Three Addends" at difficulty 0.25
+2026-02-12 23:04:15,985 [INFO] services.question_service: Pre-cached wrong-path question (diff=601, node=Three Addends)
+2026-02-12 23:04:15,986 [INFO] mora.requests: <<< POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache  status=204  location=-
+2026-02-12 23:04:15,986 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:15] "[35m[1mPOST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache HTTP/1.1[0m" 204 -
+2026-02-12 23:04:16,883 [INFO] mora.requests: >>> POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer  form={'question_id': '644', 'response_time_s': '4.6', 'answer': '14'}
+2026-02-12 23:04:16,897 [INFO] services.question_service: Pre-cache hit (correct path) for student 1 session c333ef7e-01f1-40d5-aff7-44cd1868f9e7 (diff=613)
+2026-02-12 23:04:16,897 [INFO] mora.requests: <<< POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer  status=302  location=/session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question
+2026-02-12 23:04:16,898 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:16] "[32mPOST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer HTTP/1.1[0m" 302 -
+2026-02-12 23:04:16,902 [INFO] mora.requests: >>> GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question  form={}
+2026-02-12 23:04:16,909 [INFO] mora.requests: <<< GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question  status=200  location=-
+2026-02-12 23:04:16,909 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:16] "GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question HTTP/1.1" 200 -
+2026-02-12 23:04:16,914 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:04:16,914 [INFO] mora.requests: >>> GET /static/js/session.js  form={}
+2026-02-12 23:04:16,914 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:04:16,914 [INFO] mora.requests: <<< GET /static/js/session.js  status=304  location=-
+2026-02-12 23:04:16,915 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:16] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:04:16,915 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:16] "[36mGET /static/js/session.js HTTP/1.1[0m" 304 -
+2026-02-12 23:04:16,917 [INFO] mora.requests: >>> POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache  form={}
+2026-02-12 23:04:16,918 [INFO] services.question_service: Pre-caching dual: current=754, if_correct=756, if_wrong=748
+2026-02-12 23:04:16,921 [INFO] services.question_service: Generated local inequality question for "Subtraction Within 20"
+2026-02-12 23:04:16,927 [INFO] services.question_service: Pre-cached correct-path question (diff=483, node=Subtraction Within 20)
+2026-02-12 23:04:16,930 [INFO] services.question_service: Generated local inequality question for "Subtraction Within 20"
+2026-02-12 23:04:16,930 [INFO] services.question_service: Pre-cached wrong-path question (diff=483, node=Subtraction Within 20)
+2026-02-12 23:04:16,930 [INFO] mora.requests: <<< POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache  status=204  location=-
+2026-02-12 23:04:16,931 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:16] "[35m[1mPOST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache HTTP/1.1[0m" 204 -
+2026-02-12 23:04:23,236 [INFO] mora.requests: >>> POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer  form={'question_id': '646', 'response_time_s': '6.3', 'answer': '14'}
+2026-02-12 23:04:23,252 [INFO] services.question_service: Pre-cache hit (correct path) for student 1 session c333ef7e-01f1-40d5-aff7-44cd1868f9e7 (diff=483)
+2026-02-12 23:04:23,253 [INFO] mora.requests: <<< POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer  status=302  location=/session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question
+2026-02-12 23:04:23,253 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:23] "[32mPOST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer HTTP/1.1[0m" 302 -
+2026-02-12 23:04:23,257 [INFO] mora.requests: >>> GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question  form={}
+2026-02-12 23:04:23,266 [INFO] mora.requests: <<< GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question  status=200  location=-
+2026-02-12 23:04:23,267 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:23] "GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question HTTP/1.1" 200 -
+2026-02-12 23:04:23,271 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:04:23,271 [INFO] mora.requests: >>> GET /static/js/session.js  form={}
+2026-02-12 23:04:23,271 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:04:23,272 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:23] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:04:23,272 [INFO] mora.requests: <<< GET /static/js/session.js  status=304  location=-
+2026-02-12 23:04:23,272 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:23] "[36mGET /static/js/session.js HTTP/1.1[0m" 304 -
+2026-02-12 23:04:23,274 [INFO] mora.requests: >>> POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache  form={}
+2026-02-12 23:04:23,275 [INFO] services.question_service: Pre-caching dual: current=791, if_correct=795, if_wrong=777
+2026-02-12 23:04:23,278 [INFO] services.question_service: Generated local inequality question for "Subtraction Within 20"
+2026-02-12 23:04:23,279 [INFO] services.question_service: Pre-cached correct-path question (diff=488, node=Subtraction Within 20)
+2026-02-12 23:04:23,282 [INFO] services.question_service: Generated local inequality question for "Subtraction Within 20"
+2026-02-12 23:04:23,283 [INFO] services.question_service: Pre-cached wrong-path question (diff=470, node=Subtraction Within 20)
+2026-02-12 23:04:23,283 [INFO] mora.requests: <<< POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache  status=204  location=-
+2026-02-12 23:04:23,283 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:23] "[35m[1mPOST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache HTTP/1.1[0m" 204 -
+2026-02-12 23:04:25,391 [INFO] mora.requests: >>> POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer  form={'question_id': '648', 'response_time_s': '2.1', 'answer': 'x ≤ 4'}
+2026-02-12 23:04:25,414 [INFO] services.question_service: Pre-cache hit (correct path) for student 1 session c333ef7e-01f1-40d5-aff7-44cd1868f9e7 (diff=488)
+2026-02-12 23:04:25,415 [INFO] mora.requests: <<< POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer  status=302  location=/session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question
+2026-02-12 23:04:25,415 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:25] "[32mPOST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/answer HTTP/1.1[0m" 302 -
+2026-02-12 23:04:25,420 [INFO] mora.requests: >>> GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question  form={}
+2026-02-12 23:04:25,431 [INFO] mora.requests: <<< GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question  status=200  location=-
+2026-02-12 23:04:25,431 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:25] "GET /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/question HTTP/1.1" 200 -
+2026-02-12 23:04:25,436 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:04:25,436 [INFO] mora.requests: >>> GET /static/js/session.js  form={}
+2026-02-12 23:04:25,436 [INFO] mora.requests: <<< GET /static/js/session.js  status=304  location=-
+2026-02-12 23:04:25,437 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:25] "[36mGET /static/js/session.js HTTP/1.1[0m" 304 -
+2026-02-12 23:04:25,437 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:04:25,437 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:25] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:04:25,439 [INFO] mora.requests: >>> POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache  form={}
+2026-02-12 23:04:25,441 [INFO] services.question_service: Pre-caching dual: current=795, if_correct=800, if_wrong=783
+2026-02-12 23:04:26,796 [INFO] ai.ollama_client: Ollama qwen2.5 — 130 chars, 40 tokens, 1.4s
+2026-02-12 23:04:26,796 [INFO] ai.question_generator: Raw LLM response for "3D Shapes": {
+  "question": "How many faces does a cube have? Colon",
+  "correct_answer": "6",
+  "explanation": "A cube has 6 square faces."
+}
+2026-02-12 23:04:26,796 [INFO] ai.question_generator: Generated mcq question for "3D Shapes" at difficulty 0.01
+2026-02-12 23:04:26,797 [WARNING] services.question_service: Global dedup rejected (attempt 1)
+2026-02-12 23:04:27,406 [INFO] ai.ollama_client: Ollama qwen2.5 — 130 chars, 40 tokens, 0.6s
+2026-02-12 23:04:27,406 [INFO] ai.question_generator: Raw LLM response for "3D Shapes": {
+  "question": "How many faces does a cube have? Colon",
+  "correct_answer": "6",
+  "explanation": "A cube has 6 square faces."
+}
+2026-02-12 23:04:27,406 [INFO] ai.question_generator: Generated mcq question for "3D Shapes" at difficulty 0.01
+2026-02-12 23:04:27,406 [WARNING] services.question_service: Global dedup rejected (attempt 2)
+2026-02-12 23:04:28,095 [INFO] ai.ollama_client: Ollama qwen2.5 — 146 chars, 46 tokens, 0.7s
+2026-02-12 23:04:28,095 [INFO] ai.question_generator: Raw LLM response for "3D Shapes": {
+  "question": "How many faces does a cube have? Period",
+  "correct_answer": "6",
+  "explanation": "A cube is a 3D shape with 6 square faces."
+}
+2026-02-12 23:04:28,095 [INFO] ai.question_generator: Generated mcq question for "3D Shapes" at difficulty 0.01
+2026-02-12 23:04:28,099 [INFO] services.question_service: Pre-cached correct-path question (diff=410, node=3D Shapes)
+2026-02-12 23:04:28,718 [INFO] ai.ollama_client: Ollama qwen2.5 — 130 chars, 40 tokens, 0.6s
+2026-02-12 23:04:28,718 [INFO] ai.question_generator: Raw LLM response for "3D Shapes": {
+  "question": "How many faces does a cube have? Colon",
+  "correct_answer": "6",
+  "explanation": "A cube has 6 square faces."
+}
+2026-02-12 23:04:28,718 [INFO] ai.question_generator: Generated mcq question for "3D Shapes" at difficulty 0.01
+2026-02-12 23:04:28,718 [WARNING] services.question_service: Global dedup rejected (attempt 1)
+2026-02-12 23:04:29,334 [INFO] ai.ollama_client: Ollama qwen2.5 — 130 chars, 40 tokens, 0.6s
+2026-02-12 23:04:29,335 [INFO] ai.question_generator: Raw LLM response for "3D Shapes": {
+  "question": "How many faces does a cube have? Colon",
+  "correct_answer": "6",
+  "explanation": "A cube has 6 square faces."
+}
+2026-02-12 23:04:29,335 [INFO] ai.question_generator: Generated mcq question for "3D Shapes" at difficulty 0.01
+2026-02-12 23:04:29,335 [WARNING] services.question_service: Global dedup rejected (attempt 2)
+2026-02-12 23:04:30,032 [INFO] ai.ollama_client: Ollama qwen2.5 — 160 chars, 45 tokens, 0.7s
+2026-02-12 23:04:30,032 [INFO] ai.question_generator: Raw LLM response for "3D Shapes": {
+  "question": "How many faces does a cube have? Colon",
+  "correct_answer": "6",
+  "explanation": "A cube is a three-dimensional shape with 6 square faces."
+}
+2026-02-12 23:04:30,032 [INFO] ai.question_generator: Generated mcq question for "3D Shapes" at difficulty 0.01
+2026-02-12 23:04:30,032 [WARNING] services.question_service: Global dedup rejected (attempt 3)
+2026-02-12 23:04:30,032 [INFO] mora.requests: <<< POST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache  status=204  location=-
+2026-02-12 23:04:30,032 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:04:30] "[35m[1mPOST /session/c333ef7e-01f1-40d5-aff7-44cd1868f9e7/precache HTTP/1.1[0m" 204 -
+2026-02-12 23:04:32,257 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:04:32,261 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5004
+2026-02-12 23:04:32,261 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-02-12 23:05:26,102 [INFO] mora.requests: >>> GET /  form={}
+2026-02-12 23:05:26,103 [INFO] mora.requests: <<< GET /  status=200  location=-
+2026-02-12 23:05:26,103 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:05:26] "GET / HTTP/1.1" 200 -
+2026-02-12 23:05:26,105 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:05:26,106 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:05:26,106 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:05:26] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:05:26,109 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:05:26,109 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:05:26,109 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:05:26] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:05:28,455 [INFO] mora.requests: >>> GET /pick-topic/1  form={}
+2026-02-12 23:05:28,456 [INFO] mora.requests: <<< GET /pick-topic/1  status=200  location=-
+2026-02-12 23:05:28,456 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:05:28] "GET /pick-topic/1 HTTP/1.1" 200 -
+2026-02-12 23:05:28,457 [INFO] mora.requests: >>> GET /static/js/session.js  form={}
+2026-02-12 23:05:28,457 [INFO] mora.requests: <<< GET /static/js/session.js  status=304  location=-
+2026-02-12 23:05:28,458 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:05:28] "[36mGET /static/js/session.js HTTP/1.1[0m" 304 -
+2026-02-12 23:05:28,460 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:05:28,460 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:05:28,461 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:05:28] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:05:30,388 [INFO] mora.requests: >>> POST /session/start  form={'student_id': '1', 'topic_id': '3'}
+2026-02-12 23:05:31,042 [INFO] ai.ollama_client: Ollama qwen2.5 — 130 chars, 40 tokens, 0.6s
+2026-02-12 23:05:31,043 [INFO] ai.question_generator: Raw LLM response for "3D Shapes": {
+  "question": "How many faces does a cube have? Colon",
+  "correct_answer": "6",
+  "explanation": "A cube has 6 square faces."
+}
+2026-02-12 23:05:31,043 [INFO] ai.question_generator: Generated mcq question for "3D Shapes" at difficulty 0.01
+2026-02-12 23:05:31,043 [WARNING] services.question_service: Global dedup rejected (attempt 1)
+2026-02-12 23:05:31,649 [INFO] ai.ollama_client: Ollama qwen2.5 — 130 chars, 40 tokens, 0.6s
+2026-02-12 23:05:31,649 [INFO] ai.question_generator: Raw LLM response for "3D Shapes": {
+  "question": "How many faces does a cube have? Colon",
+  "correct_answer": "6",
+  "explanation": "A cube has 6 square faces."
+}
+2026-02-12 23:05:31,649 [INFO] ai.question_generator: Generated mcq question for "3D Shapes" at difficulty 0.01
+2026-02-12 23:05:31,649 [WARNING] services.question_service: Global dedup rejected (attempt 2)
+2026-02-12 23:05:32,596 [INFO] ai.ollama_client: Ollama qwen2.5 — 242 chars, 64 tokens, 0.9s
+2026-02-12 23:05:32,596 [INFO] ai.question_generator: Raw LLM response for "3D Shapes": {
+  "question": "A cone has one pointy top and a circular base. How many vertices does a cone have? Colon",
+  "correct_answer": "1",
+  "explanation": "Vertices are the corners or points of a shape. A cone has one vertex at its pointed top."
+}
+2026-02-12 23:05:32,596 [INFO] ai.question_generator: Generated mcq question for "3D Shapes" at difficulty 0.01
+2026-02-12 23:05:32,602 [INFO] mora.requests: <<< POST /session/start  status=302  location=/session/6f0717c9-6192-4160-a402-87d1249b0bfd/question
+2026-02-12 23:05:32,602 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:05:32] "[32mPOST /session/start HTTP/1.1[0m" 302 -
+2026-02-12 23:05:32,611 [INFO] mora.requests: >>> GET /session/6f0717c9-6192-4160-a402-87d1249b0bfd/question  form={}
+2026-02-12 23:05:32,619 [INFO] mora.requests: <<< GET /session/6f0717c9-6192-4160-a402-87d1249b0bfd/question  status=200  location=-
+2026-02-12 23:05:32,619 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:05:32] "GET /session/6f0717c9-6192-4160-a402-87d1249b0bfd/question HTTP/1.1" 200 -
+2026-02-12 23:05:32,625 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:05:32,626 [INFO] mora.requests: >>> GET /static/js/session.js  form={}
+2026-02-12 23:05:32,626 [INFO] mora.requests: <<< GET /static/js/session.js  status=304  location=-
+2026-02-12 23:05:32,626 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:05:32] "[36mGET /static/js/session.js HTTP/1.1[0m" 304 -
+2026-02-12 23:05:32,626 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:05:32,626 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:05:32] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:05:32,629 [INFO] mora.requests: >>> POST /session/6f0717c9-6192-4160-a402-87d1249b0bfd/precache  form={}
+2026-02-12 23:05:32,631 [INFO] services.question_service: Pre-caching dual: current=751, if_correct=751, if_wrong=746
+2026-02-12 23:05:33,270 [INFO] ai.ollama_client: Ollama qwen2.5 — 130 chars, 40 tokens, 0.6s
+2026-02-12 23:05:33,270 [INFO] ai.question_generator: Raw LLM response for "3D Shapes": {
+  "question": "How many faces does a cube have? Colon",
+  "correct_answer": "6",
+  "explanation": "A cube has 6 square faces."
+}
+2026-02-12 23:05:33,270 [INFO] ai.question_generator: Generated mcq question for "3D Shapes" at difficulty 0.01
+2026-02-12 23:05:33,271 [WARNING] services.question_service: Global dedup rejected (attempt 1)
+2026-02-12 23:05:33,894 [INFO] ai.ollama_client: Ollama qwen2.5 — 130 chars, 40 tokens, 0.6s
+2026-02-12 23:05:33,894 [INFO] ai.question_generator: Raw LLM response for "3D Shapes": {
+  "question": "How many faces does a cube have? Colon",
+  "correct_answer": "6",
+  "explanation": "A cube has 6 square faces."
+}
+2026-02-12 23:05:33,894 [INFO] ai.question_generator: Generated mcq question for "3D Shapes" at difficulty 0.01
+2026-02-12 23:05:33,894 [WARNING] services.question_service: Global dedup rejected (attempt 2)
+2026-02-12 23:05:34,590 [INFO] ai.ollama_client: Ollama qwen2.5 — 145 chars, 46 tokens, 0.7s
+2026-02-12 23:05:34,590 [INFO] ai.question_generator: Raw LLM response for "3D Shapes": {
+  "question": "How many faces does a cube have? Colon",
+  "correct_answer": "6",
+  "explanation": "A cube is a 3D shape with 6 square faces."
+}
+2026-02-12 23:05:34,590 [INFO] ai.question_generator: Generated mcq question for "3D Shapes" at difficulty 0.01
+2026-02-12 23:05:34,590 [WARNING] services.question_service: Global dedup rejected (attempt 3)
+2026-02-12 23:05:35,203 [INFO] ai.ollama_client: Ollama qwen2.5 — 131 chars, 40 tokens, 0.6s
+2026-02-12 23:05:35,203 [INFO] ai.question_generator: Raw LLM response for "3D Shapes": {
+  "question": "How many faces does a cube have? Period",
+  "correct_answer": "6",
+  "explanation": "A cube has 6 square faces."
+}
+2026-02-12 23:05:35,203 [INFO] ai.question_generator: Generated mcq question for "3D Shapes" at difficulty 0.01
+2026-02-12 23:05:35,208 [INFO] services.question_service: Pre-cached wrong-path question (diff=405, node=3D Shapes)
+2026-02-12 23:05:35,208 [INFO] mora.requests: <<< POST /session/6f0717c9-6192-4160-a402-87d1249b0bfd/precache  status=204  location=-
+2026-02-12 23:05:35,208 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:05:35] "[35m[1mPOST /session/6f0717c9-6192-4160-a402-87d1249b0bfd/precache HTTP/1.1[0m" 204 -
+2026-02-12 23:05:35,444 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:05:43,649 [INFO] mora.requests: >>> GET /  form={}
+2026-02-12 23:05:43,654 [INFO] mora.requests: <<< GET /  status=200  location=-
+2026-02-12 23:05:43,654 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:05:43] "GET / HTTP/1.1" 200 -
+2026-02-12 23:05:51,734 [INFO] mora.requests: >>> GET /  form={}
+2026-02-12 23:05:51,735 [INFO] mora.requests: <<< GET /  status=200  location=-
+2026-02-12 23:05:51,735 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:05:51] "GET / HTTP/1.1" 200 -
+2026-02-12 23:05:51,737 [INFO] mora.requests: >>> POST /onboard  form={'student_name': 'TestUser', 'topic_name': 'Decimals'}
+2026-02-12 23:06:02,342 [INFO] ai.ollama_client: Ollama qwen2.5 — 3183 chars, 743 tokens, 10.6s
+2026-02-12 23:06:02,342 [INFO] ai.curriculum_generator: Generated curriculum for "Decimals": 10 nodes
+2026-02-12 23:06:02,359 [INFO] services.onboarding_service: Created curriculum for "Decimals": 10 nodes via qwen2.5
+2026-02-12 23:06:02,360 [INFO] mora.requests: <<< POST /onboard  status=302  location=/pick-topic/4
+2026-02-12 23:06:02,360 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:06:02] "[32mPOST /onboard HTTP/1.1[0m" 302 -
+2026-02-12 23:06:02,362 [INFO] mora.requests: >>> GET /pick-topic/4  form={}
+2026-02-12 23:06:02,365 [INFO] mora.requests: <<< GET /pick-topic/4  status=200  location=-
+2026-02-12 23:06:02,365 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:06:02] "GET /pick-topic/4 HTTP/1.1" 200 -
+2026-02-12 23:06:02,368 [INFO] mora.requests: >>> POST /session/start  form={'student_id': '4', 'topic_id': '3'}
+2026-02-12 23:06:04,158 [INFO] ai.ollama_client: Ollama qwen2.5 — 202 chars, 78 tokens, 1.8s
+2026-02-12 23:06:04,158 [INFO] ai.question_generator: Raw LLM response for "Addition Within 10": {
+  "question": "What is the answer to this problem? 2 + 3 = \(\square\)",
+  "correct_answer": "5",
+  "explanation": "When we add 2 and 3 together, we count on from 2: 3, 4, 5. So, 2 plus 3 equals 5."
+}
+2026-02-12 23:06:04,158 [INFO] ai.question_generator: Generated mcq question for "Addition Within 10" at difficulty 0.20
+2026-02-12 23:06:04,167 [INFO] mora.requests: <<< POST /session/start  status=302  location=/session/490eaf5a-0668-4614-a4bf-ba3892f4a57e/question
+2026-02-12 23:06:04,168 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:06:04] "[32mPOST /session/start HTTP/1.1[0m" 302 -
+2026-02-12 23:06:11,127 [INFO] mora.requests: >>> GET /  form={}
+2026-02-12 23:06:11,127 [INFO] mora.requests: <<< GET /  status=200  location=-
+2026-02-12 23:06:11,127 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:06:11] "GET / HTTP/1.1" 200 -
+2026-02-12 23:06:11,129 [INFO] mora.requests: >>> POST /onboard  form={'student_name': 'TestUser', 'topic_name': 'Decimals'}
+2026-02-12 23:06:11,130 [INFO] mora.requests: <<< POST /onboard  status=302  location=/pick-topic/4
+2026-02-12 23:06:11,130 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:06:11] "[32mPOST /onboard HTTP/1.1[0m" 302 -
+2026-02-12 23:06:11,131 [INFO] mora.requests: >>> GET /pick-topic/4  form={}
+2026-02-12 23:06:11,131 [INFO] mora.requests: <<< GET /pick-topic/4  status=200  location=-
+2026-02-12 23:06:11,131 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:06:11] "GET /pick-topic/4 HTTP/1.1" 200 -
+2026-02-12 23:06:11,133 [INFO] mora.requests: >>> POST /session/start  form={'student_id': '4', 'topic_id': '3'}
+2026-02-12 23:06:11,860 [INFO] ai.ollama_client: Ollama qwen2.5 — 117 chars, 45 tokens, 0.7s
+2026-02-12 23:06:11,860 [INFO] ai.question_generator: Raw LLM response for "Addition Within 10": {
+  "question": "What is \(3 + 2\)?",
+  "correct_answer": "5",
+  "explanation": "Adding 2 to 3 gives a total of 5."
+}
+2026-02-12 23:06:11,860 [INFO] ai.question_generator: Generated mcq question for "Addition Within 10" at difficulty 0.20
+2026-02-12 23:06:11,872 [INFO] mora.requests: <<< POST /session/start  status=302  location=/session/10607d40-08fe-454d-a2c5-c822e66fd891/question
+2026-02-12 23:06:11,873 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:06:11] "[32mPOST /session/start HTTP/1.1[0m" 302 -
+2026-02-12 23:06:11,875 [INFO] mora.requests: >>> GET /session/10607d40-08fe-454d-a2c5-c822e66fd891/question  form={}
+2026-02-12 23:06:11,931 [INFO] mora.requests: <<< GET /session/10607d40-08fe-454d-a2c5-c822e66fd891/question  status=200  location=-
+2026-02-12 23:06:11,931 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:06:11] "GET /session/10607d40-08fe-454d-a2c5-c822e66fd891/question HTTP/1.1" 200 -
+2026-02-12 23:06:19,265 [INFO] mora.requests: >>> POST /onboard  form={'student_name': 'User', 'topic_name': 'Arithmetic'}
+2026-02-12 23:06:31,487 [INFO] ai.ollama_client: Ollama qwen2.5 — 3850 chars, 854 tokens, 12.2s
+2026-02-12 23:06:31,488 [INFO] ai.curriculum_generator: Generated curriculum for "Arithmetic": 11 nodes
+2026-02-12 23:06:31,502 [INFO] services.onboarding_service: Created curriculum for "Arithmetic": 11 nodes via qwen2.5
+2026-02-12 23:06:31,502 [INFO] mora.requests: <<< POST /onboard  status=302  location=/pick-topic/10
+2026-02-12 23:06:31,502 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:06:31] "[32mPOST /onboard HTTP/1.1[0m" 302 -
+2026-02-12 23:06:31,504 [INFO] mora.requests: >>> GET /pick-topic/10  form={}
+2026-02-12 23:06:31,505 [INFO] mora.requests: <<< GET /pick-topic/10  status=200  location=-
+2026-02-12 23:06:31,505 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:06:31] "GET /pick-topic/10 HTTP/1.1" 200 -
+2026-02-12 23:06:31,507 [INFO] mora.requests: >>> POST /session/start  form={'student_id': '10', 'topic_id': '3'}
+2026-02-12 23:06:33,512 [INFO] ai.ollama_client: Ollama qwen2.5 — 282 chars, 93 tokens, 2.0s
+2026-02-12 23:06:33,512 [INFO] ai.question_generator: Raw LLM response for "Addition Within 10": {
+  "question": "What is the sum of 4 and 3? :",
+  "correct_answer": "7",
+  "explanation": "To find the sum of 4 and 3, we can count on from 4: 5, 6, 7. Alternatively, we can use objects like blocks to add 4 blue blocks and 3 red blocks together, which makes a total of 7 blocks."
+}
+2026-02-12 23:06:33,512 [INFO] ai.question_generator: Generated mcq question for "Addition Within 10" at difficulty 0.20
+2026-02-12 23:06:33,520 [INFO] mora.requests: <<< POST /session/start  status=302  location=/session/995d37cc-9eec-432f-b33e-2956ffe25323/question
+2026-02-12 23:06:33,521 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:06:33] "[32mPOST /session/start HTTP/1.1[0m" 302 -
+2026-02-12 23:06:33,523 [INFO] mora.requests: >>> GET /session/995d37cc-9eec-432f-b33e-2956ffe25323/question  form={}
+2026-02-12 23:06:33,531 [INFO] mora.requests: <<< GET /session/995d37cc-9eec-432f-b33e-2956ffe25323/question  status=200  location=-
+2026-02-12 23:06:33,531 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:06:33] "GET /session/995d37cc-9eec-432f-b33e-2956ffe25323/question HTTP/1.1" 200 -
+2026-02-12 23:08:08,628 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/ai/distractors.py', reloading
+2026-02-12 23:08:08,675 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:08:08,914 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:08:08,933 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:08:08,937 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:08:17,098 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/ai/distractors.py', reloading
+2026-02-12 23:08:17,163 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:08:17,402 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:08:17,417 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:08:17,421 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:08:27,595 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/services/question_service.py', reloading
+2026-02-12 23:08:27,671 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:08:27,923 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:08:27,940 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:08:27,944 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:08:34,065 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/engine/question_validator.py', reloading
+2026-02-12 23:08:34,122 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:08:34,361 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:08:34,376 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:08:34,381 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:08:53,677 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/engine/question_validator.py', reloading
+2026-02-12 23:08:53,732 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:08:53,979 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:08:53,995 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:08:54,000 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:09:03,147 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/tests/test_distractors.py', reloading
+2026-02-12 23:09:03,206 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:09:03,444 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:09:03,459 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:09:03,463 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:09:11,600 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/tests/test_distractors.py', reloading
+2026-02-12 23:09:11,658 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:09:11,901 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:09:11,915 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:09:11,919 [INFO] werkzeug:  * Debugger PIN: 134-150-250

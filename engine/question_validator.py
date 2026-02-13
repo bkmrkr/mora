@@ -180,6 +180,11 @@ def validate_question(q_data, node_description=''):
     if not draw_ok:
         return False, draw_reason
 
+    # Rule 18: Distractor quality check (MCQ only) — reject nonsensical options
+    dist_ok, dist_reason = verify_distractor_quality(q_data)
+    if not dist_ok:
+        return False, dist_reason
+
     return True, ''
 
 
@@ -635,6 +640,71 @@ def _answer_in_question_is_ok(question, answer, choices):
         return True
 
     return False
+
+
+# ---------------------------------------------------------------------------
+# Rule 18: Distractor quality check
+# ---------------------------------------------------------------------------
+
+
+def verify_distractor_quality(q_data):
+    """Rule 18: Reject MCQ questions with nonsensical distractors.
+
+    Detects:
+    - Type mismatches (Hebrew answer + English fallbacks)
+    - Multiple hardcoded fallbacks (0, false, False, etc.)
+    - Semantic incoherence
+
+    Returns (is_valid, reason).
+    """
+    question = q_data.get('question', '')
+    answer = q_data.get('correct_answer', '')
+    choices = q_data.get('options', [])
+    q_type = q_data.get('question_type', 'mcq')
+
+    if q_type != 'mcq' or not choices:
+        return True, ''
+
+    # Strip letter prefixes from answer
+    answer_text = LETTER_PREFIX_RE.sub('', answer).strip()
+
+    # Known fallback values that indicate poor distractor generation
+    FALLBACK_SET = {
+        '0', '1', 'false', 'False', 'true', 'True',
+        'no', 'No', 'yes', 'Yes', 'unknown', 'unknown'
+    }
+
+    # Count fallbacks in options
+    fallback_count = sum(1 for opt in choices if opt.strip() in FALLBACK_SET)
+
+    # Allow fallbacks if this is explicitly a boolean question
+    is_boolean_question = any(phrase in question.lower() for phrase in [
+        'true or false', 'is it true', 'is it false', 'yes or no',
+        'true/false', 'yes/no'
+    ])
+    if is_boolean_question and fallback_count <= 2:
+        return True, ''
+
+    # Reject if 2+ fallbacks used inappropriately
+    if fallback_count >= 2:
+        return False, (
+            f'Rule 18: Too many nonsensical distractors ({fallback_count}). '
+            'Unable to generate meaningful options.'
+        )
+
+    # Detect type mismatches (complex answer + simple fallbacks)
+    has_hebrew = bool(re.search(r'[\u0590-\u05FF]', answer_text))
+    has_arabic = bool(re.search(r'[\u0600-\u06FF]', answer_text))
+    has_chinese = bool(re.search(r'[\u4e00-\u9fff]', answer_text))
+    has_latex = bool(re.search(r'\\[a-z]+\{', answer_text))
+    has_math_symbols = any(s in answer_text for s in ['≥', '≤', '÷', '×', '∑', '∫'])
+
+    if (has_hebrew or has_arabic or has_chinese or has_latex or has_math_symbols) and fallback_count > 0:
+        return False, (
+            'Rule 18: Type mismatch — complex answer with generic fallback distractors'
+        )
+
+    return True, ''
 
 
 # ---------------------------------------------------------------------------

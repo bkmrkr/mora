@@ -11,6 +11,7 @@ from db.database import init_db
 from routes.home import home_bp
 from routes.session import session_bp
 from routes.dashboard import dashboard_bp
+from routes.admin import admin_bp
 
 # --- File logging with daily rotation, 3-day retention ---
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mora_debug.log')
@@ -37,6 +38,7 @@ def create_app():
     app.register_blueprint(home_bp)
     app.register_blueprint(session_bp, url_prefix='/session')
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+    app.register_blueprint(admin_bp, url_prefix='/admin')
 
     @app.template_filter('strip_letter')
     def strip_letter_prefix(text):

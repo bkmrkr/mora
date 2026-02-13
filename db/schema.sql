@@ -46,6 +46,8 @@ CREATE TABLE IF NOT EXISTS questions (
     generated_prompt TEXT,
     model_used TEXT,
     quality_flags INTEGER DEFAULT 0,
+    test_status TEXT DEFAULT 'approved' CHECK(test_status IN ('pending_review', 'approved', 'rejected')),
+    validation_error TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

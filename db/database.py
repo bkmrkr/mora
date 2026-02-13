@@ -29,6 +29,8 @@ def _migrate(conn):
         ('attempts', 'curriculum_node_id', 'INTEGER REFERENCES curriculum_nodes(id)'),
         ('attempts', 'skill_rating_before', 'REAL'),
         ('attempts', 'skill_rating_after', 'REAL'),
+        ('questions', 'test_status', "TEXT DEFAULT 'approved' CHECK(test_status IN ('pending_review', 'approved', 'rejected'))"),
+        ('questions', 'validation_error', 'TEXT'),
     ]
     for table, column, col_type in migrations:
         if not _column_exists(conn, table, column):

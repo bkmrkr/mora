@@ -20,7 +20,8 @@ session_bp = Blueprint('session', __name__)
 
 def _load_question_from_db(question_id):
     """Reconstruct a question_dict from the DB (for session resume after restart)."""
-    q = question_model.get_by_id(question_id)
+    # Only load approved questions for students
+    q = question_model.get_by_id_approved(question_id)
     if not q:
         return None
     node = node_model.get_by_id(q['curriculum_node_id'])

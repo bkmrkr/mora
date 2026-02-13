@@ -32,8 +32,9 @@ def sanitize_answer(text):
     if not text:
         return ""
 
-    # Remove letter prefix if present (e.g., "A) 6" → "6")
-    cleaned = re.sub(r'^[A-Da-d][).\s]+\s*', '', text).strip()
+    # Remove letter prefix if present (e.g., "A) 6" → "6", "A. 6" → "6")
+    # Match: single letter A-D (or a-d), followed by ) or ., followed by optional whitespace
+    cleaned = re.sub(r'^[A-Da-d][).]\s*', '', text).strip()
 
     # Escape HTML entities to prevent XSS
     escaped = html.escape(cleaned)

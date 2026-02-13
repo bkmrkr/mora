@@ -5315,3 +5315,94 @@ werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on 
 2026-02-12 23:09:11,901 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
 2026-02-12 23:09:11,915 [WARNING] werkzeug:  * Debugger is active!
 2026-02-12 23:09:11,919 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:10:28,103 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/routes/session.py', reloading
+2026-02-12 23:10:28,159 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:10:28,403 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:10:28,418 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:10:28,422 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:10:45,735 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/routes/session.py', reloading
+2026-02-12 23:10:45,796 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:18:19,152 [INFO] mora.requests: >>> GET /  form={}
+2026-02-12 23:18:19,153 [INFO] mora.requests: <<< GET /  status=200  location=-
+2026-02-12 23:18:19,153 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:18:19] "GET / HTTP/1.1" 200 -
+2026-02-12 23:18:19,155 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:18:19,156 [INFO] mora.requests: <<< GET /static/css/style.css  status=200  location=-
+2026-02-12 23:18:19,156 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:18:19] "GET /static/css/style.css HTTP/1.1" 200 -
+2026-02-12 23:18:19,159 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:18:19,159 [INFO] mora.requests: <<< GET /static/css/style.css  status=200  location=-
+2026-02-12 23:18:19,159 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:18:19] "GET /static/css/style.css HTTP/1.1" 200 -
+2026-02-12 23:18:24,401 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:18:24,422 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5002
+ * Running on http://192.168.68.149:5002
+2026-02-12 23:18:24,422 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-02-12 23:18:24,422 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:18:24,660 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:18:24,675 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:18:24,680 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:19:23,311 [INFO] mora.requests: >>> GET /  form={}
+2026-02-12 23:19:23,312 [INFO] mora.requests: <<< GET /  status=200  location=-
+2026-02-12 23:19:23,313 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:19:23] "GET / HTTP/1.1" 200 -
+2026-02-12 23:19:23,315 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:19:23,316 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:19:23,317 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:19:23] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:19:23,318 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:19:23,319 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:19:23,319 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:19:23] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:19:24,906 [INFO] mora.requests: >>> GET /pick-topic/1  form={}
+2026-02-12 23:19:24,909 [INFO] mora.requests: <<< GET /pick-topic/1  status=200  location=-
+2026-02-12 23:19:24,909 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:19:24] "GET /pick-topic/1 HTTP/1.1" 200 -
+2026-02-12 23:19:24,911 [INFO] mora.requests: >>> GET /static/js/session.js  form={}
+2026-02-12 23:19:24,912 [INFO] mora.requests: <<< GET /static/js/session.js  status=304  location=-
+2026-02-12 23:19:24,912 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:19:24] "[36mGET /static/js/session.js HTTP/1.1[0m" 304 -
+2026-02-12 23:19:24,914 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:19:24,914 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:19:24,914 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:19:24] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:19:28,524 [INFO] mora.requests: >>> POST /session/start  form={'student_id': '1', 'topic_id': '5'}
+2026-02-12 23:19:30,427 [INFO] ai.ollama_client: Ollama qwen2.5 — 244 chars, 83 tokens, 1.9s
+2026-02-12 23:19:30,427 [INFO] ai.question_generator: Raw LLM response for "Understanding Decimal Place Value": {
+  "question": "What is the value of the digit 5 in the number 25.34?",
+  "correct_answer": "5 tenths",
+  "explanation": "In the decimal number 25.34, the digit 5 is located in the tenths place, which means its value is 5 tenths or \(0.5\)."
+}
+2026-02-12 23:19:30,427 [INFO] ai.question_generator: Generated mcq question for "Understanding Decimal Place Value" at difficulty 0.25
+2026-02-12 23:19:30,438 [INFO] mora.requests: <<< POST /session/start  status=302  location=/session/11e662b5-a7ab-4b72-99f5-aa0a6d67481d/question
+2026-02-12 23:19:30,438 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:19:30] "[32mPOST /session/start HTTP/1.1[0m" 302 -
+2026-02-12 23:19:30,447 [INFO] mora.requests: >>> GET /session/11e662b5-a7ab-4b72-99f5-aa0a6d67481d/question  form={}
+2026-02-12 23:19:30,452 [INFO] mora.requests: <<< GET /session/11e662b5-a7ab-4b72-99f5-aa0a6d67481d/question  status=200  location=-
+2026-02-12 23:19:30,452 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:19:30] "GET /session/11e662b5-a7ab-4b72-99f5-aa0a6d67481d/question HTTP/1.1" 200 -
+2026-02-12 23:19:30,457 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:19:30,458 [INFO] mora.requests: >>> GET /static/js/session.js  form={}
+2026-02-12 23:19:30,458 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:19:30,458 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:19:30] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:19:30,458 [INFO] mora.requests: <<< GET /static/js/session.js  status=304  location=-
+2026-02-12 23:19:30,458 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:19:30] "[36mGET /static/js/session.js HTTP/1.1[0m" 304 -
+2026-02-12 23:19:30,462 [INFO] mora.requests: >>> POST /session/11e662b5-a7ab-4b72-99f5-aa0a6d67481d/precache  form={}
+2026-02-12 23:19:30,464 [INFO] services.question_service: Pre-caching dual: current=800, if_correct=815, if_wrong=776
+2026-02-12 23:19:31,659 [INFO] ai.ollama_client: Ollama qwen2.5 — 206 chars, 79 tokens, 1.2s
+2026-02-12 23:19:31,660 [INFO] ai.question_generator: Raw LLM response for "Understanding Decimal Place Value": {
+  "question": "What is the value of the digit 5 in the number 23.456?",
+  "correct_answer": "0.05",
+  "explanation": "The digit 5 is in the hundredths place, so its value is \( \frac{5}{100} = 0.05 \)."
+}
+2026-02-12 23:19:31,660 [INFO] ai.question_generator: Generated mcq question for "Understanding Decimal Place Value" at difficulty 0.25
+2026-02-12 23:19:31,666 [INFO] services.question_service: Pre-cached correct-path question (diff=596, node=Understanding Decimal Place Value)
+2026-02-12 23:19:33,027 [INFO] ai.ollama_client: Ollama qwen2.5 — 244 chars, 92 tokens, 1.4s
+2026-02-12 23:19:33,027 [INFO] ai.question_generator: Raw LLM response for "Understanding Decimal Place Value": {
+  "question": "What is the value of the digit 5 in the number 23.456?",
+  "correct_answer": "0.05",
+  "explanation": "In the decimal number 23.456, the digit 5 is in the hundredths place. Therefore, its value is \( \frac{5}{100} = 0.05 \)."
+}
+2026-02-12 23:19:33,027 [INFO] ai.question_generator: Generated mcq question for "Understanding Decimal Place Value" at difficulty 0.25
+2026-02-12 23:19:33,035 [INFO] services.question_service: Pre-cached wrong-path question (diff=596, node=Understanding Decimal Place Value)
+2026-02-12 23:19:33,035 [INFO] mora.requests: <<< POST /session/11e662b5-a7ab-4b72-99f5-aa0a6d67481d/precache  status=204  location=-
+2026-02-12 23:19:33,035 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:19:33] "[35m[1mPOST /session/11e662b5-a7ab-4b72-99f5-aa0a6d67481d/precache HTTP/1.1[0m" 204 -
+2026-02-12 23:19:41,998 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/routes/session.py', reloading
+2026-02-12 23:19:42,053 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:19:42,296 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:19:42,312 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:19:42,316 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:19:43,541 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:20:29,145 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:21:41,383 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db

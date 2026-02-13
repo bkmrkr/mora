@@ -355,3 +355,42 @@ def precache(session_id):
     except Exception as e:
         logger.warning('Precache failed for session %s: %s', session_id, e)
     return '', 204
+
+
+@session_bp.route('/<session_id>/report', methods=['POST'])
+def report(session_id):
+    """Mark a question as bad and regenerate the next question."""
+    sess = session_model.get_by_id(session_id)
+    if not sess:
+        return redirect(url_for('home.index'))
+
+    student = student_model.get_by_id(sess['student_id'])
+
+    # Get current question
+    current = flask_session.get('current_question')
+    if not current and sess.get('current_question_id'):
+        current = _load_question_from_db(sess['current_question_id'])
+    if not current:
+        return redirect(url_for('session.question', session_id=session_id))
+
+    # Get report reason from form
+    reason = request.form.get('reason', 'bad_question')
+    details = request.form.get('details', '')
+
+    # Record the report
+    from models import question_report
+    question_report.create(
+        question_id=current['question_id'],
+        student_id=student['id'],
+        reason=reason,
+        details=details
+    )
+    question_report.mark_as_rejected(current['question_id'], reason)
+
+    logger.info('Question %d marked as rejected: %s', current['question_id'], reason)
+
+    # Clear current question so we generate a new one
+    flask_session.pop('current_question', None)
+
+    # Redirect to get next question
+    return redirect(url_for('session.question', session_id=session_id))

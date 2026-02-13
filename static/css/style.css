@@ -687,3 +687,16 @@ code.math-fallback {
     padding: 0.1em 0.3em;
     border-radius: 3px;
 }
+
+.report-form {
+    margin-top: 15px;
+    text-align: center;
+}
+.report-btn {
+    color: #999;
+    font-size: 0.8rem;
+    text-decoration: none;
+}
+.report-btn:hover {
+    color: #d00;
+}

@@ -62,6 +62,29 @@
                 {% endif %}
             </form>
 
+            <!-- Report bad question button -->
+            <form action="{{ url_for('session.report', session_id=session_id) }}" method="post" class="report-form">
+                <input type="hidden" name="reason" value="bad_question">
+                <button type="submit" class="btn btn-link btn-sm report-btn" title="Report this question as problematic">Report bad question</button>
+            </form>
+
+            <!-- Report bad question button -->
+            <details class="report-question">
+                <summary>Report a problem with this question</summary>
+                <form action="{{ url_for('session.report', session_id=session_id) }}" method="post">
+                    <input type="hidden" name="question_id" value="{{ question.question_id }}">
+                    <select name="reason" required>
+                        <option value="">Select issue...</option>
+                        <option value="wrong_answer">Wrong answer shown</option>
+                        <option value="confusing">Question is confusing</option>
+                        <option value="inappropriate">Content not appropriate</option>
+                        <option value="other">Other issue</option>
+                    </select>
+                    <textarea name="details" placeholder="Optional details..." rows="2"></textarea>
+                    <button type="submit" class="btn btn-warning btn-sm">Submit Report & Get New Question</button>
+                </form>
+            </details>
+
             <div class="difficulty-display">
                 <span class="difficulty-label">Difficulty:</span>
                 <span class="difficulty-dots">

@@ -61,7 +61,9 @@ def test_generate_next_stores_in_session(mock_gen, app):
             result = question_service.generate_next(session_id, student, topic_id)
     assert result is not None
     assert result['content'] == 'What is 7 + 5?'
-    assert result['correct_answer'] == '12'
+    # correct_answer now includes letter prefix from computed distractors
+    assert result['correct_answer'].endswith('12')
+    assert result['options'] is not None  # Computed distractors
 
 
 @patch('services.question_service.question_generator.generate')

@@ -15,6 +15,7 @@ from engine import elo
 from engine import next_question as nq_engine
 from engine.question_validator import validate_question
 from ai import question_generator
+from ai.distractors import insert_distractors
 from ai.local_generators import (is_clock_node, generate_clock_question,
                                  is_inequality_node, generate_inequality_question)
 from config.settings import SESSION_DEFAULTS
@@ -276,6 +277,10 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
 
             # Passed all checks
             break
+
+    # Compute distractors for MCQ (after validation, before storing)
+    if q_type == 'mcq' and q_data:
+        q_data = insert_distractors(q_data)
 
     if not q_data:
         if store_in_session:

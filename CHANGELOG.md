@@ -27,6 +27,7 @@
 - `parse_ai_json_dict()` error messages now include the raw LLM text for debugging
 - **Difficulty normalization bug (root cause of easy questions)**: The ELO difficulty was being normalized incorrectly. Formula `(target - 500) / 600` mapped skill 800 to difficulty 0.10 (nearly easiest). Changed to `(target - 400) / 800` which maps skill 800 → 0.20, skill 1000 → 0.45. Questions will now scale properly from easy to hard. Updated in question_generator.py and routes/session.py
 - **Initial uncertainty in schema**: Changed default from 500 to 350 to match spec. Updated schema.sql and test
+- **Computed distractors for MCQ**: LLM now generates only question, answer, explanation. Distractors are computed algorithmically (correct±1, ×2, ÷2, etc.) - eliminates wrong answer choices from LLM errors. 17 new tests
 
 ## [2026-02-11]
 

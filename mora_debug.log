@@ -7604,3 +7604,42 @@ werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on 
 2026-02-12 23:29:13,571 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
 2026-02-12 23:29:13,587 [WARNING] werkzeug:  * Debugger is active!
 2026-02-12 23:29:13,592 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:30:13,032 [INFO] mora.requests: >>> GET /  form={}
+2026-02-12 23:30:13,035 [INFO] mora.requests: <<< GET /  status=200  location=-
+2026-02-12 23:30:13,036 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:30:13] "GET / HTTP/1.1" 200 -
+2026-02-12 23:30:13,038 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:30:13,038 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:30:13,039 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:30:13] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:30:13,041 [INFO] mora.requests: >>> GET /static/css/style.css  form={}
+2026-02-12 23:30:13,042 [INFO] mora.requests: <<< GET /static/css/style.css  status=304  location=-
+2026-02-12 23:30:13,042 [INFO] werkzeug: 127.0.0.1 - - [12/Feb/2026 23:30:13] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-02-12 23:31:10,245 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/services/question_service.py', reloading
+2026-02-12 23:31:10,299 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:31:10,532 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:31:10,547 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:31:10,551 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:31:15,650 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/services/question_service.py', reloading
+2026-02-12 23:31:15,700 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:31:15,934 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:31:15,948 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:31:15,953 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:31:20,028 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/services/question_service.py', reloading
+2026-02-12 23:31:20,091 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:31:20,328 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:31:20,344 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:31:20,348 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:31:25,453 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/services/question_service.py', reloading
+2026-02-12 23:31:25,514 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:31:25,752 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:31:25,768 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:31:25,772 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:31:27,822 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/services/question_service.py', reloading
+2026-02-12 23:31:27,876 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:31:28,116 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:31:28,132 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:31:28,136 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:31:30,195 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/services/question_service.py', reloading
+2026-02-12 23:31:30,256 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:31:30,501 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:31:30,551 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:31:30,556 [INFO] werkzeug:  * Debugger PIN: 134-150-250

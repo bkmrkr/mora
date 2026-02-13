@@ -15,6 +15,11 @@ from engine import elo
 from engine import next_question as nq_engine
 from engine.question_validator import validate_question
 from engine.question_similarity import is_similar_to_any
+from engine.question_options import (
+    create_placeholder_options,
+    SIMILARITY_THRESHOLD,
+    QUESTION_TYPE_MCQ,
+)
 from ai import question_generator
 from ai.distractors import insert_distractors
 from ai.local_generators import (is_clock_node, generate_clock_question,
@@ -217,7 +222,7 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
             focus_node['name'], node_desc, recent_text_list
         )
         if q_data:
-            q_type = 'mcq'
+            q_type = QUESTION_TYPE_MCQ
             logger.info('Generated local clock question for "%s"', focus_node['name'])
 
     if not q_data and is_inequality_node(focus_node['name'], node_desc):
@@ -225,7 +230,7 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
             focus_node['name'], node_desc, recent_text_list
         )
         if q_data:
-            q_type = 'mcq'
+            q_type = QUESTION_TYPE_MCQ
             logger.info('Generated local inequality question for "%s"', focus_node['name'])
 
     # --- Generate with validation + dedup retry (LLM path) ---
@@ -259,20 +264,16 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
 
             # Validate the generated question
             # For MCQ, add placeholder options for validation (will be replaced with computed distractors)
-            # Use attempt number to make placeholders unique across retries
-            if q_type == 'mcq' and q_data and not q_data.get('options'):
+            if q_type == QUESTION_TYPE_MCQ and q_data and not q_data.get('options'):
                 correct = q_data.get('correct_answer', '')
-                q_data['options'] = [
-                    f'A) {correct}',
-                    f'B) alt{attempt_num}a',
-                    f'C) alt{attempt_num}b',
-                    f'D) alt{attempt_num}c'
-                ]
-                # Strip any existing letter prefix from LLM's answer before validation
-                # LLM sometimes returns "A) 6" - we need just "6"
-                import re
-                clean_answer = re.sub(r'^[A-Da-d][).\s]+\s*', '', correct).strip()
+
+                # Sanitize and normalize the correct answer
+                from engine.question_options import sanitize_answer
+                clean_answer = sanitize_answer(correct)
                 q_data['correct_answer'] = clean_answer
+
+                # Create placeholder options (sanitized, escaped)
+                q_data['options'] = create_placeholder_options(clean_answer, attempt_num)
 
             is_valid, reason = validate_question(q_data, node_desc)
             if not is_valid:
@@ -295,7 +296,7 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
             # Layer 3: Similarity check against correctly-answered questions
             # Avoid similar follow-up questions after correct answers (e.g., don't ask "5+3" then "5+2")
             is_similar, similar_to, similarity_score = is_similar_to_any(
-                q_text, list(global_correct_texts), threshold=0.7
+                q_text, list(global_correct_texts), threshold=SIMILARITY_THRESHOLD
             )
             if is_similar:
                 logger.warning('Similarity dedup rejected (attempt %d, score=%.2f)',
@@ -304,7 +305,7 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
                 continue
 
             # Compute distractors for MCQ (after validation, before storing)
-            if q_type == 'mcq' and q_data:
+            if q_type == QUESTION_TYPE_MCQ and q_data:
                 q_data, success, reason = insert_distractors(q_data)
                 if not success:
                     logger.warning('Distractor generation failed (attempt %d): %s',

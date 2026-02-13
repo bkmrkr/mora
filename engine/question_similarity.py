@@ -1,6 +1,7 @@
 """Question similarity detection to avoid similar follow-up questions."""
 import re
 from difflib import SequenceMatcher
+from engine.question_options import SIMILARITY_THRESHOLD
 
 
 def normalize_question_text(text):
@@ -40,7 +41,7 @@ def text_similarity(text1, text2):
     return SequenceMatcher(None, norm1, norm2).ratio()
 
 
-def is_similar_to_any(question_text, exclude_questions, threshold=0.7):
+def is_similar_to_any(question_text, exclude_questions, threshold=SIMILARITY_THRESHOLD):
     """Check if question is similar to any excluded question.
 
     Args:

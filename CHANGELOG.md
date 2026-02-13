@@ -9,6 +9,7 @@
 - **Multi-value answer distractors (Q#491 regression)**: Questions with multi-value answers like "2, 3" (quadratic solutions, systems of equations) were generating duplicate distractors ["0", "2, 3", "0", "0"]. Added `_multi_value_distractors()` with strategies: off-by-one, swapped order, single value. Modified `compute_distractors()` to track and exclude duplicates during fallback generation. Enhanced `_fallback_distractor()` to vary output. Added 7 comprehensive tests including Q491-specific regression test
 - **Difficulty always near zero**: Questions were too easy because normalization used wrong ELO range (500-1100 instead of 400-1200). Changed formula from `(diff-500)/600` to `(diff-400)/800`. Now skill=800 gives norm=0.20, skill=1000 gives norm=0.45
 - **ELO config drift**: Initial uncertainty was 500 (spec says 350), base K was 64 (spec says 32), schema default was 500 (spec says 350). All corrected to match spec — skill updates now faster and more accurate
+- **Database cleanup (27 questions)**: Comprehensive scan identified 27 invalid questions that bypassed earlier validation: 13 clock questions with answer text visible in brackets (Rule 5 violation), 14 questions with 2+ nonsensical distractors like ["0", "false", "1"] mixed with complex answers (Rule 18 violation), 2 additional questions with multiple correct answers (Q3 and Q131, similar to Q130). All deleted from database. Database now contains only valid MCQ questions
 
 ### Changed
 - Difficulty normalization now consistent across: LLM prompt, question display, and session route

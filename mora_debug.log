@@ -7668,3 +7668,13 @@ werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on 
 2026-02-12 23:32:29,071 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
 2026-02-12 23:32:29,088 [WARNING] werkzeug:  * Debugger is active!
 2026-02-12 23:32:29,093 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:32:57,511 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/engine/question_similarity.py', reloading
+2026-02-12 23:32:57,574 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:32:57,821 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:32:57,853 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:32:57,858 [INFO] werkzeug:  * Debugger PIN: 134-150-250
+2026-02-12 23:33:01,959 [INFO] werkzeug:  * Detected change in '/Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/engine/question_similarity.py', reloading
+2026-02-12 23:33:02,017 [INFO] werkzeug:  * Restarting with stat
+2026-02-12 23:33:02,253 [INFO] db.database: Database initialized at /Users/greggurevich/Library/CloudStorage/OneDrive-Personal/Python/personal/mora/mora.db
+2026-02-12 23:33:02,268 [WARNING] werkzeug:  * Debugger is active!
+2026-02-12 23:33:02,273 [INFO] werkzeug:  * Debugger PIN: 134-150-250

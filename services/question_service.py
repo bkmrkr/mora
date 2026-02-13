@@ -267,9 +267,11 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
                     f'C) alt{attempt_num}b',
                     f'D) alt{attempt_num}c'
                 ]
-                # Ensure correct_answer format matches the options format for validation
-                if correct and not correct.startswith(('A)', 'B)', 'C)', 'D)')):
-                    q_data['correct_answer'] = f'A) {correct}'
+                # Strip any existing letter prefix from LLM's answer before validation
+                # LLM sometimes returns "A) 6" - we need just "6"
+                import re
+                clean_answer = re.sub(r'^[A-Da-d][).\s]+\s*', '', correct).strip()
+                q_data['correct_answer'] = clean_answer
 
             is_valid, reason = validate_question(q_data, node_desc)
             if not is_valid:

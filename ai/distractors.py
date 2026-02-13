@@ -16,8 +16,11 @@ def compute_distractors(correct_answer, num_options=4):
 
     Returns list of distractor strings (without letter prefixes).
     """
-    distractors = []
-    correct_str = str(correct_answer).strip()
+    import re
+    LETTER_PREFIX_RE = re.compile(r'^[A-Da-d][).\s]+\s*')
+
+    # Strip any existing letter prefix first
+    correct_str = LETTER_PREFIX_RE.sub('', str(correct_answer)).strip()
 
     # Try numeric strategies first
     num = _parse_number(correct_str)
@@ -270,6 +273,9 @@ def insert_distractors(question_data):
     If the question already has options, replace them with computed ones.
     If it's MCQ type but has no options, generate them.
     """
+    import re
+    LETTER_PREFIX_RE = re.compile(r'^[A-Da-d][).\s]+\s*')
+
     q_type = question_data.get('question_type', 'mcq')
     if q_type != 'mcq':
         return question_data
@@ -277,6 +283,9 @@ def insert_distractors(question_data):
     correct = question_data.get('correct_answer', '')
     if not correct:
         return question_data
+
+    # Strip any existing letter prefix from correct answer
+    correct = LETTER_PREFIX_RE.sub('', correct).strip()
 
     # Compute new distractors
     computed = compute_distractors(correct, num_options=4)

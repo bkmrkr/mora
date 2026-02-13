@@ -39,7 +39,7 @@ def generate_curriculum(topic_name):
     Returns (topic_description, list_of_node_dicts, model_used, prompt_used).
     """
     user_prompt = f"Create a learning curriculum for: {topic_name}"
-    response_text, model, prompt = ask(SYSTEM_PROMPT, user_prompt)
+    response_text, model, prompt = ask(SYSTEM_PROMPT, user_prompt, max_tokens=2048)
     data = parse_ai_json(response_text)
 
     nodes = data.get('nodes', [])

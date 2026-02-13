@@ -1556,3 +1556,93 @@ def test_rule17_accepts_solve():
     q = _q('Solve for x: 3x - 2 = 7.', '3')
     valid, _ = validate_question(q)
     assert valid
+
+
+# --- Q586 Regression Tests ---
+# Q586 had answer in brackets "[x > -5]" which bypassed validation
+# Root cause: _answer_in_question_is_ok() was too permissive for "which" questions
+
+
+def test_rule5_rejects_bracket_placeholder_answer():
+    """Q586 regression: Answer in brackets [x > -5] should be rejected."""
+    q = {
+        'question': 'Which inequality does this number line represent? [x > -5]',
+        'correct_answer': 'D) x > -5',
+        'options': ['x > -5', 'x < -5', 'x ≥ -5', 'x ≤ -5'],
+        'question_type': 'mcq'
+    }
+    valid, reason = validate_question(q)
+    assert not valid, "Q586-type: bracket placeholder should be rejected"
+    assert 'answer' in reason.lower() or 'placeholder' in reason.lower()
+
+
+def test_rule5_rejects_which_expression_with_answer():
+    """Generic 'which expression' questions shouldn't have answer shown."""
+    q = {
+        'question': 'Which equation represents this? [2x + 3 = 7]',
+        'correct_answer': 'D) 2x + 3 = 7',
+        'options': ['2x + 3 = 7', 'x + 3 = 7', '2x = 7', 'x = 7'],
+        'question_type': 'mcq'
+    }
+    valid, reason = validate_question(q)
+    assert not valid, "Which expression with answer in brackets should fail"
+
+
+def test_rule6_catches_bracket_with_variable():
+    """Rule 6 should catch [x > ...] patterns as placeholders."""
+    q = {
+        'question': 'Represent: [x ≥ 0] on a number line',
+        'correct_answer': 'correct representation',
+        'question_type': 'short_answer'
+    }
+    valid, reason = validate_question(q)
+    assert not valid, "Should catch [x ...] as placeholder pattern"
+    assert 'placeholder' in reason.lower()
+
+
+def test_rule5_allows_legitimate_which_is_questions():
+    """'Which is...' identification questions naturally contain answer."""
+    q = {
+        'question': 'Which is bigger: 1/2 or 2/3?',
+        'correct_answer': 'B) 2/3',
+        'options': ['1/2', '2/3', 'neither', 'equal'],
+        'question_type': 'mcq'
+    }
+    valid, _ = validate_question(q)
+    assert valid, "Which is comparison questions should pass"
+
+
+def test_rule5_allows_what_is_math():
+    """'What is' math questions naturally contain expressions."""
+    q = {
+        'question': 'What is 4 + 3 × 2?',
+        'correct_answer': '10',
+        'question_type': 'short_answer'
+    }
+    valid, _ = validate_question(q)
+    assert valid, "Math questions with expressions in question are OK"
+
+
+def test_rule5_rejects_which_inequality_with_bracketed_answer():
+    """'Which inequality' shouldn't show answer in brackets."""
+    q = {
+        'question': 'Which inequality does this represent? [x < 5]',
+        'correct_answer': 'A) x < 5',
+        'options': ['x < 5', 'x > 5', 'x ≤ 5', 'x ≥ 5'],
+        'question_type': 'mcq'
+    }
+    valid, reason = validate_question(q)
+    assert not valid, "Which inequality with bracket answer should fail"
+    assert 'answer' in reason.lower()
+
+
+def test_rule5_allows_which_of_list():
+    """'Which of these' questions naturally have answers in options."""
+    q = {
+        'question': 'Which of these numbers is prime: 4, 7, 9, 10?',
+        'correct_answer': 'B) 7',
+        'options': ['4', '7', '9', '10'],
+        'question_type': 'mcq'
+    }
+    valid, _ = validate_question(q)
+    assert valid, "Which of list questions should pass"

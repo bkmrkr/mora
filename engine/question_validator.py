@@ -12,7 +12,7 @@ MIN_CHOICES = 3
 
 PLACEHOLDER_ANSWERS = {'', '?', '...', 'n/a', 'none', 'null', 'tbd', 'unknown'}
 
-PLACEHOLDER_PATTERNS = ['[shows', '[image', '[picture', '[display', '[insert']
+PLACEHOLDER_PATTERNS = ['[shows', '[image', '[picture', '[display', '[insert', '[x ', '[x>', '[x<']
 
 BANNED_CHOICES = {
     'all of the above', 'none of the above',
@@ -612,8 +612,22 @@ def _answer_in_question_is_ok(question, answer, choices):
     if q_lower.startswith(('is ', 'are ', 'does ', 'do ', 'can ', 'will ')):
         return True
 
-    # "What/which" identification questions
+    # REJECT: Answer in brackets [x > -5] is placeholder format (local generator bug)
+    if '[' in question and ']' in question and a_lower in question:
+        return False
+
+    # "What/which" identification questions (but NOT "which [inequality|expression] does")
+    # "Which is the capital of..." → OK to have answer
+    # "Which inequality does this represent? [x > -5]" → NOT OK (has bracket answer)
     if q_lower.startswith(('what ', 'which ')):
+        # Allow ONLY if it's a specific identification pattern
+        # "which is", "which of", "what is"
+        if any(pattern in q_lower for pattern in ('which is ', 'which of ', 'what is ')):
+            return True
+        # But NOT generic "which [expression]" patterns
+        if any(pattern in q_lower for pattern in ('which inequality', 'which equation',
+                                                     'which expression')):
+            return False
         return True
 
     # Single character answers (letters, digits) are too common to flag

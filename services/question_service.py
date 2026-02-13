@@ -257,6 +257,20 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
                 continue
 
             # Validate the generated question
+            # For MCQ, add placeholder options for validation (will be replaced with computed distractors)
+            # Use attempt number to make placeholders unique across retries
+            if q_type == 'mcq' and q_data and not q_data.get('options'):
+                correct = q_data.get('correct_answer', '')
+                q_data['options'] = [
+                    f'A) {correct}',
+                    f'B) alt{attempt_num}a',
+                    f'C) alt{attempt_num}b',
+                    f'D) alt{attempt_num}c'
+                ]
+                # Ensure correct_answer format matches the options format for validation
+                if correct and not correct.startswith(('A)', 'B)', 'C)', 'D)')):
+                    q_data['correct_answer'] = f'A) {correct}'
+
             is_valid, reason = validate_question(q_data, node_desc)
             if not is_valid:
                 logger.warning('Validation rejected (attempt %d): %s', attempt_num + 1, reason)

@@ -6,7 +6,7 @@ import re
 import traceback
 import argparse
 
-from flask import Flask, request as flask_request
+from flask import Flask, request as flask_request, Response
 
 from db.database import init_db
 from routes.home import home_bp
@@ -43,16 +43,29 @@ def create_app():
 
     @app.template_filter('strip_letter')
     def strip_letter_prefix(text):
-        """Remove leading letter prefix like 'A) ' or 'B. ' from MCQ options."""
-        return re.sub(r'^[A-Da-d][).\s]+\s*', '', str(text))
+        """Remove leading letter prefix like 'A) ' or 'B. ' from MCQ options.
 
-    from markupsafe import Markup
+        Only strips explicit prefixes (A), A.) — NOT articles like 'A rock'.
+        """
+        return re.sub(r'^[A-Da-d][.)]\s*', '', str(text))
+
+    from markupsafe import Markup, escape
     from services.math_renderer import render_math_in_text
 
     @app.template_filter('render_math')
     def render_math_filter(text):
         """Replace LaTeX expressions with server-rendered SVG images."""
         return Markup(render_math_in_text(str(text)))
+
+    @app.template_filter('render_md_bold')
+    def render_md_bold_filter(text):
+        """Convert **bold** markdown to <strong> tags."""
+        escaped = str(escape(str(text)))
+        return Markup(re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', escaped))
+
+    @app.route('/favicon.ico')
+    def favicon():
+        return Response(status=204)
 
     # --- Request/response logging ---
     req_logger = logging.getLogger('mora.requests')

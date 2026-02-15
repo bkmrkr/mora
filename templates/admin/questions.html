@@ -41,8 +41,8 @@
             <td>Q{{ q.id }}</td>
             <td>{{ q.topic_name }}</td>
             <td>{{ q.node_name[:25] }}{% if q.node_name|length > 25 %}...{% endif %}</td>
-            <td>{{ q.content[:50] }}{% if q.content|length > 50 %}...{% endif %}</td>
-            <td>{{ q.correct_answer[:20] }}{% if q.correct_answer|length > 20 %}...{% endif %}</td>
+            <td>{{ q.content[:50] | render_md_bold | render_math }}{% if q.content|length > 50 %}...{% endif %}</td>
+            <td>{{ q.correct_answer[:20] | render_math }}{% if q.correct_answer|length > 20 %}...{% endif %}</td>
             <td>{{ q.created_at[:19] if q.created_at else '' }}</td>
             <td>
                 <a href="{{ url_for('admin.question_detail', question_id=q.id) }}" class="btn btn-sm btn-primary">Review</a>

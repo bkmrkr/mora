@@ -18,7 +18,7 @@
                 <div class="node-stats">
                     <span>{{ node.mastery_pct }}%</span>
                     <span>{{ node.skill_rating }} ELO</span>
-                    <span>{{ node.total_attempts }} tries</span>
+                    <span>{{ node.total_attempts }} {{ "try" if node.total_attempts == 1 else "tries" }}</span>
                 </div>
             </div>
             {% endfor %}
@@ -39,17 +39,15 @@
                 </tr>
             </thead>
             <tbody>
-                {% for sess in sessions %}
+                {% for sess in sessions if sess.total_questions %}
                 <tr>
                     <td>{{ sess.started_at[:16] if sess.started_at else '—' }}</td>
-                    <td>{{ sess.total_questions or 0 }}</td>
+                    <td>{{ sess.total_questions }}</td>
                     <td>{{ sess.total_correct or 0 }}</td>
-                    <td>
-                        {% if sess.total_questions %}
-                        {{ ((sess.total_correct or 0) / sess.total_questions * 100)|round }}%
-                        {% else %}—{% endif %}
-                    </td>
+                    <td>{{ ((sess.total_correct or 0) / sess.total_questions * 100)|round(1) }}%</td>
                 </tr>
+                {% else %}
+                <tr><td colspan="4" style="text-align:center; color:#999">No sessions with answers yet</td></tr>
                 {% endfor %}
             </tbody>
         </table>

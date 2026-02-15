@@ -700,3 +700,38 @@ code.math-fallback {
 .report-btn:hover {
     color: #d00;
 }
+
+/* Report question form inside <details> */
+.report-question summary {
+    color: #888;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+.report-question summary:hover {
+    color: #555;
+}
+.report-question form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+}
+.report-question select,
+.report-question textarea {
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: white;
+}
+.report-question select {
+    min-width: 140px;
+}
+.report-question textarea {
+    flex: 1;
+    min-width: 150px;
+    resize: vertical;
+}

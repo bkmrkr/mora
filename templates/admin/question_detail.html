@@ -20,7 +20,7 @@
                 <span class="qid-badge">Q#{{ question.id }}</span>
             </div>
 
-            <div class="question-text">{{ question.content | render_math }}</div>
+            <div class="question-text">{{ question.content | render_md_bold | render_math }}</div>
 
             {% if question.question_type == 'mcq' and options %}
             <div class="choices-grid">
@@ -114,7 +114,7 @@
             <dd>{{ question.question_type }}</dd>
 
             <dt>Difficulty</dt>
-            <dd>{{ question.difficulty or 'N/A' }}</dd>
+            <dd>{{ "%.0f"|format(question.difficulty) if question.difficulty else 'N/A' }} ELO</dd>
 
             <dt>Created</dt>
             <dd>{{ question.created_at }}</dd>

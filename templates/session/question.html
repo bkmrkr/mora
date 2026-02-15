@@ -36,7 +36,7 @@
                 <span class="qid-badge">Q#{{ question.question_id }}</span>
             </div>
 
-            <div class="question-text">{{ question.content | render_math }}</div>
+            <div class="question-text">{{ question.content | render_md_bold | render_math }}</div>
 
             <form action="{{ url_for('session.answer', session_id=session_id) }}" method="post"
                   id="answer-form">

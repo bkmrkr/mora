@@ -5,6 +5,14 @@
 ### Fixed — Playwright Browser Testing
 - **Critical: MCQ answer matching treated article "A" as letter prefix** — `_extract_letter("A rock")` matched regex `^([A-D])[.)\s]`, extracting letter "A". Any two options starting with the same article (e.g., "A leaf", "A rock", "A caterpillar") were all graded as matching. Fix: tightened regex to `^([A-D])[.)]` (only `.` and `)`, not whitespace), added `^([A-D])\s+\d` for normalized letter-prefixed options like "B 4". Restructured `_check_mcq` to prioritize option-index matching over letter extraction. 2 regression tests added (443 total)
 - **Stale precache JS call removed** — `static/js/session.js` still called `/session/<id>/precache` (deleted in Phase 3), generating console errors on every question page
+- **Favicon 500 error** — Added `/favicon.ico` route returning 204 to prevent server errors on every page load
+- **Admin table raw LaTeX/Markdown** — Added `render_md_bold` and `render_math` filters to `questions.html` question/answer columns
+- **Markdown bold not rendered** — Added `render_md_bold` template filter (`**text**` → `<strong>`) to question text across session, feedback, and admin templates
+- **Empty sessions in dashboard table** — Filtered out sessions with 0 questions; added "No sessions with answers yet" empty state
+- **Raw float difficulty in admin detail** — Rounded to integer with "ELO" suffix (e.g., "764 ELO" instead of "764.2345")
+- **"1 tries" grammar** — Changed to conditional singular/plural ("1 try" vs "8 tries") in dashboard overview
+- **Report form unstyled** — Added CSS for inline layout with proper spacing, font inheritance, and border-radius
+- **strip_letter regex too greedy** — Tightened from `r'^[A-Da-d][).\s]+\s*'` to `r'^[A-Da-d][.)]\s*'` to avoid stripping article "A" from option text like "A rock"
 
 ### Changed — Phase 10 Documentation Sync & Knowledge Capture
 - **spec.md updated** (15+ inaccuracies fixed): Default model qwen3:8b → qwen2.5, blueprints 3 → 4 (added admin), max_generation_attempts 2 → 3, AI modules description updated, question generation section rewritten (universal prompt, subject rules, no distractors), validation 12 rules → 5 rules + math verification, dedup 3 layers → 2 layers, answer matching simplified (removed letter-prefix extraction), data model updated (added test_status, validation_error, quality_flags, current_question_id, last_result_json columns)

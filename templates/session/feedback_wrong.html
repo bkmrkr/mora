@@ -27,7 +27,7 @@
         {% if question and question.content %}
         <div class="original-question">
             <span class="label">Question:</span>
-            <span class="value">{{ question.content | render_math }}</span>
+            <span class="value">{{ question.content | render_md_bold | render_math }}</span>
         </div>
         {% endif %}
 

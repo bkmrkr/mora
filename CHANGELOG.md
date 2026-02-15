@@ -1,5 +1,14 @@
 # Mora v2 Changelog
 
+### Fixed — Error Handler Swallowed HTTP Status Codes
+- Catch-all `@app.errorhandler(Exception)` was converting 404 Not Found to 500 Internal Server Error
+- Now re-raises `HTTPException` subclasses (404, 405, etc.) with their correct status codes
+- Only non-HTTP exceptions return 500
+
+### Fixed — Non-Numeric response_time_s Crashed Answer Route
+- `float(request.form.get('response_time_s', 0))` crashed with `ValueError` on non-numeric input ('abc', '', etc.)
+- Now wrapped in try/except, defaults to 0.0 on invalid input
+
 ### Hardened — NaN/Inf Guards in ELO Functions
 - All ELO functions (p_correct, compute_k_factor, update_skill, compute_mastery) now guard against NaN/Inf inputs
 - Corrupted data falls back to safe defaults (800.0 for ratings, initial values for uncertainty)

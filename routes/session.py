@@ -107,7 +107,10 @@ def answer(session_id):
         return redirect(url_for('session.question', session_id=session_id))
 
     student_answer = request.form.get('answer', '').strip()
-    response_time_s = float(request.form.get('response_time_s', 0))
+    try:
+        response_time_s = float(request.form.get('response_time_s', 0))
+    except (ValueError, TypeError):
+        response_time_s = 0.0
 
     if not student_answer:
         return redirect(url_for('session.question', session_id=session_id))

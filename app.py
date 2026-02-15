@@ -77,10 +77,13 @@ def create_app():
 
     @app.errorhandler(Exception)
     def log_error(error):
+        from werkzeug.exceptions import HTTPException
         req_logger.error('!!! %s %s  EXCEPTION:\n%s',
                          flask_request.method,
                          flask_request.full_path.rstrip('?'),
                          traceback.format_exc())
+        if isinstance(error, HTTPException):
+            return error.get_response()
         return "Internal Server Error", 500
 
     with app.app_context():

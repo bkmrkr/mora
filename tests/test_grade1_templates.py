@@ -4,7 +4,7 @@ import json
 from curriculum.templates.grade1 import GRADE1_TEMPLATES
 
 
-REQUIRED_KEYS = {'skill_id', 'question', 'correct_answer', 'options', 'explanation', 'template_id'}
+REQUIRED_KEYS = {'skill_id', 'question', 'correct_answer', 'options', 'explanation', 'template_id', 'difficulty'}
 
 
 class TestAllGrade1Templates:
@@ -67,9 +67,16 @@ class TestAllGrade1Templates:
         """Multiple calls should produce different questions (randomness works)."""
         for skill_id, templates in GRADE1_TEMPLATES.items():
             for template_fn in templates:
-                questions = {template_fn(800)['question'] for _ in range(20)}
-                assert len(questions) > 1, \
-                    f"{skill_id}: same question generated 20 times"
+                results = [template_fn(800) for _ in range(20)]
+                # For clock questions, variety is in the answer (different times)
+                if results[0].get('clock_hour') is not None:
+                    answers = {r['correct_answer'] for r in results}
+                    assert len(answers) > 1, \
+                        f"{skill_id}: same answer generated 20 times"
+                else:
+                    questions = {r['question'] for r in results}
+                    assert len(questions) > 1, \
+                        f"{skill_id}: same question generated 20 times"
 
 
 class TestAdditionWithin10:

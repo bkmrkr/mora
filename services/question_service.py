@@ -89,6 +89,10 @@ def generate_next(session_id, student, current_skill_id=None):
         'explanation': q_data.get('explanation', ''),
         'difficulty': question_difficulty,
     }
+    # Clock params for SVG generation at render time (avoids cookie bloat)
+    if 'clock_hour' in q_data:
+        question_dict['clock_hour'] = q_data['clock_hour']
+        question_dict['clock_minute'] = q_data['clock_minute']
 
     session_model.update_current_question(session_id, question_id)
     return question_dict

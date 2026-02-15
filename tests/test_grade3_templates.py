@@ -3,7 +3,7 @@ import pytest
 from curriculum.templates.grade3 import GRADE3_TEMPLATES
 
 
-REQUIRED_KEYS = {'skill_id', 'question', 'correct_answer', 'options', 'explanation', 'template_id'}
+REQUIRED_KEYS = {'skill_id', 'question', 'correct_answer', 'options', 'explanation', 'template_id', 'difficulty'}
 
 
 class TestAllGrade3Templates:

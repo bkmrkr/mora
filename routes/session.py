@@ -11,6 +11,7 @@ from models import attempt as attempt_model
 from models.progress import get as get_progress, get_for_student
 from services import question_service, answer_service
 from curriculum.skills import get_skill, get_skills_for_grade
+from curriculum.templates.common import generate_clock_svg
 from engine import elo
 
 logger = logging.getLogger(__name__)
@@ -74,6 +75,11 @@ def question(session_id):
     last_result = flask_session.get('last_result')
     session_stats = _get_session_stats(session_id)
 
+    # Generate clock SVG at render time (not stored in cookie)
+    visual_svg = None
+    if 'clock_hour' in current:
+        visual_svg = generate_clock_svg(current['clock_hour'], current['clock_minute'])
+
     return render_template(
         'session/question.html',
         session_id=session_id,
@@ -81,6 +87,7 @@ def question(session_id):
         question=current,
         last_result=last_result,
         session_stats=session_stats,
+        visual_svg=visual_svg,
     )
 
 

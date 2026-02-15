@@ -185,7 +185,7 @@ def comparing_numbers(difficulty_elo):
 
 
 def telling_time_hour(difficulty_elo):
-    """g1_time: Tell time to the hour and half-hour."""
+    """g1_time: Tell time to the hour and half-hour (with clock SVG)."""
     if difficulty_elo < 750:
         # Whole hours only
         hour = random.randint(1, 12)
@@ -197,10 +197,8 @@ def telling_time_hour(difficulty_elo):
 
     if minute == 0:
         answer = f'{hour}:00'
-        spoken = f'{hour} o\'clock'
     else:
         answer = f'{hour}:30'
-        spoken = f'half past {hour}'
 
     # Distractors: wrong hour, wrong minute
     wrong_hours = [h for h in range(1, 13) if h != hour]
@@ -212,16 +210,16 @@ def telling_time_hour(difficulty_elo):
         f'{hour}:{"30" if minute == 0 else "00"}',
     ]
 
-    question = f'A clock shows {spoken}. What time is it?'
-
     return {
         'skill_id': 'g1_time',
-        'question': question,
+        'question': 'What time does this clock show?',
         'correct_answer': answer,
         'options': make_options(answer, distractors),
         'explanation': f'The time is {answer}.',
         'template_id': 'g1_time',
         'difficulty': estimate_difficulty(1, 0.3 if minute == 0 else 0.7),
+        'clock_hour': hour,
+        'clock_minute': minute,
     }
 
 

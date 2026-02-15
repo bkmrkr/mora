@@ -135,7 +135,7 @@ def money(difficulty_elo):
 
 
 def telling_time_5min(difficulty_elo):
-    """g2_time: Tell time to the nearest 5 minutes."""
+    """g2_time: Tell time to the nearest 5 minutes (with clock SVG)."""
     hour = random.randint(1, 12)
     minute = random.choice([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55])
     answer = f'{hour}:{minute:02d}'
@@ -151,15 +151,16 @@ def telling_time_5min(difficulty_elo):
         f'{hour}:{d3_min:02d}',
     ]
 
-    question = f'A clock shows {hour} hour{"s" if hour > 1 else ""} and {minute} minutes. What time is it?'
     return {
         'skill_id': 'g2_time',
-        'question': question,
+        'question': 'What time does this clock show?',
         'correct_answer': answer,
         'options': make_options(answer, distractors),
         'explanation': f'The time is {answer}.',
         'template_id': 'g2_time',
         'difficulty': estimate_difficulty(2, 0.3 + minute / 120),
+        'clock_hour': hour,
+        'clock_minute': minute,
     }
 
 

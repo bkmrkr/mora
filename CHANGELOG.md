@@ -56,6 +56,14 @@ LLM (qwen2.5) could not reliably produce grade-appropriate educational content. 
 - All 40 skills verified: registered in service, every template produces valid 4-option MCQ
 - 10 integration tests (189 total)
 
+### Added — Clock SVG Visuals for Time Questions
+- `common.py`: `generate_clock_svg(hour, minute)` renders analog clock face with hour/minute hands
+- Ported from kidtutor project — circle, tick marks, numbers, hour hand (thick), minute hand (thin), center dot
+- Grade 1 (`g1_time`) and Grade 2 (`g2_time`) templates now show clock image instead of text like "A clock shows 12 o'clock"
+- Question text changed to "What time does this clock show?" — no more giving away the answer
+- Clock params (`clock_hour`, `clock_minute`) stored in session cookie (8 bytes vs ~2KB SVG), SVG regenerated at render time
+- Verified with Playwright: clock renders correctly in browser
+
 ### Added — Intrinsic Difficulty Scoring
 - `common.py`: `estimate_difficulty(grade, complexity)` maps grade (1-4) + complexity (0.0-1.0) to ELO difficulty
 - Grade bands: G1 500-750, G2 700-950, G3 900-1150, G4 1100-1350

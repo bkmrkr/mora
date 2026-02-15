@@ -26,6 +26,12 @@
 
         <div class="question-text">{{ question.content }}</div>
 
+        {% if visual_svg %}
+        <div class="clock-visual" style="display: flex; justify-content: center; margin: 1rem 0;">
+            {{ visual_svg | safe }}
+        </div>
+        {% endif %}
+
         <form action="{{ url_for('session.answer', session_id=session_id) }}" method="post"
               id="answer-form">
             <input type="hidden" name="question_id" value="{{ question.question_id }}">

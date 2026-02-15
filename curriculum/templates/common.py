@@ -1,4 +1,5 @@
 """Common utilities for question templates — distractor generation, shuffling."""
+import math
 import random
 
 # ELO difficulty bands per grade (each spans ~250 ELO points)
@@ -13,6 +14,66 @@ def estimate_difficulty(grade, complexity):
     """
     low, high = GRADE_DIFFICULTY.get(grade, (800, 1000))
     return round(low + complexity * (high - low))
+
+
+def generate_clock_svg(hour, minute, size=200):
+    """Generate an analog clock face SVG showing the given time.
+
+    Returns an SVG string with circle, hour numbers, hour/minute hands, center dot.
+    """
+    cx, cy = size / 2, size / 2
+    r = size / 2 - 10
+
+    parts = [
+        f'<svg width="{size}" height="{size}" viewBox="0 0 {size} {size}" xmlns="http://www.w3.org/2000/svg">',
+        f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="white" stroke="#2C3E50" stroke-width="3"/>',
+    ]
+
+    # Hour tick marks
+    for i in range(12):
+        angle = math.radians(i * 30 - 90)
+        x1 = cx + (r - 8) * math.cos(angle)
+        y1 = cy + (r - 8) * math.sin(angle)
+        x2 = cx + r * math.cos(angle)
+        y2 = cy + r * math.sin(angle)
+        parts.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="#2C3E50" stroke-width="2"/>')
+
+    # Hour numbers
+    for i in range(1, 13):
+        angle = math.radians(i * 30 - 90)
+        nx = cx + (r - 22) * math.cos(angle)
+        ny = cy + (r - 22) * math.sin(angle)
+        parts.append(
+            f'<text x="{nx:.1f}" y="{ny:.1f}" text-anchor="middle" '
+            f'dominant-baseline="central" font-size="{size // 10}" '
+            f'font-family="sans-serif" fill="#2C3E50">{i}</text>'
+        )
+
+    # Minute hand (long, thin)
+    min_angle = math.radians(minute * 6 - 90)
+    min_len = r - 30
+    mx = cx + min_len * math.cos(min_angle)
+    my = cy + min_len * math.sin(min_angle)
+    parts.append(
+        f'<line x1="{cx}" y1="{cy}" x2="{mx:.1f}" y2="{my:.1f}" '
+        f'stroke="#2C3E50" stroke-width="2.5" stroke-linecap="round"/>'
+    )
+
+    # Hour hand (short, thick) — accounts for fractional hour from minutes
+    hour_fraction = hour + minute / 60.0
+    hr_angle = math.radians(hour_fraction * 30 - 90)
+    hr_len = r * 0.55
+    hx = cx + hr_len * math.cos(hr_angle)
+    hy = cy + hr_len * math.sin(hr_angle)
+    parts.append(
+        f'<line x1="{cx}" y1="{cy}" x2="{hx:.1f}" y2="{hy:.1f}" '
+        f'stroke="#2C3E50" stroke-width="4" stroke-linecap="round"/>'
+    )
+
+    # Center dot
+    parts.append(f'<circle cx="{cx}" cy="{cy}" r="4" fill="#2C3E50"/>')
+    parts.append('</svg>')
+    return '\n'.join(parts)
 
 
 def arithmetic_distractors(answer, a, b, op='+', count=3):

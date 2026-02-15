@@ -94,7 +94,7 @@ def _detect_subject(topic_name, node_name):
     return None
 
 
-def generate(node_name, node_description, topic_name, skill_description,
+def generate(node_name, node_description, topic_name,
              target_difficulty_elo, question_type, recent_questions=None):
     """Generate a question via Ollama.
 

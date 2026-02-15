@@ -2,6 +2,15 @@
 
 ## [2026-02-15]
 
+### Changed — Phase 4 Hardening (post-rebuild verification & cleanup)
+- **`scripts/generate_balanced.py` + `scripts/generate_questions.py` fixed**: Both hard-coded `options=["A","B","C","D"]` instead of using actual LLM options — this was the root cause of 97.7% broken questions in the DB
+- **`scripts/question_tester.py` fixed**: Removed import of deleted `ai.distractors` module and distractor insertion code
+- **`ai/question_generator.py`**: Removed unused `skill_description` parameter from `generate()` signature; updated all callers
+- **`engine/question_options.py`**: Removed unused `SIMILARITY_THRESHOLD` constant
+
+### Removed — Phase 4
+- **`scripts/fix_bad_distractors.py` deleted**: One-time cleanup script that imported deleted `ai.distractors` module — no longer applicable
+
 ### Changed — Phase 3 Rebuild (from-scratch rewrite of question pipeline)
 - **Root cause fix**: LLM now ALWAYS provides complete MCQ options. Eliminates the algorithmic distractor system that caused 97.7% of questions to have broken `["A", "B", "C", "D"]` placeholder options
 - **`ai/question_generator.py` rewritten** (296 → 150 lines): One universal `SYSTEM_PROMPT` + subject-specific `SUBJECT_RULES` dict injected into user prompt. Replaced 6 per-subject prompt constants with `_detect_subject()` auto-detection

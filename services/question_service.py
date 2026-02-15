@@ -100,7 +100,7 @@ def generate_next(session_id, student, topic_id, last_was_correct=None):
             try:
                 q_data, model, prompt = question_generator.generate(
                     focus_node['name'], node_desc,
-                    topic['name'] if topic else '', node_desc,
+                    topic['name'] if topic else '',
                     target_diff, q_type, recent_text_list,
                 )
             except Exception as e:

@@ -216,7 +216,7 @@ def test_generate_uses_system_prompt(mock_ask):
         node_name='Kindergarten Math',
         node_description='Basic addition',
         topic_name='Math (K-4)',
-        skill_description='Addition to 10',
+
         target_difficulty_elo=500,
         question_type='mcq'
     )
@@ -244,7 +244,7 @@ def test_generate_includes_subject_rules_in_user_prompt(mock_ask):
         node_name='Kindergarten: Alef-Bet',
         node_description='Basic Hebrew vocabulary',
         topic_name='Hebrew (K-4)',
-        skill_description='Family words',
+
         target_difficulty_elo=500,
         question_type='mcq'
     )
@@ -272,7 +272,7 @@ def test_generate_returns_parsed_json(mock_ask):
         node_name='Addition',
         node_description='Basic addition',
         topic_name='Math',
-        skill_description='Addition to 10',
+
         target_difficulty_elo=500,
         question_type='mcq'
     )

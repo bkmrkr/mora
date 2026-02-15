@@ -39,29 +39,37 @@ def arithmetic_distractors(answer, a, b, op='+', count=3):
 
 
 def make_options(correct, distractors):
-    """Combine correct answer with distractors and shuffle."""
-    opts = distractors[:3]
-    # Ensure we have exactly 3 distractors
-    # If not enough, pad with nearby values
+    """Combine correct answer with distractors and shuffle. Always 4 unique options."""
+    correct_str = str(correct)
+
+    # Deduplicate distractors, excluding the correct answer
+    seen = {correct_str}
+    opts = []
+    for d in distractors:
+        d_str = str(d)
+        if d_str not in seen:
+            opts.append(d_str)
+            seen.add(d_str)
+        if len(opts) == 3:
+            break
+
+    # Pad if we don't have enough unique distractors
     correct_int = None
     try:
-        correct_int = int(correct)
+        correct_int = int(correct_str)
     except (ValueError, TypeError):
         pass
 
-    existing = {correct} | set(opts)
-    while len(opts) < 3:
-        if correct_int is not None:
-            candidate = str(correct_int + random.choice([-3, 3, -4, 4, 5]))
-            if candidate not in existing and int(candidate) >= 0:
+    if correct_int is not None:
+        for offset in [-3, 3, -4, 4, 5, -5, 6, -6, 7]:
+            if len(opts) >= 3:
+                break
+            candidate = str(correct_int + offset)
+            if candidate not in seen and int(candidate) >= 0:
                 opts.append(candidate)
-                existing.add(candidate)
-            else:
-                opts.append(str(random.randint(0, 20)))
-        else:
-            break
+                seen.add(candidate)
 
-    all_opts = opts[:3] + [str(correct)]
+    all_opts = opts[:3] + [correct_str]
     random.shuffle(all_opts)
     return all_opts
 

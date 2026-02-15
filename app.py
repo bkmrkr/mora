@@ -1,4 +1,4 @@
-"""Mora — Flask application entry point."""
+"""Mora v2 — Flask application entry point."""
 import logging
 import logging.handlers
 import os
@@ -12,9 +12,7 @@ from db.database import init_db
 from routes.home import home_bp
 from routes.session import session_bp
 from routes.dashboard import dashboard_bp
-from routes.admin import admin_bp
 
-# --- File logging with daily rotation, 3-day retention ---
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mora_debug.log')
 
 file_handler = logging.handlers.TimedRotatingFileHandler(
@@ -39,35 +37,15 @@ def create_app():
     app.register_blueprint(home_bp)
     app.register_blueprint(session_bp, url_prefix='/session')
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
-    app.register_blueprint(admin_bp, url_prefix='/admin')
 
     @app.template_filter('strip_letter')
     def strip_letter_prefix(text):
-        """Remove leading letter prefix like 'A) ' or 'B. ' from MCQ options.
-
-        Only strips explicit prefixes (A), A.) — NOT articles like 'A rock'.
-        """
         return re.sub(r'^[A-Da-d][.)]\s*', '', str(text))
-
-    from markupsafe import Markup, escape
-    from services.math_renderer import render_math_in_text
-
-    @app.template_filter('render_math')
-    def render_math_filter(text):
-        """Replace LaTeX expressions with server-rendered SVG images."""
-        return Markup(render_math_in_text(str(text)))
-
-    @app.template_filter('render_md_bold')
-    def render_md_bold_filter(text):
-        """Convert **bold** markdown to <strong> tags."""
-        escaped = str(escape(str(text)))
-        return Markup(re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', escaped))
 
     @app.route('/favicon.ico')
     def favicon():
         return Response(status=204)
 
-    # --- Request/response logging ---
     req_logger = logging.getLogger('mora.requests')
 
     @app.before_request
@@ -107,10 +85,6 @@ def create_app():
 
     with app.app_context():
         init_db()
-
-    # Pre-load Ollama model so first question doesn't incur cold-start delay
-    from ai.ollama_client import warm_up
-    warm_up()
 
     return app
 

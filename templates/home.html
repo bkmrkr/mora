@@ -1,46 +1,26 @@
 {% extends "base.html" %}
-{% block title %}Mora — Home{% endblock %}
+{% block title %}Mora — Math Practice{% endblock %}
 {% block content %}
 <div class="home-container">
-    <h1>Welcome to Mora</h1>
-    <p class="subtitle">Adaptive learning powered by AI. Enter any topic and start learning.</p>
+    <h1>Mora Math</h1>
+    <p class="subtitle">Adaptive math practice for grades 1-4</p>
 
-    <div class="card onboard-card">
-        <h2>Start Learning</h2>
-        <form action="{{ url_for('home.onboard') }}" method="post">
-            <div class="form-group">
-                <label for="student_name">Your Name</label>
-                <input type="text" id="student_name" name="student_name"
-                       placeholder="Enter your name" required>
-            </div>
-            <div class="form-group">
-                <label for="topic_name">Topic</label>
-                <input type="text" id="topic_name" name="topic_name"
-                       placeholder='e.g., "Calculus", "Python", "World War II"' required>
-            </div>
-            <button type="submit" class="btn btn-primary">Generate Curriculum & Start</button>
-        </form>
-    </div>
+    <form action="{{ url_for('home.start') }}" method="post" class="start-form">
+        <label for="student_name">What's your name?</label>
+        <input type="text" id="student_name" name="student_name"
+               placeholder="Enter your name" required autofocus>
+        <button type="submit" class="btn btn-primary">Start Practice</button>
+    </form>
 
     {% if students %}
-    <div class="card">
-        <h2>Returning Students</h2>
-        <div class="student-list">
+    <div class="returning-students">
+        <h3>Returning students:</h3>
+        <div class="student-chips">
             {% for s in students %}
-            <a href="{{ url_for('home.pick_topic', student_id=s.id) }}" class="student-chip">
-                {{ s.name }}
-            </a>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
-    {% if topics %}
-    <div class="card">
-        <h2>Available Topics</h2>
-        <div class="topic-list">
-            {% for t in topics %}
-            <span class="topic-chip">{{ t.name }}</span>
+            <form action="{{ url_for('home.start') }}" method="post" class="chip-form">
+                <input type="hidden" name="student_name" value="{{ s.name }}">
+                <button type="submit" class="student-chip">{{ s.name }}</button>
+            </form>
             {% endfor %}
         </div>
     </div>

@@ -10,15 +10,14 @@
         <a href="{{ url_for('dashboard.overview', student_id=s.student.id) }}" class="card student-card-link">
             <h3>{{ s.student.name }}</h3>
             <div class="student-stats">
-                <span>{{ s.total_attempts }} attempts</span>
-                <span>{{ s.mastered_nodes }} mastered</span>
-                <span>{{ s.in_progress }} in progress</span>
+                <span>{{ s.total_attempts }} {{ "attempt" if s.total_attempts == 1 else "attempts" }}</span>
+                <span>{{ s.mastered_skills }} mastered</span>
             </div>
         </a>
         {% endfor %}
     </div>
     {% else %}
-    <p>No students yet. <a href="{{ url_for('home.index') }}">Start learning</a> to see progress here.</p>
+    <p>No students yet. <a href="{{ url_for('home.index') }}">Start practicing</a> to see progress here.</p>
     {% endif %}
 </div>
 {% endblock %}

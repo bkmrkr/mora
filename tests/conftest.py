@@ -22,3 +22,18 @@ def temp_db(monkeypatch, tmp_path):
     init_db()
 
     return db_path
+
+
+@pytest.fixture
+def app():
+    """Flask test app with TESTING enabled."""
+    from app import create_app
+    application = create_app()
+    application.config['TESTING'] = True
+    return application
+
+
+@pytest.fixture
+def client(app):
+    """Flask test client for route tests."""
+    return app.test_client()

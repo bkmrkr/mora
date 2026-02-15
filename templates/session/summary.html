@@ -29,7 +29,7 @@
                 <span class="skill-name">{{ skill.name }}</span>
                 <div class="mastery-bar">
                     <div class="mastery-fill {% if skill.mastered %}mastered{% endif %}"
-                         style="width: {{ (skill.mastery_level * 100)|round }}%"></div>
+                         style="width: {{ skill.mastery_pct }}%"></div>
                 </div>
                 <span class="skill-rating">{{ skill.skill_rating }} ELO</span>
                 {% if skill.mastered %}
@@ -42,8 +42,7 @@
     {% endif %}
 
     <div class="summary-actions">
-        <a href="{{ url_for('home.pick_topic', student_id=student.id) }}"
-           class="btn btn-primary">Continue Learning</a>
+        <a href="{{ url_for('home.index') }}" class="btn btn-primary">Practice Again</a>
         <a href="{{ url_for('dashboard.overview', student_id=student.id) }}"
            class="btn btn-secondary">View Progress</a>
     </div>

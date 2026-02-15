@@ -1,169 +1,60 @@
 {% extends "base.html" %}
 {% block title %}Mora — Question{% endblock %}
 {% block content %}
-<div class="session-top-bar">
-    <span class="student-name">{{ student.name }}</span>
-    <div class="topic-mastery-display">
-        <span class="mastery-pct">{{ "%.1f"|format(topic_mastery) }}%</span>
-        <div class="mastery-bar">
-            <div class="mastery-fill {% if topic_mastery >= 75 %}mastered{% endif %}"
-                 style="width: {{ topic_mastery }}%"></div>
+<div class="session-container">
+    <div class="session-header">
+        <span class="student-name">{{ student.name }}</span>
+        <div class="session-stats">
+            {% if session_stats.total > 0 %}
+            <span>{{ session_stats.correct }}/{{ session_stats.total }} ({{ session_stats.accuracy }}%)</span>
+            {% endif %}
         </div>
-        <span class="mastery-label">Topic Mastery</span>
+        <a href="{{ url_for('session.end', session_id=session_id) }}" class="btn btn-secondary btn-sm">End Session</a>
     </div>
-    {% if session_stats and session_stats.total > 0 %}
-    <span class="session-stat">{{ session_stats.correct }}/{{ session_stats.total }} ({{ session_stats.accuracy }}%)</span>
+
+    {% if last_result and last_result.is_correct %}
+    <div class="result-banner correct">
+        Correct! {{ last_result.skill_name }} — Rating: {{ last_result.skill_rating }}
+    </div>
     {% endif %}
-    <form action="{{ url_for('session.end', session_id=session_id) }}" method="get" class="end-btn-form">
-        <button type="submit" class="btn btn-secondary btn-sm">End Session</button>
-    </form>
-</div>
 
-<div class="two-panel-layout">
-    <!-- LEFT PANEL: Current Question -->
-    <div class="panel-left">
-        <div class="question-card">
-            {% if question.clock_svg %}
-            <div class="clock-visual">{{ question.clock_svg | safe }}</div>
+    <div class="question-card">
+        <div class="question-meta">
+            <span class="node-badge">{{ question.skill_name }}</span>
+            <span class="qid-badge">Q#{{ question.question_id }}</span>
+        </div>
+
+        <div class="question-text">{{ question.content }}</div>
+
+        <form action="{{ url_for('session.answer', session_id=session_id) }}" method="post"
+              id="answer-form">
+            <input type="hidden" name="question_id" value="{{ question.question_id }}">
+            <input type="hidden" name="response_time_s" id="response_time_s" value="0">
+
+            {% if question.question_type == 'mcq' and question.options %}
+            <div class="choices-grid">
+                {% for option in question.options %}
+                <button type="submit" name="answer" value="{{ option }}"
+                        class="choice-btn">
+                    <span class="choice-text">{{ option | strip_letter }}</span>
+                </button>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="form-group">
+                <input type="text" name="answer" placeholder="Your answer" required autofocus>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Answer</button>
             {% endif %}
-            {% if question.number_line_svg %}
-            <div class="diagram-visual">{{ question.number_line_svg | safe }}</div>
-            {% endif %}
-
-            <div class="question-meta">
-                <span class="node-badge">{{ question.node_name }}</span>
-                <span class="type-badge">{{ question.question_type }}</span>
-                <span class="qid-badge">Q#{{ question.question_id }}</span>
-            </div>
-
-            <div class="question-text">{{ question.content | render_md_bold | render_math }}</div>
-
-            <form action="{{ url_for('session.answer', session_id=session_id) }}" method="post"
-                  id="answer-form">
-                <input type="hidden" name="question_id" value="{{ question.question_id }}">
-                <input type="hidden" name="response_time_s" id="response_time_s" value="0">
-
-                {% if question.question_type == 'mcq' and question.options %}
-                <div class="choices-grid">
-                    {% for option in question.options %}
-                    <button type="submit" name="answer" value="{{ option }}"
-                            class="choice-btn" data-key="{{ 'ABCD'[loop.index0] }}">
-                        <span class="choice-letter">{{ 'ABCD'[loop.index0] }}</span>
-                        <span class="choice-text">{{ option | strip_letter | render_math }}</span>
-                    </button>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="form-group">
-                    <textarea name="answer" id="answer-input" rows="3"
-                              placeholder="Type your answer..." required autofocus></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit Answer</button>
-                {% endif %}
-            </form>
-
-            <!-- Report bad question -->
-            <details class="report-question">
-                <summary>Report a problem with this question</summary>
-                <form action="{{ url_for('session.report', session_id=session_id) }}" method="post">
-                    <input type="hidden" name="question_id" value="{{ question.question_id }}">
-                    <select name="reason" required>
-                        <option value="">Select issue...</option>
-                        <option value="wrong_answer">Wrong answer shown</option>
-                        <option value="confusing">Question is confusing</option>
-                        <option value="inappropriate">Content not appropriate</option>
-                        <option value="other">Other issue</option>
-                    </select>
-                    <textarea name="details" placeholder="Optional details..." rows="2"></textarea>
-                    <button type="submit" class="btn btn-warning btn-sm">Submit Report & Get New Question</button>
-                </form>
-            </details>
-
-            <div class="difficulty-display">
-                <span class="difficulty-label">Difficulty:</span>
-                <span class="difficulty-dots">
-                    {% for i in range(10) %}
-                    <span class="difficulty-dot {% if i < question.difficulty_score %}filled{% endif %}"></span>
-                    {% endfor %}
-                </span>
-                <span class="difficulty-value">{{ question.difficulty_score }}/10</span>
-                <span class="difficulty-chance">({{ question.p_correct }}% chance)</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- RIGHT PANEL: Previous Result + Progress -->
-    <div class="panel-right">
-        {% if last_result %}
-        <div class="result-card {% if last_result.is_correct %}result-correct{% else %}result-wrong{% endif %}">
-            <div class="result-header">
-                {% if last_result.is_correct %}
-                <span class="result-icon correct">&#10004;</span>
-                <span class="result-label">Correct!</span>
-                {% else %}
-                <span class="result-icon wrong">&#10008;</span>
-                <span class="result-label">Wrong</span>
-                {% endif %}
-            </div>
-            <div class="result-question">{{ last_result.question_text[:80] | render_math }}{% if last_result.question_text|length > 80 %}...{% endif %}</div>
-            <div class="result-answers">
-                <div class="result-row">
-                    <span class="result-key">Your answer:</span>
-                    <span class="{% if last_result.is_correct %}correct-text{% else %}wrong-text{% endif %}">{{ last_result.student_answer | render_math }}</span>
-                </div>
-                {% if not last_result.is_correct %}
-                <div class="result-row">
-                    <span class="result-key">Correct:</span>
-                    <span class="correct-text">{{ last_result.correct_answer | render_math }}</span>
-                </div>
-                {% endif %}
-            </div>
-            <div class="result-meta">
-                <span>{{ last_result.node_name }}{% if last_result.question_id %} (Q#{{ last_result.question_id }}){% endif %}</span>
-                <span>{{ last_result.skill_rating }} ELO
-                    {% if last_result.rating_delta is defined %}
-                    <span class="delta {% if last_result.rating_delta >= 0 %}delta-up{% else %}delta-down{% endif %}">
-                        {% if last_result.rating_delta >= 0 %}+{% endif %}{{ last_result.rating_delta }}
-                    </span>
-                    {% endif %}
-                </span>
-            </div>
-            {% if last_result.mastery_after is defined %}
-            <div class="result-meta">
-                <span>Topic Progress: {{ last_result.mastery_after }}%
-                    <span class="delta {% if last_result.mastery_delta >= 0 %}delta-up{% else %}delta-down{% endif %}">
-                        {% if last_result.mastery_delta >= 0 %}+{% endif %}{{ last_result.mastery_delta }}%
-                    </span>
-                </span>
-            </div>
-            {% endif %}
-        </div>
-        {% else %}
-        <div class="result-card result-empty">
-            <p>Answer a question to see results here.</p>
-        </div>
-        {% endif %}
-
-        <div class="progress-card">
-            <h3>Topic Progress</h3>
-            {% for node in topic_progress %}
-            <div class="progress-node">
-                <div class="progress-node-header">
-                    <span class="progress-node-name {% if node.mastered %}text-mastered{% endif %}">
-                        {{ node.name[:30] }}{% if node.name|length > 30 %}...{% endif %}
-                    </span>
-                    <span class="progress-node-pct">{{ "%.1f"|format(node.mastery_pct) }}%</span>
-                </div>
-                <div class="mastery-bar small">
-                    <div class="mastery-fill {% if node.mastered %}mastered{% endif %}"
-                         style="width: {{ node.mastery_pct }}%"></div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+        </form>
     </div>
 </div>
 {% endblock %}
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/session.js') }}"></script>
+<script>
+    const startTime = Date.now();
+    document.getElementById('answer-form').addEventListener('submit', function() {
+        document.getElementById('response_time_s').value = ((Date.now() - startTime) / 1000).toFixed(1);
+    });
+</script>
 {% endblock %}

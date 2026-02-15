@@ -4,14 +4,6 @@
 <div class="session-container">
     <div class="session-header">
         <span class="student-name">{{ student.name }}</span>
-        <div class="topic-mastery-display">
-            <span class="mastery-pct">{{ "%.1f"|format(topic_mastery) }}%</span>
-            <div class="mastery-bar">
-                <div class="mastery-fill {% if topic_mastery|float >= 75 %}mastered{% endif %}"
-                     style="width: {{ "%.1f"|format(topic_mastery) }}%"></div>
-            </div>
-            <span class="mastery-label">Topic Mastery</span>
-        </div>
     </div>
 
     <div class="feedback-card wrong">
@@ -20,59 +12,27 @@
             <h2>Not quite!</h2>
         </div>
 
-        {% if explanation and explanation.encouragement %}
-        <p class="encouragement">{{ explanation.encouragement }}</p>
-        {% endif %}
-
-        {% if question and question.content %}
-        <div class="original-question">
-            <span class="label">Question:</span>
-            <span class="value">{{ question.content | render_md_bold | render_math }}</span>
-        </div>
-        {% endif %}
-
         <div class="answer-comparison">
             <div class="answer-row">
                 <span class="label">Your answer:</span>
-                <span class="value wrong-text">{{ result.student_answer | render_math }}</span>
+                <span class="value wrong-text">{{ result.student_answer }}</span>
             </div>
             <div class="answer-row">
                 <span class="label">Correct answer:</span>
-                <span class="value correct-text">{{ result.correct_answer | render_math }}</span>
+                <span class="value correct-text">{{ result.correct_answer }}</span>
             </div>
         </div>
 
-        {% if explanation and explanation.explanation %}
+        {% if result.explanation %}
         <div class="explanation-box">
             <h3>Explanation</h3>
-            <p>{{ explanation.explanation | render_math }}</p>
-        </div>
-        {% elif result.explanation %}
-        <div class="explanation-box">
-            <h3>Explanation</h3>
-            <p>{{ result.explanation | render_math }}</p>
-        </div>
-        {% endif %}
-
-        {% if explanation and explanation.key_concept %}
-        <div class="key-concept">
-            <strong>Key concept:</strong> {{ explanation.key_concept | render_math }}
-        </div>
-        {% endif %}
-
-        {% if explanation and explanation.tip %}
-        <div class="tip-box">
-            <strong>Tip:</strong> {{ explanation.tip | render_math }}
+            <p>{{ result.explanation }}</p>
         </div>
         {% endif %}
 
         <div class="skill-update">
-            <span>Skill: {{ result.node_name }}</span>
+            <span>Skill: {{ result.skill_name }}</span>
             <span>Rating: {{ result.skill_rating }}</span>
-            <span>Mastery: {{ (result.mastery_level * 100)|round(1) }}%</span>
-            {% if question and question.question_id %}
-            <span>Q#{{ question.question_id }}</span>
-            {% endif %}
         </div>
 
         <form action="{{ url_for('session.next_question', session_id=session_id) }}" method="post">

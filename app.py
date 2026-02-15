@@ -72,13 +72,25 @@ def create_app():
                         response.headers.get('Location', '-'))
         return response
 
+    @app.after_request
+    def add_security_headers(response):
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self'; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data:; "
+            "script-src 'self'"
+        )
+        return response
+
     @app.errorhandler(Exception)
     def log_error(error):
         req_logger.error('!!! %s %s  EXCEPTION:\n%s',
                          flask_request.method,
                          flask_request.full_path.rstrip('?'),
                          traceback.format_exc())
-        return f"Internal Server Error: {error}", 500
+        return "Internal Server Error", 500
 
     with app.app_context():
         init_db()

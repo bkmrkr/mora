@@ -357,9 +357,12 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
         'difficulty': target_diff,
         'difficulty_score': difficulty_score,
         'p_correct': round(p_correct * 100),
-        'clock_svg': q_data.get('clock_svg'),
-        'number_line_svg': q_data.get('number_line_svg'),
         'node_description': node_desc,
+        # SVG regeneration params (small strings, not raw SVGs)
+        'clock_hour': q_data.get('clock_hour'),
+        'clock_minute': q_data.get('clock_minute'),
+        'inequality_op': q_data.get('inequality_op'),
+        'inequality_boundary': q_data.get('inequality_boundary'),
     }
     if store_in_session:
         flask_session['current_question'] = question_dict

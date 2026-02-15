@@ -13,9 +13,23 @@ from models import curriculum_node as node_model
 from models import question as question_model
 from services import question_service, answer_service
 from engine import elo
+from ai.local_generators import _generate_clock_svg, _generate_number_line_svg
 
 logger = logging.getLogger(__name__)
 session_bp = Blueprint('session', __name__)
+
+
+def _inject_svgs(question_dict):
+    """Regenerate SVGs from stored params (not stored in session to save cookie space)."""
+    if not question_dict:
+        return question_dict
+    if question_dict.get('clock_hour') is not None:
+        question_dict['clock_svg'] = _generate_clock_svg(
+            question_dict['clock_hour'], question_dict['clock_minute'])
+    if question_dict.get('inequality_op') is not None:
+        question_dict['number_line_svg'] = _generate_number_line_svg(
+            question_dict['inequality_op'], question_dict['inequality_boundary'])
+    return question_dict
 
 
 def _load_question_from_db(question_id):
@@ -131,6 +145,9 @@ def question(session_id):
             topic_mastery=topic_mastery, topic_progress=topic_progress,
             session_stats=session_stats,
         )
+
+    # Regenerate SVGs from params (not stored in cookie to save space)
+    _inject_svgs(current)
 
     topic_mastery = _compute_topic_mastery(student['id'], sess['topic_id'])
     last_result = flask_session.get('last_result')

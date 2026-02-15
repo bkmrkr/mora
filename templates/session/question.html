@@ -62,13 +62,7 @@
                 {% endif %}
             </form>
 
-            <!-- Report bad question button -->
-            <form action="{{ url_for('session.report', session_id=session_id) }}" method="post" class="report-form">
-                <input type="hidden" name="reason" value="bad_question">
-                <button type="submit" class="btn btn-link btn-sm report-btn" title="Report this question as problematic">Report bad question</button>
-            </form>
-
-            <!-- Report bad question button -->
+            <!-- Report bad question -->
             <details class="report-question">
                 <summary>Report a problem with this question</summary>
                 <form action="{{ url_for('session.report', session_id=session_id) }}" method="post">

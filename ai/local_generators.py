@@ -88,6 +88,8 @@ def generate_clock_question(node_name, node_description='', recent_questions=Non
         'options': choices,
         'explanation': hint,
         'clock_svg': clock_svg,
+        'clock_hour': hour,
+        'clock_minute': minute,
     }
 
     return q_data, 'local-clock', f'Clock node: {node_name}'
@@ -227,6 +229,8 @@ def generate_inequality_question(node_name, node_description='',
         'options': choices,
         'explanation': explanation,
         'number_line_svg': svg,
+        'inequality_op': op,
+        'inequality_boundary': boundary,
     }
 
     return q_data, 'local-inequality', f'Inequality node: {node_name}'

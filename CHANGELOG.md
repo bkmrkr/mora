@@ -1,5 +1,20 @@
 # Mora Changelog
 
+## [2026-02-14]
+
+### Fixed
+- **Question report crash (CRITICAL)**: `mark_as_rejected()` in `question_report.py` referenced non-existent columns `is_rejected` and `rejection_reason`. Schema uses `test_status` and `validation_error`. Clicking "Report bad question" would crash with `OperationalError`. Fixed to use correct column names
+- **Error handler info disclosure**: `app.py` error handler returned raw exception message to user (`f"Internal Server Error: {error}"`). Now returns generic "Internal Server Error" — details logged server-side only
+- **Bare except in admin routes**: Two bare `except:` clauses in `routes/admin.py` caught `SystemExit`, `KeyboardInterrupt`, and all other exceptions. Narrowed to `except (json.JSONDecodeError, TypeError, ValueError)`
+- **Double url_prefix on admin blueprint**: `url_prefix='/admin'` was set both in Blueprint constructor and `app.register_blueprint()`. Removed from constructor (kept in `app.py` registration)
+- **Flask session cookie overflow from SVGs**: Clock SVGs (~2KB) and number line SVGs (~2.5KB) were stored directly in Flask's cookie-based session (~4KB limit). Now stores small regeneration params (hour, minute, op, boundary) and regenerates SVGs on demand in the route
+- **Duplicate report buttons**: Question template had both a simple "Report bad question" button AND a detailed `<details>` dropdown. Removed the simple button, kept the detailed dropdown with reason selection
+
+### Added
+- **Security headers**: Added `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, and `Content-Security-Policy` via `after_request` handler
+- **SQLite WAL mode + busy timeout**: `get_db()` now sets `journal_mode=WAL` and `timeout=5` (seconds). WAL allows concurrent reads during writes; timeout prevents immediate `database is locked` errors during dual pre-caching
+- `.gitignore` now excludes `*.log` and `*.log.*` files
+
 ## [Unreleased]
 
 ### Fixed

@@ -22,7 +22,7 @@ def get_by_question(question_id):
 def mark_as_rejected(question_id, reason=''):
     """Mark a question as rejected/bad."""
     execute_db(
-        'UPDATE questions SET is_rejected = 1, rejection_reason = ? WHERE id = ?',
+        "UPDATE questions SET test_status = 'rejected', validation_error = ? WHERE id = ?",
         (reason, question_id),
     )
 
@@ -30,6 +30,6 @@ def mark_as_rejected(question_id, reason=''):
 def get_rejected_questions():
     """Get all rejected questions."""
     return query_db(
-        'SELECT * FROM questions WHERE is_rejected = 1 ORDER BY created_at DESC',
+        "SELECT * FROM questions WHERE test_status = 'rejected' ORDER BY created_at DESC",
         one=False
     )

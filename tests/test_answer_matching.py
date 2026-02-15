@@ -78,3 +78,25 @@ def test_mcq_text_with_letter_prefix_options():
 def test_mcq_no_options_fallback():
     """Without options, text vs letter can't resolve."""
     assert check_answer("6", "B", 'mcq') == (False, False)
+
+
+# --- Article-A regression (Q#1077 bug) ---
+
+def test_mcq_article_a_not_treated_as_letter():
+    """Options starting with article 'A' must not all match each other.
+
+    Bug: _extract_letter('a rock') returned 'A', so 'A rock' vs 'A caterpillar'
+    both extracted to letter 'A' and were graded as equal.
+    """
+    opts = ['A leaf', 'A rock', 'A caterpillar', 'A bicycle']
+    # Wrong answer must be wrong
+    assert check_answer("A rock", "A caterpillar", 'mcq', options=opts) == (False, False)
+    # Correct answer must be correct
+    assert check_answer("A caterpillar", "A caterpillar", 'mcq', options=opts) == (True, False)
+
+
+def test_mcq_article_b_not_treated_as_letter():
+    """Option starting with 'B' as part of a name must not extract as letter B."""
+    opts = ['Abraham Lincoln', 'Benjamin Franklin', 'Calvin Coolidge', 'Dwight Eisenhower']
+    assert check_answer("Benjamin Franklin", "Abraham Lincoln", 'mcq', options=opts) == (False, False)
+    assert check_answer("Abraham Lincoln", "Abraham Lincoln", 'mcq', options=opts) == (True, False)

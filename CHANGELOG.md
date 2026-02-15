@@ -2,6 +2,10 @@
 
 ## [2026-02-15]
 
+### Fixed — Playwright Browser Testing
+- **Critical: MCQ answer matching treated article "A" as letter prefix** — `_extract_letter("A rock")` matched regex `^([A-D])[.)\s]`, extracting letter "A". Any two options starting with the same article (e.g., "A leaf", "A rock", "A caterpillar") were all graded as matching. Fix: tightened regex to `^([A-D])[.)]` (only `.` and `)`, not whitespace), added `^([A-D])\s+\d` for normalized letter-prefixed options like "B 4". Restructured `_check_mcq` to prioritize option-index matching over letter extraction. 2 regression tests added (443 total)
+- **Stale precache JS call removed** — `static/js/session.js` still called `/session/<id>/precache` (deleted in Phase 3), generating console errors on every question page
+
 ### Changed — Phase 10 Documentation Sync & Knowledge Capture
 - **spec.md updated** (15+ inaccuracies fixed): Default model qwen3:8b → qwen2.5, blueprints 3 → 4 (added admin), max_generation_attempts 2 → 3, AI modules description updated, question generation section rewritten (universal prompt, subject rules, no distractors), validation 12 rules → 5 rules + math verification, dedup 3 layers → 2 layers, answer matching simplified (removed letter-prefix extraction), data model updated (added test_status, validation_error, quality_flags, current_question_id, last_result_json columns)
 - **CLAUDE.md updated**: Removed obsolete "precache (dual caching)" test category, replaced with "session integration (full flow)"

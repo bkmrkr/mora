@@ -45,47 +45,48 @@ def check_answer(student_answer, correct_answer, question_type='short_answer',
 
 
 def _check_mcq(student, correct, options=None):
-    """MCQ: match on letter (A/B/C/D), full text, or text↔letter via options."""
+    """MCQ: match on full text, option index, or letter (A/B/C/D)."""
+    # Direct text match
+    if student == correct:
+        return True, False
+
+    # Option-index match: most reliable when options list is available
+    if options:
+        norm_opts = [_normalize(o) for o in options]
+        s_idx = None
+        c_idx = None
+        for i, opt in enumerate(norm_opts):
+            if opt == student:
+                s_idx = i
+            if opt == correct:
+                c_idx = i
+        if s_idx is not None and c_idx is not None:
+            return s_idx == c_idx, False
+
+    # Letter-based matching (legacy fallback)
     LETTERS = 'ABCD'
     s_letter = _extract_letter(student)
     c_letter = _extract_letter(correct)
 
-    # Both are letters — direct compare
     if s_letter and c_letter:
         return s_letter == c_letter, False
 
-    # Full text match
-    if student == correct:
-        return True, False
-
-    # Resolve mismatches using options list
+    # Resolve text↔letter mismatches using options list
     if options:
-        norm_opts = [_normalize(o) for o in options]
-        # Strip letter prefixes from options for matching
-        clean_opts = [re.sub(r'^[a-d][.)\s]+\s*', '', o).strip() for o in norm_opts]
+        # Strip letter prefixes from raw options BEFORE normalizing,
+        # so "A) 4" → "4" works even though normalize strips the ")"
+        clean_opts = [_normalize(re.sub(r'^[A-Da-d][.)]\s*', '', o))
+                      for o in options]
 
-        # Student submitted text, correct is letter → find correct text
         if not s_letter and c_letter:
             idx = LETTERS.index(c_letter)
             if idx < len(clean_opts) and student == clean_opts[idx]:
                 return True, False
 
-        # Student submitted letter, correct is text → find correct index
         if s_letter and not c_letter:
             for i, opt_text in enumerate(clean_opts):
                 if opt_text == correct and i < len(LETTERS):
                     return s_letter == LETTERS[i], False
-
-        # Neither is a letter — try matching both as option texts
-        s_idx = None
-        c_idx = None
-        for i, opt_text in enumerate(clean_opts):
-            if opt_text == student:
-                s_idx = i
-            if opt_text == correct:
-                c_idx = i
-        if s_idx is not None and c_idx is not None:
-            return s_idx == c_idx, False
 
     return False, False
 
@@ -107,11 +108,20 @@ def _to_number(text):
 
 
 def _extract_letter(text):
-    """Extract a single letter answer (A-D)."""
+    """Extract a single letter answer (A-D).
+
+    Matches: "A", "A)", "A.", "B 4" (normalized "B) 4").
+    Does NOT match: "A rock", "A caterpillar" (article, not MCQ letter).
+    """
     text = text.strip().upper()
     if len(text) == 1 and text in 'ABCD':
         return text
-    match = re.match(r'^([A-D])[.)\s]', text.upper())
+    # Explicit prefix: "A)" or "A."
+    match = re.match(r'^([A-D])[.)]', text)
+    if match:
+        return match.group(1)
+    # Normalized prefix: "B 4" (from "B) 4" after normalize strips the paren)
+    match = re.match(r'^([A-D])\s+\d', text)
     if match:
         return match.group(1)
     return None

@@ -282,7 +282,7 @@ def elapsed_time(difficulty_elo):
         if end_h > 12:
             end_h -= 12
         answer = diff_h
-        question = f'A movie starts at {start_h}:00 and ends at {start_h + diff_h}:00. How many hours long is the movie?'
+        question = f'A movie starts at {start_h}:00 and ends at {end_h}:00. How many hours long is the movie?'
         distractors = [str(diff_h + 1), str(diff_h - 1) if diff_h > 1 else '0',
                        str(diff_h + 2)]
     else:
@@ -323,7 +323,7 @@ def elapsed_time(difficulty_elo):
 def data_interpretation(difficulty_elo):
     """g3_data: Read and interpret data from tables/bar graphs (described)."""
     items = random.sample(['cats', 'dogs', 'birds', 'fish', 'hamsters'], 4)
-    values = [random.randint(2, 15) for _ in range(4)]
+    values = random.sample(range(2, 16), 4)  # Unique values to avoid ties
 
     variant = random.choice(['most', 'total', 'difference', 'fewest'])
 

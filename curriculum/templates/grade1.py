@@ -236,7 +236,11 @@ def basic_shapes(difficulty_elo):
     variant = random.choice(['sides_to_name', 'name_to_sides'])
 
     if variant == 'sides_to_name':
-        name, sides, explanation = random.choice([s for s in shapes if s[1] > 0])
+        # Only use shapes with unique side counts to avoid ambiguity
+        # (square and rectangle both have 4 sides)
+        unique = [s for s in shapes if s[1] > 0
+                  and sum(1 for x in shapes if x[1] == s[1]) == 1]
+        name, sides, explanation = random.choice(unique)
         question = f'What shape has {sides} sides?'
         wrong_names = [s[0] for s in shapes if s[0] != name]
         random.shuffle(wrong_names)

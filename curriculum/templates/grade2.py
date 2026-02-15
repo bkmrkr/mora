@@ -307,27 +307,21 @@ def odd_even(difficulty_elo):
             'difficulty': estimate_difficulty(2, 0.2),
         }
     else:
-        numbers = random.sample(range(1, 40), 4)
         target = random.choice(['even', 'odd'])
-        # Ensure at least one correct answer
-        matching = [n for n in numbers if (n % 2 == 0) == (target == 'even')]
-        if not matching:
-            numbers[0] = numbers[0] + 1 if target == 'even' and numbers[0] % 2 != 0 else numbers[0]
-            if target == 'even' and numbers[0] % 2 != 0:
-                numbers[0] += 1
-            elif target == 'odd' and numbers[0] % 2 == 0:
-                numbers[0] += 1
-            matching = [n for n in numbers if (n % 2 == 0) == (target == 'even')]
+        # Pick exactly 1 correct + 3 wrong to avoid multiple valid answers
+        is_target = (lambda n: n % 2 == 0) if target == 'even' else (lambda n: n % 2 != 0)
+        target_pool = [n for n in range(2, 40) if is_target(n)]
+        wrong_pool = [n for n in range(2, 40) if not is_target(n)]
+        correct = random.choice(target_pool)
+        wrong = random.sample(wrong_pool, 3)
 
-        answer = str(matching[0])
-        wrong = [str(n) for n in numbers if str(n) != answer]
         question = f'Which of these numbers is {target}?'
         return {
             'skill_id': 'g2_odd_even',
             'question': question,
-            'correct_answer': answer,
-            'options': make_options(answer, wrong[:3]),
-            'explanation': f'{answer} is {target}.',
+            'correct_answer': str(correct),
+            'options': make_options(str(correct), [str(w) for w in wrong]),
+            'explanation': f'{correct} is {target}.',
             'template_id': 'g2_odd_even_which',
             'difficulty': estimate_difficulty(2, 0.5),
         }

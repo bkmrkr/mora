@@ -4,7 +4,7 @@
 - g1_shapes: "What shape has 4 sides?" accepted only square OR rectangle — now only asks about shapes with unique side counts (triangle=3, hexagon=6)
 - g2_odd_even: "Which number is odd?" showed multiple odd numbers in options but only one was accepted — now generates exactly 1 correct + 3 opposite-parity options
 - g3_data: "Most popular pet?" had 26% chance of tied values with only one accepted — now uses unique values (`random.sample`)
-- g3_elapsed_time: Showed 24-hour format ("ends at 13:00") confusing for K-4 kids — now wraps to 12-hour format
+- g3_elapsed_time: Showed 24-hour format ("ends at 13:00") and confusing 12-hour wraparound ("starts at 10:00, ends at 2:00") — now limits start time so end never exceeds 12
 
 ## [2026-02-15] — v2 Rewrite: Math-Only, Template-Based
 

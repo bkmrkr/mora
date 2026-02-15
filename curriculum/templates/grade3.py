@@ -275,12 +275,10 @@ def mult_div_word_problems(difficulty_elo):
 def elapsed_time(difficulty_elo):
     """g3_elapsed_time: Calculate elapsed time."""
     if difficulty_elo < 750:
-        # Whole hour differences
-        start_h = random.randint(1, 10)
+        # Whole hour differences — avoid crossing 12 (confusing for K-4)
         diff_h = random.randint(1, 4)
+        start_h = random.randint(1, 12 - diff_h)
         end_h = start_h + diff_h
-        if end_h > 12:
-            end_h -= 12
         answer = diff_h
         question = f'A movie starts at {start_h}:00 and ends at {end_h}:00. How many hours long is the movie?'
         distractors = [str(diff_h + 1), str(diff_h - 1) if diff_h > 1 else '0',

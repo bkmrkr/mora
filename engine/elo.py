@@ -11,9 +11,18 @@ import math
 from config.settings import ELO_DEFAULTS, DIFFICULTY_DEFAULTS
 
 
+def _safe(value, default=0.0):
+    """Guard against NaN/Inf from corrupted data."""
+    if math.isnan(value) or math.isinf(value):
+        return default
+    return value
+
+
 def p_correct(skill_rating, difficulty,
               scale=DIFFICULTY_DEFAULTS['elo_scale_factor']):
     """Probability of answering correctly given skill and question difficulty."""
+    skill_rating = _safe(skill_rating, 800.0)
+    difficulty = _safe(difficulty, 800.0)
     return 1.0 / (1.0 + 10 ** ((difficulty - skill_rating) / scale))
 
 
@@ -33,6 +42,7 @@ def compute_k_factor(uncertainty,
                      base_k=ELO_DEFAULTS['base_k_factor'],
                      initial_uncertainty=ELO_DEFAULTS['initial_uncertainty']):
     """Dynamic K-factor: higher when uncertain, lower when confident."""
+    uncertainty = _safe(uncertainty, initial_uncertainty)
     return base_k * (uncertainty / initial_uncertainty)
 
 
@@ -49,6 +59,10 @@ def update_skill(skill_rating, uncertainty, difficulty, is_correct,
 
     Returns (new_skill_rating, new_uncertainty).
     """
+    skill_rating = _safe(skill_rating, 800.0)
+    uncertainty = _safe(uncertainty, initial_uncertainty)
+    difficulty = _safe(difficulty, 800.0)
+
     expected = p_correct(skill_rating, difficulty)
     actual = 1.0 if is_correct else 0.0
     k = compute_k_factor(uncertainty, base_k, initial_uncertainty)
@@ -78,6 +92,8 @@ def compute_mastery(skill_rating, recent_accuracy,
     Requires min_attempts before mastery can cross the threshold
     (prevents mastering a skill after 1-2 lucky answers).
     """
+    skill_rating = _safe(skill_rating, 800.0)
+    recent_accuracy = _safe(recent_accuracy, 0.0)
     normalized = max(0.0, min(1.0, (skill_rating - 400) / 1200))
     mastery = weight_skill * normalized + weight_recent * recent_accuracy
     if total_attempts < min_attempts:

@@ -1,5 +1,10 @@
 # Mora v2 Changelog
 
+### Hardened — NaN/Inf Guards in ELO Functions
+- All ELO functions (p_correct, compute_k_factor, update_skill, compute_mastery) now guard against NaN/Inf inputs
+- Corrupted data falls back to safe defaults (800.0 for ratings, initial values for uncertainty)
+- NaN can never enter through normal operation paths — guards are purely defensive
+
 ### Fixed — Fraction Equivalence in Short Answer Mode
 - `_to_number()` now parses fractions like "1/2" → 0.5, so "2/4" is accepted when answer is "1/2"
 - Also handles fraction-to-decimal comparison ("3/4" matches "0.75")

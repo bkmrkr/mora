@@ -1,5 +1,10 @@
 # Mora v2 Changelog
 
+### Hardened — Cookie Validation Requires question_type
+- Answer route and question route now require `question_type` in session cookie validation
+- Previously, a tampered cookie missing `question_type` caused `KeyError` crash in `answer_service.py`
+- Added to both `required_keys` checks in `routes/session.py`
+
 ### Fixed — Error Handler Swallowed HTTP Status Codes
 - Catch-all `@app.errorhandler(Exception)` was converting 404 Not Found to 500 Internal Server Error
 - Now re-raises `HTTPException` subclasses (404, 405, etc.) with their correct status codes

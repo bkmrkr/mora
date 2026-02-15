@@ -79,10 +79,10 @@ def test_uncertainty_floor():
 
 def test_mastery_computation():
     """Mastery should blend normalized rating and recent accuracy."""
-    m = compute_mastery(1000, 0.8)
+    m = compute_mastery(1000, 0.8, total_attempts=10)
     # normalized = (1000-400)/1200 = 0.5
-    # mastery = 0.6*0.5 + 0.4*0.8 = 0.62
-    assert abs(m - 0.62) < 0.01
+    # mastery = 0.3*0.5 + 0.7*0.8 = 0.71
+    assert abs(m - 0.71) < 0.01
 
 
 def test_mastery_at_floor():

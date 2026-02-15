@@ -47,7 +47,8 @@ def process_answer(student, current_question, student_answer,
     recent = attempt_model.get_recent_for_skill(student_id, skill_id, limit=30)
     recent_results = [bool(a['is_correct']) for a in recent] + [is_correct]
     recent_accuracy = sum(recent_results) / len(recent_results)
-    mastery = elo.compute_mastery(new_rating, recent_accuracy)
+    mastery = elo.compute_mastery(new_rating, recent_accuracy,
+                                  total_attempts=prog['total_attempts'] + 1)
 
     # Persist
     upsert_progress(

@@ -12,7 +12,10 @@ ELO_DEFAULTS = {
     'initial_skill_rating': 800.0,
     'initial_uncertainty': 350.0,
     'base_k_factor': 32.0,
-    'mastery_threshold': 0.75,
+    'mastery_threshold': 0.65,
+    'mastery_weight_skill': 0.3,
+    'mastery_weight_recent': 0.7,
+    'mastery_min_attempts': 5,
 }
 
 # Difficulty targeting

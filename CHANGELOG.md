@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Fixed — Mastery Progression Too Slow
+- Mastery formula overweighted ELO rating (60%) vs actual accuracy (40%) — student with 100% accuracy after 31 questions still couldn't unlock Grade 2
+- Changed mastery weights to 0.3 rating / 0.7 accuracy — accuracy-dominant for faster progression
+- Lowered mastery threshold from 0.75 to 0.65 — 80% accuracy students (the target rate) can now progress
+- Added `min_attempts=5` gate to prevent mastering a skill with 1-2 lucky answers
+- Result: perfect student masters a skill in ~5 questions; 80% student masters in ~5-8; 70% student stays put
+
 ### Fixed — Template Content Bugs (found via stress testing)
 - g1_shapes: "What shape has 4 sides?" accepted only square OR rectangle — now only asks about shapes with unique side counts (triangle=3, hexagon=6)
 - g2_odd_even: "Which number is odd?" showed multiple odd numbers in options but only one was accepted — now generates exactly 1 correct + 3 opposite-parity options

@@ -68,13 +68,21 @@ def update_skill(skill_rating, uncertainty, difficulty, is_correct,
 
 
 def compute_mastery(skill_rating, recent_accuracy,
-                    weight_skill=0.6, weight_recent=0.4):
+                    weight_skill=ELO_DEFAULTS['mastery_weight_skill'],
+                    weight_recent=ELO_DEFAULTS['mastery_weight_recent'],
+                    total_attempts=0,
+                    min_attempts=ELO_DEFAULTS['mastery_min_attempts']):
     """Compute mastery_level (0-1) from normalized skill + recent accuracy.
 
     Normalize skill_rating: 400-1600 range → 0-1.
+    Requires min_attempts before mastery can cross the threshold
+    (prevents mastering a skill after 1-2 lucky answers).
     """
     normalized = max(0.0, min(1.0, (skill_rating - 400) / 1200))
-    return weight_skill * normalized + weight_recent * recent_accuracy
+    mastery = weight_skill * normalized + weight_recent * recent_accuracy
+    if total_attempts < min_attempts:
+        mastery = min(mastery, ELO_DEFAULTS['mastery_threshold'] - 0.01)
+    return mastery
 
 
 def is_mastered(mastery_level,

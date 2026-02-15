@@ -2,6 +2,12 @@
 
 ## [2026-02-15]
 
+### Verified — Phase 9 Full Session Integration Test
+- **20/20 integration checks pass** — complete student journey verified end-to-end via Flask test client
+- **Core flow**: Home → Pick Topic → Start Session → Question → Correct Answer (skip feedback) → Wrong Answer → Feedback → Continue → End Session → Summary
+- **Edge cases verified**: Report bad question (reject + regenerate), empty answer rejection, stale form submission guard, admin question detail + API, admin stats, dashboard index + history
+- **Validation retry confirmed live**: First generation rejected ("answer not in choices"), retry produced valid question automatically
+
 ### Added — Phase 8 Question Bank Replenishment
 - **247 validated questions generated** across all 25 curriculum nodes using rebuilt pipeline with qwen2.5
 - **Per-topic**: Math 50, Reading 50, Science 48, Social Studies 49, Hebrew 50

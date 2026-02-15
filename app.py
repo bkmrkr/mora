@@ -80,7 +80,7 @@ def create_app():
             "default-src 'self'; "
             "style-src 'self' 'unsafe-inline'; "
             "img-src 'self' data:; "
-            "script-src 'self'"
+            "script-src 'self' 'unsafe-inline'"
         )
         return response
 

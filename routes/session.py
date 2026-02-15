@@ -45,11 +45,26 @@ def _load_question_from_db(question_id):
     difficulty_score = round(norm_diff * 9) + 1
     p_correct = q['estimated_p_correct'] or 0
     options = json.loads(q['options']) if q['options'] else None
+
+    # Extract SVG regeneration params from question content
+    clock_hour, clock_minute, ineq_op, ineq_boundary = None, None, None, None
+    content = q['content'] or ''
+    if 'clock' in content.lower() or 'time' in content.lower():
+        import re
+        m = re.search(r'\[(\d{1,2}):(\d{2})\]', content)
+        if m:
+            clock_hour, clock_minute = int(m.group(1)), int(m.group(2))
+    elif 'inequality' in content.lower() or 'number line' in content.lower():
+        import re
+        m = re.search(r'\[x\s*(>=|<=|>|<)\s*(-?\d+)\]', content)
+        if m:
+            ineq_op, ineq_boundary = m.group(1), int(m.group(2))
+
     return {
         'question_id': q['id'],
         'node_id': q['curriculum_node_id'],
         'node_name': node['name'] if node else '',
-        'content': q['content'],
+        'content': content,
         'question_type': q['question_type'],
         'options': options,
         'correct_answer': q['correct_answer'],
@@ -58,6 +73,10 @@ def _load_question_from_db(question_id):
         'difficulty_score': difficulty_score,
         'p_correct': round(p_correct * 100) if p_correct else 0,
         'node_description': node.get('description', '') if node else '',
+        'clock_hour': clock_hour,
+        'clock_minute': clock_minute,
+        'inequality_op': ineq_op,
+        'inequality_boundary': ineq_boundary,
     }
 
 
@@ -211,7 +230,7 @@ def answer(session_id):
     # Compute deltas
     after_mastery = _compute_topic_mastery(student['id'], sess['topic_id'])
     rating_delta = round(result['skill_rating'] - before_rating, 1)
-    mastery_delta = after_mastery - before_mastery
+    mastery_delta = round(after_mastery - before_mastery, 1)
     result['rating_delta'] = rating_delta
     result['mastery_before'] = before_mastery
     result['mastery_after'] = after_mastery

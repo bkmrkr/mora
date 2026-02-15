@@ -7,3 +7,4 @@ mora.db
 .pytest_cache/
 *.log
 *.log.*
+cookies.txt

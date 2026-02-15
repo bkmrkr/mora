@@ -3,17 +3,30 @@
 ## [2026-02-14]
 
 ### Fixed
-- **Question report crash (CRITICAL)**: `mark_as_rejected()` in `question_report.py` referenced non-existent columns `is_rejected` and `rejection_reason`. Schema uses `test_status` and `validation_error`. Clicking "Report bad question" would crash with `OperationalError`. Fixed to use correct column names
-- **Error handler info disclosure**: `app.py` error handler returned raw exception message to user (`f"Internal Server Error: {error}"`). Now returns generic "Internal Server Error" — details logged server-side only
-- **Bare except in admin routes**: Two bare `except:` clauses in `routes/admin.py` caught `SystemExit`, `KeyboardInterrupt`, and all other exceptions. Narrowed to `except (json.JSONDecodeError, TypeError, ValueError)`
-- **Double url_prefix on admin blueprint**: `url_prefix='/admin'` was set both in Blueprint constructor and `app.register_blueprint()`. Removed from constructor (kept in `app.py` registration)
-- **Flask session cookie overflow from SVGs**: Clock SVGs (~2KB) and number line SVGs (~2.5KB) were stored directly in Flask's cookie-based session (~4KB limit). Now stores small regeneration params (hour, minute, op, boundary) and regenerates SVGs on demand in the route
-- **Duplicate report buttons**: Question template had both a simple "Report bad question" button AND a detailed `<details>` dropdown. Removed the simple button, kept the detailed dropdown with reason selection
+- **Hebrew questions stuck on retry page (CRITICAL)**: When MCQ distractor generation fails for non-Latin answers (Hebrew, Arabic, CJK), the question was discarded entirely — 3 failures = stuck. Now falls back to `short_answer` type instead of discarding. Hebrew questions work as open-ended
+- **Question report crash (CRITICAL)**: `mark_as_rejected()` referenced non-existent columns `is_rejected`/`rejection_reason`. Fixed to use `test_status`/`validation_error`
+- **Admin question detail crash**: Template referenced undefined `questions` variable (Jinja2 UndefinedError). Replaced broken next-question nav with back-to-list link
+- **Admin CSS silently dropped**: `base.html` had no `{% block styles %}` — all admin template CSS was discarded. Added the block to `<head>`
+- **Admin questions.html missing `<style>` tag**: Raw CSS in `{% block styles %}` without opening `<style>` tag
+- **CSP blocked inline scripts**: `script-src 'self'` blocked admin delete confirmation `onsubmit` handler. Added `'unsafe-inline'` for local dev app
+- **mastery_delta floating point display**: Subtracting two `round(...,1)` floats showed `+0.10000000000000142%`. Now rounds delta to 1 decimal
+- **Wrong default skill rating**: `question_service.py` used 1000.0, `dashboard.py` used 1000. Config says 800.0. Fixed both
+- **SVGs lost after server restart**: `_load_question_from_db` didn't extract clock/inequality params. Now parses `[3:00]` and `[x > -5]` from question content
+- **Error handler info disclosure**: Returned raw exception to user. Now returns generic "Internal Server Error"
+- **Bare except in admin routes**: Narrowed to `except (json.JSONDecodeError, TypeError, ValueError)`
+- **Double url_prefix on admin blueprint**: Removed from Blueprint constructor
+- **Flask session cookie overflow from SVGs**: Store small params, regenerate on demand
+- **Duplicate report buttons**: Removed simple button, kept detailed dropdown
 
 ### Added
-- **Security headers**: Added `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, and `Content-Security-Policy` via `after_request` handler
-- **SQLite WAL mode + busy timeout**: `get_db()` now sets `journal_mode=WAL` and `timeout=5` (seconds). WAL allows concurrent reads during writes; timeout prevents immediate `database is locked` errors during dual pre-caching
-- `.gitignore` now excludes `*.log` and `*.log.*` files
+- **Security headers**: CSP, X-Content-Type-Options, X-Frame-Options
+- **SQLite WAL mode + busy timeout**: Concurrent reads + 5s retry
+- **25 new tests** (644 total): question_report model (6), SVG injection (5), distractor fallback (2), security headers + error handler + WAL (6), DB question load with SVG params (6)
+- `requirements.txt`: added matplotlib, markupsafe
+- `.gitignore`: `*.log`, `*.log.*`, `cookies.txt`
+
+### Removed
+- Dead `SYSTEM_PROMPT` alias in `question_generator.py`
 
 ## [Unreleased]
 

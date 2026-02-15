@@ -308,10 +308,13 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
             if q_type == QUESTION_TYPE_MCQ and q_data:
                 q_data, success, reason = insert_distractors(q_data)
                 if not success:
-                    logger.warning('Distractor generation failed (attempt %d): %s',
-                                   attempt_num + 1, reason)
-                    q_data = None
-                    continue
+                    # Fall back to short_answer instead of discarding.
+                    # Hebrew and other non-Latin answers can't generate
+                    # meaningful MCQ distractors — still valid as open-ended.
+                    logger.info('Distractor failed, falling back to short_answer: %s',
+                                reason)
+                    q_type = 'short_answer'
+                    q_data.pop('options', None)
 
             # Passed all checks
             break
@@ -323,7 +326,7 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
 
     # Store question in DB
     skill = all_skills.get(focus_node_id, {})
-    skill_rating = skill.get('skill_rating', 1000.0)
+    skill_rating = skill.get('skill_rating', 800.0)
     p_correct = elo.p_correct(skill_rating, target_diff)
 
     question_id = question_model.create(

@@ -49,7 +49,7 @@ def overview(student_id):
             sk = skills_by_node.get(n['id'])
             node_list.append({
                 'name': n['name'],
-                'skill_rating': round(sk['skill_rating'], 1) if sk else 1000,
+                'skill_rating': round(sk['skill_rating'], 1) if sk else 800,
                 'mastery_level': round(sk['mastery_level'], 3) if sk else 0,
                 'mastery_pct': round((sk['mastery_level'] if sk else 0) * 100),
                 'mastered': elo.is_mastered(sk['mastery_level']) if sk else False,

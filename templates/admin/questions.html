@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Questions - {{ status }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Questions: {{ status|title }}</h1>
+    <a href="{{ url_for('admin.index') }}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div class="status-tabs">
+    <a href="{{ url_for('admin.questions', status='pending_review') }}"
+       class="tab {% if status == 'pending_review' %}active{% endif %}">
+        Pending Review ({{ stats.get('pending_review', 0) }})
+    </a>
+    <a href="{{ url_for('admin.questions', status='approved') }}"
+       class="tab {% if status == 'approved' %}active{% endif %}">
+        Approved ({{ stats.get('approved', 0) }})
+    </a>
+    <a href="{{ url_for('admin.questions', status='rejected') }}"
+       class="tab {% if status == 'rejected' %}active{% endif %}">
+        Rejected ({{ stats.get('rejected', 0) }})
+    </a>
+</div>
+
+{% if questions %}
+<table class="questions-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Topic</th>
+            <th>Node</th>
+            <th>Question</th>
+            <th>Answer</th>
+            <th>Created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for q in questions %}
+        <tr class="status-{{ q.test_status }}">
+            <td>Q{{ q.id }}</td>
+            <td>{{ q.topic_name }}</td>
+            <td>{{ q.node_name[:25] }}{% if q.node_name|length > 25 %}...{% endif %}</td>
+            <td>{{ q.content[:50] }}{% if q.content|length > 50 %}...{% endif %}</td>
+            <td>{{ q.correct_answer[:20] }}{% if q.correct_answer|length > 20 %}...{% endif %}</td>
+            <td>{{ q.created_at[:19] if q.created_at else '' }}</td>
+            <td>
+                <a href="{{ url_for('admin.question_detail', question_id=q.id) }}" class="btn btn-sm btn-primary">Review</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="no-questions">No questions with status "{{ status }}"</p>
+{% endif %}
+{% endblock %}
+
+{% block styles %}
+<style>
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+.status-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #ddd;
+}
+.tab {
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    color: #666;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+}
+.tab:hover {
+    color: #333;
+}
+.tab.active {
+    border-bottom-color: #2196F3;
+    color: #2196F3;
+    font-weight: bold;
+}
+.questions-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.questions-table th,
+.questions-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+.questions-table th {
+    background: #f5f5f5;
+    font-weight: 600;
+}
+.questions-table tr:hover {
+    background: #f9f9f9;
+}
+.status-pending_review { background: #fffde7; }
+.status-approved { background: #e8f5e9; }
+.status-rejected { background: #ffebee; }
+.no-questions {
+    color: #666;
+    font-style: italic;
+    padding: 2rem;
+    text-align: center;
+}
+</style>
+{% endblock %}

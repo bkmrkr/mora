@@ -229,8 +229,6 @@ Rules:
 9. Use LaTeX notation for math: \\(\\sqrt{16}\\), \\(\\frac{1}{2}\\), \\(x^2\\)."""
 
 
-SYSTEM_PROMPT = DEFAULT_PROMPT  # Backwards compatibility
-
 
 def generate(node_name, node_description, topic_name, skill_description,
              target_difficulty_elo, question_type, recent_questions=None):

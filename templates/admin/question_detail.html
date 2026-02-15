@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+{% block title %}Review Question #{{ question.id }}{% endblock %}
+
+{% block content %}
+<div class="review-header">
+    <h1>Question Review</h1>
+    <a href="{{ url_for('admin.questions', status='pending_review') }}" class="btn btn-secondary">Back to List</a>
+</div>
+
+<div class="review-layout">
+    <!-- Student View -->
+    <div class="student-view">
+        <h2>Student View</h2>
+        <p class="view-label">This is how the student sees the question:</p>
+
+        <div class="question-card">
+            <div class="question-meta">
+                <span class="node-badge">{{ node.name if node else 'Unknown' }}</span>
+                <span class="type-badge">{{ question.question_type }}</span>
+                <span class="qid-badge">Q#{{ question.id }}</span>
+            </div>
+
+            <div class="question-text">{{ question.content | render_math }}</div>
+
+            {% if question.question_type == 'mcq' and options %}
+            <div class="choices-grid">
+                {% for option in options %}
+                <button type="button" class="choice-btn" data-key="{{ 'ABCD'[loop.index0] }}">
+                    <span class="choice-letter">{{ 'ABCD'[loop.index0] }}</span>
+                    <span class="choice-text">{{ option | strip_letter | render_math }}</span>
+                </button>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="form-group">
+                <textarea readonly placeholder="Type your answer..." rows="3"></textarea>
+            </div>
+            {% endif %}
+
+            <div class="difficulty-display">
+                <span class="difficulty-label">Difficulty:</span>
+                {% if question.difficulty %}
+                <span class="difficulty-value">{{ "%.0f"|format(question.difficulty) }} ELO</span>
+                {% else %}
+                <span class="difficulty-value">N/A</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Reveal Answer -->
+        <details class="answer-reveal">
+            <summary>Show Correct Answer</summary>
+            <div class="answer-box">
+                <strong>Correct Answer:</strong> {{ question.correct_answer | render_math }}
+            </div>
+            {% if question.explanation %}
+            <div class="explanation-box">
+                <strong>Explanation:</strong>
+                {{ question.explanation | render_math }}
+            </div>
+            {% endif %}
+        </details>
+    </div>
+
+    <!-- Admin Actions -->
+    <div class="admin-actions-panel">
+        <h2>Actions</h2>
+
+        <div class="status-badge status-{{ question.test_status }}">
+            Status: {{ question.test_status }}
+        </div>
+
+        {% if question.test_status == 'pending_review' %}
+        <form method="POST" action="{{ url_for('admin.approve_question', question_id=question.id) }}">
+            <button type="submit" class="btn btn-success btn-lg btn-block">Approve Question</button>
+        </form>
+
+        <form method="POST" action="{{ url_for('admin.reject_question', question_id=question.id) }}" class="reject-form">
+            <label>Reject Reason:</label>
+            <select name="reason" required>
+                <option value="">Select a reason...</option>
+                <option value="confusing">Question is confusing</option>
+                <option value="wrong_answer">Answer is wrong</option>
+                <option value="inappropriate">Content not appropriate</option>
+                <option value="too_hard">Too difficult for level</option>
+                <option value="too_easy">Too easy for level</option>
+                <option value="grammar">Grammar/spelling issues</option>
+                <option value="other">Other issue</option>
+            </select>
+            <button type="submit" class="btn btn-danger btn-block">Reject Question</button>
+        </form>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('admin.delete_question', question_id=question.id) }}"
+              onsubmit="return confirm('Are you sure you want to delete this question?')">
+            <button type="submit" class="btn btn-outline-danger btn-block">Delete Permanently</button>
+        </form>
+
+        <hr>
+
+        <!-- Question Details -->
+        <h3>Question Details</h3>
+        <dl class="question-details">
+            <dt>ID</dt>
+            <dd>{{ question.id }}</dd>
+
+            <dt>Topic</dt>
+            <dd>{{ topic.name if topic else 'Unknown' }}</dd>
+
+            <dt>Node</dt>
+            <dd>{{ node.name if node else 'Unknown' }}</dd>
+
+            <dt>Type</dt>
+            <dd>{{ question.question_type }}</dd>
+
+            <dt>Difficulty</dt>
+            <dd>{{ question.difficulty or 'N/A' }}</dd>
+
+            <dt>Created</dt>
+            <dd>{{ question.created_at }}</dd>
+
+            {% if question.validation_error %}
+            <dt>Validation Error</dt>
+            <dd class="error-text">{{ question.validation_error }}</dd>
+            {% endif %}
+
+            {% if question.model_used %}
+            <dt>Model Used</dt>
+            <dd>{{ question.model_used }}</dd>
+            {% endif %}
+        </dl>
+
+        {% if question.generated_prompt %}
+        <details>
+            <summary>View Generated Prompt</summary>
+            <pre class="prompt-view">{{ question.generated_prompt }}</pre>
+        </details>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Navigation -->
+<div class="review-nav">
+    <a href="{{ url_for('admin.questions', status=question.test_status or 'pending_review') }}"
+       class="btn btn-secondary">&larr; Back to List</a>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+.review-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+}
+@media (max-width: 900px) {
+    .review-layout {
+        grid-template-columns: 1fr;
+    }
+}
+.student-view {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+.view-label {
+    color: #666;
+    margin-bottom: 1rem;
+}
+.question-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.question-meta {
+    margin-bottom: 1rem;
+}
+.node-badge, .type-badge, .qid-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    margin-right: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+.node-badge { background: #e3f2fd; }
+.type-badge { background: #f3e5f5; }
+.qid-badge { background: #e8f5e9; }
+.question-text {
+    font-size: 1.2rem;
+    margin: 1.5rem 0;
+    min-height: 3rem;
+}
+.choices-grid {
+    display: grid;
+    gap: 0.75rem;
+    margin: 1rem 0;
+}
+.choice-btn {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.choice-btn:hover {
+    border-color: #2196F3;
+    background: #f5faff;
+}
+.choice-letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: #2196F3;
+    color: white;
+    border-radius: 50%;
+    margin-right: 1rem;
+    font-weight: bold;
+}
+.choice-text {
+    flex: 1;
+    text-align: left;
+}
+.difficulty-display {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+    color: #666;
+}
+.answer-reveal {
+    margin-top: 1rem;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+}
+.answer-reveal summary {
+    cursor: pointer;
+    font-weight: bold;
+    color: #2196F3;
+}
+.answer-box, .explanation-box {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #e8f5e9;
+    border-radius: 4px;
+}
+.explanation-box {
+    background: #fff3e0;
+}
+.admin-actions-panel {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: fit-content;
+}
+.status-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+.status-pending_review { background: #fff3cd; }
+.status-approved { background: #d4edda; }
+.status-rejected { background: #f8d7da; }
+.btn-block {
+    width: 100%;
+    margin-bottom: 0.75rem;
+}
+.reject-form {
+    margin-top: 1rem;
+}
+.reject-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+.reject-form select {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+}
+.question-details {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+.question-details dt {
+    font-weight: bold;
+    color: #666;
+}
+.error-text {
+    color: #dc3545;
+    font-size: 0.85rem;
+}
+.prompt-view {
+    background: #f5f5f5;
+    padding: 1rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 200px;
+    overflow-y: auto;
+}
+.review-nav {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+}
+</style>
+{% endblock %}

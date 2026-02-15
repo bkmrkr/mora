@@ -45,6 +45,12 @@ LLM (qwen2.5) could not reliably produce grade-appropriate educational content. 
 - `make_options()` extended: fraction distractor padding and decimal distractor padding
 - 31 new tests (179 total)
 
+### Added — Phase 7: Integration Test
+- `tests/test_integration.py` — full 20-question student journey via Flask test client
+- Verifies: session lifecycle, ELO rating updates, attempt persistence, skill variety, dashboard display, student persistence across sessions, feedback flow (correct skips, wrong shows), accuracy calculation, returning student chips
+- All 40 skills verified: registered in service, every template produces valid 4-option MCQ
+- 10 integration tests (189 total)
+
 ### Removed
 - All `ai/` modules (question_generator, json_utils, explainer, answer_grader, local_generators)
 - Admin blueprint and templates

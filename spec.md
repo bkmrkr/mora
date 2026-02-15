@@ -18,7 +18,7 @@ Mora is a local, privacy-first adaptive learning system. It starts from any user
 
 - **Frontend**: Flask web application with Jinja2 templates and vanilla CSS/JS.
 - **Backend**: Python 3.9+. Uses raw `sqlite3` (no ORM), `urllib.request` for Ollama HTTP calls, and `python-dotenv` for configuration. No pandas, no SQLAlchemy.
-- **LLM Integration**: Ollama via its `/api/chat` HTTP endpoint. Model is configurable (default: `qwen3:8b`).
+- **LLM Integration**: Ollama via its `/api/chat` HTTP endpoint. Model is configurable (default: `qwen2.5`).
 - **Storage**: Single SQLite file (`mora.db`).
 - **Server**: Flask runs on `0.0.0.0:5002` in debug mode.
 
@@ -30,9 +30,9 @@ The codebase follows a strict layered architecture. Each layer only depends on l
 - **`db/`** — Database connection helpers (`get_db`, `init_db`, `query_db`, `execute_db`) and the SQL schema file. All connections use `sqlite3.Row` for dict-like access and enable foreign keys.
 - **`models/`** — One file per table. Raw SQL CRUD functions only. No business logic. Every function either calls `query_db` (for reads) or `execute_db` (for writes). Returns plain dicts.
 - **`engine/`** — Pure functions with zero database or Flask dependencies. Contains the ELO algorithm, difficulty calibration, next-question selection logic, and answer matching.
-- **`ai/`** — Ollama HTTP client, JSON response parser, and four prompt modules: curriculum generation, question generation, answer grading, and explanation generation.
+- **`ai/`** — Ollama HTTP client (with warm-up), JSON response parser, and prompt modules: curriculum generation, question generation (universal prompt with subject-specific rules), answer grading, explanation generation, and local generators (clock SVG, inequality number line).
 - **`services/`** — Orchestration layer that combines models, engine, and AI modules. Three services: onboarding, question generation, and answer processing.
-- **`routes/`** — Flask blueprints. Three blueprints: home (no prefix), session (`/session`), dashboard (`/dashboard`).
+- **`routes/`** — Flask blueprints. Four blueprints: home (no prefix), session (`/session`), dashboard (`/dashboard`), admin (`/admin`).
 - **`templates/`** — Jinja2 HTML templates extending a shared `base.html`.
 - **`static/`** — CSS stylesheet and session JavaScript (response timer, MCQ keyboard shortcuts).
 - **`tests/`** — Unit tests using pytest with an `autouse` fixture that redirects `DB_PATH` to a temporary file for every test. No test ever touches `mora.db`.
@@ -45,9 +45,9 @@ All settings live in `config/settings.py` and are importable as module-level dic
 
 **DIFFICULTY_DEFAULTS**: target_success_rate is 0.80, recent_window is 30 attempts, elo_scale_factor is 400.0.
 
-**SESSION_DEFAULTS**: target_success_rate is 0.80, max_generation_attempts is 2 (retry limit for Ollama calls). Sessions have no question limit — they continue indefinitely until the student clicks "End Session".
+**SESSION_DEFAULTS**: target_success_rate is 0.80, max_generation_attempts is 3 (retry limit for Ollama calls). Sessions have no question limit — they continue indefinitely until the student clicks "End Session".
 
-**Ollama**: base URL defaults to `http://localhost:11434`, model defaults to `qwen3:8b`. Both are overridable via `OLLAMA_BASE_URL` and `OLLAMA_MODEL` environment variables.
+**Ollama**: base URL defaults to `http://localhost:11434`, model defaults to `qwen2.5`. Both are overridable via `OLLAMA_BASE_URL` and `OLLAMA_MODEL` environment variables. On server startup, the model is pre-loaded via a background warm-up thread to avoid cold-start latency on the first question.
 
 ---
 
@@ -61,9 +61,9 @@ Seven tables stored in `mora.db`.
 
 **curriculum_nodes**: Stores the ordered concepts within a topic. Fields: integer `id`, integer `topic_id` (foreign key to topics, required), text `name`, optional text `description`, integer `order_index` defaulting to 0 (determines curriculum sequence), text `prerequisites` defaulting to `'[]'` (a JSON array of node IDs that must be mastered first), real `mastery_threshold` defaulting to 0.75.
 
-**sessions**: Tracks learning sessions. Fields: text `id` (UUID primary key), integer `student_id` (required foreign key), optional integer `topic_id`, datetime `started_at` with auto-timestamp, nullable datetime `ended_at`, integer `total_questions` and `total_correct` both defaulting to 0 (computed when session ends).
+**sessions**: Tracks learning sessions. Fields: text `id` (UUID primary key), integer `student_id` (required foreign key), optional integer `topic_id`, datetime `started_at` with auto-timestamp, nullable datetime `ended_at`, integer `total_questions` and `total_correct` both defaulting to 0 (computed when session ends), nullable integer `current_question_id` (tracks the active question for session resume after restart), nullable text `last_result_json` (serialized last answer result for session recovery).
 
-**questions**: Stores every generated question. Fields: integer `id`, integer `curriculum_node_id` (required foreign key), text `content` (the question text), text `question_type` constrained to 'mcq', 'short_answer', or 'problem', nullable text `options` (JSON array for MCQ choices), text `correct_answer`, nullable text `explanation` (LLM-generated step-by-step solution), nullable real `difficulty` (ELO-scale value), nullable real `estimated_p_correct`, nullable text `generated_prompt` (full prompt sent to Ollama for reproducibility), nullable text `model_used`, datetime `created_at`.
+**questions**: Stores every generated question. Fields: integer `id`, integer `curriculum_node_id` (required foreign key), text `content` (the question text), text `question_type` constrained to 'mcq', 'short_answer', or 'problem', nullable text `options` (JSON array for MCQ choices — LLM provides complete options with correct answer included), text `correct_answer`, nullable text `explanation` (LLM-generated step-by-step solution), nullable real `difficulty` (ELO-scale value), nullable real `estimated_p_correct`, nullable text `generated_prompt` (full prompt sent to Ollama for reproducibility), nullable text `model_used`, integer `quality_flags` defaulting to 0, text `test_status` defaulting to 'approved' constrained to ('pending_review', 'approved', 'rejected'), nullable text `validation_error`, datetime `created_at`.
 
 **attempts**: Records every student answer. Fields: integer `id`, integer `question_id` (required foreign key), integer `student_id` (required foreign key), text `session_id` (foreign key to sessions), nullable text `answer_given`, integer `is_correct` (0 or 1), nullable real `partial_score` (0 to 1 for open-ended), nullable real `response_time_seconds`, datetime `timestamp` with auto-timestamp.
 
@@ -128,7 +128,7 @@ The system analyzes the most recent 30 attempts (across all nodes) and applies a
 
 Three-tier grading system:
 
-**MCQ and short_answer**: Graded locally without Ollama. The answer matching normalizes both strings (lowercase, strip whitespace and non-alphanumeric characters). For MCQ, it extracts the letter (A-D) from both student and correct answers and compares letters. For short_answer, it tries exact string match, then numeric equivalence (parses both as floats and compares with tolerance of 1e-9), then a containment check (if one string contains the other and their length ratio exceeds 0.8, it counts as correct). If none match, it computes a character overlap ratio — if above 70%, the answer is marked as "close" (not correct, but close). Returns a tuple of (is_correct, is_close).
+**MCQ and short_answer**: Graded locally without Ollama. The answer matching normalizes both strings (lowercase, strip whitespace). For MCQ, it compares the student's selected option text directly against the correct answer text. For short_answer, it tries exact string match, then numeric equivalence (parses both as floats and compares with tolerance of 1e-9), then a containment check (if one string contains the other and their length ratio exceeds 0.8, it counts as correct). If none match, it computes a character overlap ratio — if above 70%, the answer is marked as "close" (not correct, but close). Returns a tuple of (is_correct, is_close).
 
 **Problem type**: Sent to Ollama for LLM-based grading. The grading prompt asks the model to compare the student answer to the correct answer and return JSON with is_correct (boolean), partial_score (0 to 1), and feedback (text). Uses temperature 0.3 for consistency. If the Ollama call fails, falls back to the local exact-match grading.
 
@@ -152,32 +152,28 @@ Some curriculum nodes are handled locally without calling the LLM. The system de
 
 #### Question Generation
 
-For nodes not handled by local generators, the system calls the LLM. The ELO-scale difficulty is normalized to a 0-1 scale for the prompt: difficulty of 600 maps to 0.0 (easiest), 1400 maps to 1.0 (hardest). The prompt includes the topic name, concept name and description, normalized difficulty, question type (mcq/short_answer/problem), and a combined exclude list of all session questions and all lifetime correctly-answered questions. The system prompt has 14 rules covering: difficulty matching, dedup, MCQ format (exactly 4 options, correct answer among them), answer format (concise, not a sentence), single correct answer (no multiple blanks), no placeholder text, no "all/none of the above", punctuation, and answer length limits. If generation fails, it retries up to 2 times total.
+For nodes not handled by local generators, the system calls the LLM via a universal prompt architecture. A single `SYSTEM_PROMPT` defines the JSON output format and 10 critical rules (4 options, unique options, answer in options, concise answers, no repeats, no visual references, verify math, JSON only). Subject-specific `SUBJECT_RULES` (hebrew, math, reading, science, social_studies) are auto-detected from topic/node names via `_detect_subject()` and injected into the user prompt.
+
+The LLM always provides complete MCQ options — there is no algorithmic distractor generation. The user prompt includes: topic name, concept name and description, difficulty label (easy/medium/hard mapped from ELO), format instruction (MCQ with 4 options), and a list of recent questions to avoid. If generation fails validation, it retries up to 3 times.
 
 #### Question Validation
 
-Every generated question passes through a 12-rule post-generation validator before being accepted. If validation fails, the system retries generation. Rules:
+Every generated question passes through a 5-rule structural validator plus math verification. If validation fails, the system retries generation. Rules:
 1. Question text minimum 10 characters.
 2. Answer not empty or placeholder (rejects empty strings, "?", "...", "N/A", "none", "null").
-3. Choices must be unique after stripping letter prefixes (A/B/C/D) — case-insensitive.
-4. Correct answer must appear among choices (by text match, letter match, or index).
-5. Answer not given away in question text, with exceptions for math expressions ("What is 86 - 43?" answer "43" is allowed), comparison questions, classification questions, and "what/which" identification questions.
-6. No placeholder text patterns ("[shows", "[image", "[picture", "[display", "[insert").
-7. Answer maximum 200 characters.
-8. No HTML or markdown artifacts ("</", "```").
-9. Minimum 3 choices if any are provided.
-10. Answer length bias prevention — rejects if correct answer is 3x longer than average distractor AND 15+ chars longer than the longest distractor.
-11. No "all of the above", "none of the above", "none of these", or similar banned choices.
-12. Question must end with punctuation (? : .), contain a blank (__), or start with an imperative verb (solve, calculate, find, etc.).
+3. MCQ: choices must be unique (case-insensitive), correct answer must appear among choices, minimum 3 choices, no banned choices ("all of the above", "none of the above").
+4. No placeholder text patterns ("[shows", "[image", "[picture", "[display", "[insert") — rejects questions that reference non-existent visual aids.
+5. Answer maximum 200 characters, no HTML or markdown artifacts.
+
+Additionally, a math verification pass checks any arithmetic expressions in the explanation (e.g., "5 + 3 = 8") and rejects if the computed result doesn't match.
 
 #### Question Deduplication
 
-Three dedup layers prevent question repetition:
-1. **Session dedup**: Never repeat any question within the same session. All question texts from the current session are collected and any generated question matching one is rejected.
-2. **Global correct-answer dedup**: Never repeat a question the student has correctly answered in any previous session. A lifetime set of all correctly-answered question texts is queried from the attempts table and used as an exclusion set.
-3. **LLM prompt dedup**: The combined exclusion set (session + global correct) is passed to the LLM in the prompt with an instruction not to repeat or ask similar questions.
+Two dedup layers prevent question repetition:
+1. **Session dedup**: Exact text match against all questions seen in the current session.
+2. **Global correct-answer dedup**: Exact text match against all questions the student has correctly answered in any previous session.
 
-Both dedup checks happen post-generation as hard rejections. If a generated question matches either set, it is discarded and the system retries.
+The combined exclusion set is also passed to the LLM in the prompt to discourage similar questions. Post-generation, both checks are hard rejections — if a generated question matches either set, it is discarded and the system retries.
 
 #### Explanation Generation
 
@@ -267,4 +263,4 @@ Nodes have prerequisite chains (e.g., Addition Within 10 → Subtraction Within 
 
 All tests use pytest. A shared `conftest.py` fixture (`temp_db`) is marked `autouse` and redirects `DB_PATH` to a temporary file for every test, then runs `init_db()` to create the schema. No test touches the production database.
 
-Test files cover: ELO algorithm (probability, target difficulty, skill updates, K-factor, mastery computation), difficulty calibration, answer matching (exact, case-insensitive, numeric, MCQ letter extraction), next-question selection (empty history, per-node accuracy, node advancement on mastery), JSON parsing (raw, markdown-wrapped, surrounding text, invalid input), question validation (all 12 rules with positive and negative cases including edge cases for math expressions, letter-prefixed choices, length bias, and banned choice patterns), and model CRUD operations (student creation, topic creation, curriculum nodes, sessions, skill upsert, attempts, session finalization).
+Test files (26 files, 4,465 lines) cover: ELO algorithm (probability, target difficulty, skill updates, K-factor, mastery computation), difficulty calibration, answer matching (exact, case-insensitive, numeric, MCQ matching), next-question selection and dedup (empty history, per-node accuracy, node advancement, exact dedup), JSON parsing (raw, markdown-wrapped, surrounding text, invalid input, trailing comma handling), question validation (5 structural rules + math verification with positive and negative cases), AI question generation (subject detection, prompt structure, LLM integration with mocks), question service orchestration (generation, validation, MCQ check, dedup), DB persistence (session resume, question loading with options validation), local generators (clock SVG, inequality number line), model CRUD operations (all 8 tables), session integration (full student flow, edge cases), and topic mastery computation.

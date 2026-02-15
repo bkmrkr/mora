@@ -2,6 +2,11 @@
 
 ## [2026-02-15]
 
+### Changed — Phase 10 Documentation Sync & Knowledge Capture
+- **spec.md updated** (15+ inaccuracies fixed): Default model qwen3:8b → qwen2.5, blueprints 3 → 4 (added admin), max_generation_attempts 2 → 3, AI modules description updated, question generation section rewritten (universal prompt, subject rules, no distractors), validation 12 rules → 5 rules + math verification, dedup 3 layers → 2 layers, answer matching simplified (removed letter-prefix extraction), data model updated (added test_status, validation_error, quality_flags, current_question_id, last_result_json columns)
+- **CLAUDE.md updated**: Removed obsolete "precache (dual caching)" test category, replaced with "session integration (full flow)"
+- **Testing section updated**: Reflects current 26 test files, 4,465 lines, 441 tests
+
 ### Verified — Phase 9 Full Session Integration Test
 - **20/20 integration checks pass** — complete student journey verified end-to-end via Flask test client
 - **Core flow**: Home → Pick Topic → Start Session → Question → Correct Answer (skip feedback) → Wrong Answer → Feedback → Continue → End Session → Summary

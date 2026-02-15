@@ -63,6 +63,9 @@ def generate_next(session_id, student, current_skill_id=None):
     template_fn = random.choice(templates)
     q_data = template_fn(target_diff)
 
+    # Use intrinsic difficulty from template if available, else fall back to target
+    question_difficulty = q_data.get('difficulty', target_diff)
+
     # Store in DB
     question_id = question_model.create(
         skill_id=q_data['skill_id'],
@@ -71,7 +74,7 @@ def generate_next(session_id, student, current_skill_id=None):
         options=json.dumps(q_data['options']) if q_data.get('options') else None,
         correct_answer=q_data['correct_answer'],
         explanation=q_data.get('explanation', ''),
-        difficulty=target_diff,
+        difficulty=question_difficulty,
         template_id=q_data.get('template_id'),
     )
 
@@ -84,7 +87,7 @@ def generate_next(session_id, student, current_skill_id=None):
         'options': q_data.get('options'),
         'correct_answer': q_data['correct_answer'],
         'explanation': q_data.get('explanation', ''),
-        'difficulty': target_diff,
+        'difficulty': question_difficulty,
     }
 
     session_model.update_current_question(session_id, question_id)

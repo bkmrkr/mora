@@ -5,7 +5,7 @@ Each function takes difficulty_elo and returns a dict:
 """
 import random
 
-from curriculum.templates.common import arithmetic_distractors, make_options
+from curriculum.templates.common import arithmetic_distractors, make_options, estimate_difficulty
 
 
 def multi_digit_multiply(difficulty_elo):
@@ -26,6 +26,7 @@ def multi_digit_multiply(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{a} × {b} = {answer}',
         'template_id': 'g4_multi_digit_mult',
+        'difficulty': estimate_difficulty(4, min(answer / 4950, 1.0)),
     }
 
 
@@ -48,6 +49,7 @@ def long_division(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{dividend} ÷ {divisor} = {answer}',
         'template_id': 'g4_long_division',
+        'difficulty': estimate_difficulty(4, min(dividend / 960, 1.0)),
     }
 
 
@@ -100,6 +102,7 @@ def fraction_ops(difficulty_elo):
         'options': make_options(answer, distractors),
         'explanation': f'{n1}/{d1} {op} {n2}/{d2} = {adj_n1}/{lcd} {op} {adj_n2}/{lcd} = {answer}',
         'template_id': f'g4_fraction_ops_{op}',
+        'difficulty': estimate_difficulty(4, 0.4 + lcd / 24),
     }
 
 
@@ -139,6 +142,7 @@ def decimal_place_value(difficulty_elo):
         'options': make_options(answer, distractors),
         'explanation': f'The {place} digit of {number} is {answer}.',
         'template_id': f'g4_decimal_place_value_{place}',
+        'difficulty': estimate_difficulty(4, 0.2 if place == 'tenths' else 0.5),
     }
 
 
@@ -168,6 +172,7 @@ def decimal_add_sub(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{a} {op} {b} = {answer}',
         'template_id': f'g4_decimal_add_sub_{op}',
+        'difficulty': estimate_difficulty(4, 0.3 + min(max(a, b) / 10, 0.7)),
     }
 
 
@@ -190,6 +195,7 @@ def angles(difficulty_elo):
             'options': make_options(correct, wrong[:3]),
             'explanation': f'A {degrees}° angle is {correct} ({"less than 90°" if correct == "acute" else "exactly 90°" if correct == "right" else "greater than 90°"}).',
             'template_id': 'g4_angles_classify',
+            'difficulty': estimate_difficulty(4, 0.2),
         }
     else:
         # Complementary / supplementary
@@ -214,6 +220,7 @@ def angles(difficulty_elo):
             'options': make_options(str(answer), distractors),
             'explanation': explanation,
             'template_id': f'g4_angles_{variant}',
+            'difficulty': estimate_difficulty(4, 0.5 if variant == 'complementary' else 0.7),
         }
 
 
@@ -257,6 +264,7 @@ def geometry_lines(difficulty_elo):
             'options': make_options(answer, distractors),
             'explanation': explanation,
             'template_id': f'g4_geometry_{prop}',
+            'difficulty': estimate_difficulty(4, 0.5),
         }
 
     return {
@@ -266,6 +274,7 @@ def geometry_lines(difficulty_elo):
         'options': make_options(answer, distractors),
         'explanation': f'{answer} is correct.',
         'template_id': f'g4_geometry_{variant}',
+        'difficulty': estimate_difficulty(4, 0.3),
     }
 
 
@@ -285,6 +294,7 @@ def factors_multiples(difficulty_elo):
             'options': make_options(answer, ['no', 'only sometimes', 'cannot tell']),
             'explanation': f'{n} ÷ {target_factor} = {n // target_factor}, so yes, {target_factor} is a factor of {n}.',
             'template_id': 'g4_factors_is_factor',
+            'difficulty': estimate_difficulty(4, 0.3),
         }
     else:
         # Find multiples
@@ -300,6 +310,7 @@ def factors_multiples(difficulty_elo):
             'options': make_options(str(answer), distractors),
             'explanation': f'{n} × {pos} = {answer}',
             'template_id': 'g4_factors_multiples',
+            'difficulty': estimate_difficulty(4, 0.4 + n / 24),
         }
 
 
@@ -342,6 +353,7 @@ def multi_step_word(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': explanation,
         'template_id': f'g4_multi_step_word_{variant}',
+        'difficulty': estimate_difficulty(4, 0.5 + answer / 100),
     }
 
 
@@ -384,6 +396,7 @@ def equivalent_fractions(difficulty_elo):
         'options': make_options(answer, distractors),
         'explanation': f'{num}/{den} × {multiplier}/{multiplier} = {eq_num}/{eq_den}' if difficulty_elo < 750 else f'{num}/{den} = {eq}',
         'template_id': 'g4_equivalent_fractions',
+        'difficulty': estimate_difficulty(4, 0.3 if difficulty_elo < 750 else 0.7),
     }
 
 

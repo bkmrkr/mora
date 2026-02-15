@@ -5,7 +5,7 @@ Each function takes difficulty_elo and returns a dict:
 """
 import random
 
-from curriculum.templates.common import arithmetic_distractors, make_options
+from curriculum.templates.common import arithmetic_distractors, make_options, estimate_difficulty
 
 
 def multiplication_facts(difficulty_elo):
@@ -29,6 +29,7 @@ def multiplication_facts(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{a} × {b} = {answer}',
         'template_id': 'g3_mult_facts',
+        'difficulty': estimate_difficulty(3, min(answer / 144, 1.0)),
     }
 
 
@@ -54,6 +55,7 @@ def division_facts(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{dividend} ÷ {divisor} = {answer}',
         'template_id': 'g3_div_facts',
+        'difficulty': estimate_difficulty(3, min(dividend / 144, 1.0)),
     }
 
 
@@ -75,6 +77,7 @@ def multi_digit_multiply(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{a} × {b} = {answer}',
         'template_id': 'g3_multi_digit_mult',
+        'difficulty': estimate_difficulty(3, min(answer / 891, 1.0)),
     }
 
 
@@ -109,6 +112,7 @@ def area_perimeter(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': explanation,
         'template_id': f'g3_area_perimeter_{variant}',
+        'difficulty': estimate_difficulty(3, 0.3 + (length * width) / 180),
     }
 
 
@@ -133,6 +137,7 @@ def fraction_compare(difficulty_elo):
                                              f'{den}/{max(a, b)}']),
             'explanation': explanation,
             'template_id': 'g3_fraction_compare_same_den',
+            'difficulty': estimate_difficulty(3, 0.3),
         }
     else:
         # Different denominator comparison (unit fractions)
@@ -150,6 +155,7 @@ def fraction_compare(difficulty_elo):
                                              f'1/{a_den + b_den}']),
             'explanation': explanation,
             'template_id': 'g3_fraction_compare_unit',
+            'difficulty': estimate_difficulty(3, 0.6 + max(a_den, b_den) / 20),
         }
 
 
@@ -182,6 +188,7 @@ def fraction_add_sub(difficulty_elo):
         'options': make_options(answer, distractors),
         'explanation': f'{a}/{den} {op} {b}/{den} = {answer_num}/{den}',
         'template_id': f'g3_fraction_add_sub_{op}',
+        'difficulty': estimate_difficulty(3, 0.4 + den / 16),
     }
 
 
@@ -220,6 +227,7 @@ def rounding(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{n} rounded to the nearest {target} is {answer}.',
         'template_id': f'g3_rounding_{target}',
+        'difficulty': estimate_difficulty(3, 0.2 if target == 10 else 0.6),
     }
 
 
@@ -260,6 +268,7 @@ def mult_div_word_problems(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': explanation,
         'template_id': f'g3_mult_div_word_{op}',
+        'difficulty': estimate_difficulty(3, 0.3 + answer / 80),
     }
 
 
@@ -307,6 +316,7 @@ def elapsed_time(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'The elapsed time is {answer}.',
         'template_id': 'g3_elapsed_time',
+        'difficulty': estimate_difficulty(3, 0.3 if isinstance(answer, int) else 0.7),
     }
 
 
@@ -332,6 +342,7 @@ def data_interpretation(difficulty_elo):
             'options': make_options(answer, wrong[:3]),
             'explanation': explanation,
             'template_id': 'g3_data_most',
+            'difficulty': estimate_difficulty(3, 0.2),
         }
     elif variant == 'fewest':
         min_idx = values.index(min(values))
@@ -346,6 +357,7 @@ def data_interpretation(difficulty_elo):
             'options': make_options(answer, wrong[:3]),
             'explanation': explanation,
             'template_id': 'g3_data_fewest',
+            'difficulty': estimate_difficulty(3, 0.2),
         }
     elif variant == 'total':
         answer = sum(values)
@@ -359,6 +371,7 @@ def data_interpretation(difficulty_elo):
             'options': make_options(str(answer), distractors),
             'explanation': explanation,
             'template_id': 'g3_data_total',
+            'difficulty': estimate_difficulty(3, 0.5),
         }
     else:  # difference
         i, j = random.sample(range(4), 2)
@@ -375,6 +388,7 @@ def data_interpretation(difficulty_elo):
             'options': make_options(str(answer), distractors),
             'explanation': explanation,
             'template_id': 'g3_data_difference',
+            'difficulty': estimate_difficulty(3, 0.6),
         }
 
 

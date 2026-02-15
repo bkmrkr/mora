@@ -56,6 +56,13 @@ LLM (qwen2.5) could not reliably produce grade-appropriate educational content. 
 - All 40 skills verified: registered in service, every template produces valid 4-option MCQ
 - 10 integration tests (189 total)
 
+### Added — Intrinsic Difficulty Scoring
+- `common.py`: `estimate_difficulty(grade, complexity)` maps grade (1-4) + complexity (0.0-1.0) to ELO difficulty
+- Grade bands: G1 500-750, G2 700-950, G3 900-1150, G4 1100-1350
+- All 40 templates now return a `difficulty` field based on actual question parameters (operand size, number of steps, denominator size, etc.)
+- `question_service.py` uses intrinsic difficulty instead of target difficulty for ELO calculations
+- Result: "2 + 1" gets difficulty ~525, "7 × 8" gets ~962, "1/2 + 1/4" gets ~1242
+
 ### Fixed — Stale Session Cookie Bug
 - `routes/home.py`: clear Flask session on `/start` to purge stale v1 cookies
 - `routes/session.py`: validate `current_question` has required v2 fields (`skill_id`, `question_id`, `correct_answer`, `options`) before using; discard and regenerate if invalid

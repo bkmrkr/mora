@@ -5,7 +5,8 @@ Each function takes difficulty_elo and returns a dict:
 """
 import random
 
-from curriculum.templates.common import arithmetic_distractors, make_options, word_problem_frame
+from curriculum.templates.common import (arithmetic_distractors, make_options,
+                                        word_problem_frame, estimate_difficulty)
 
 
 def addition_within_10(difficulty_elo):
@@ -22,6 +23,7 @@ def addition_within_10(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{a} + {b} = {answer}',
         'template_id': 'g1_add_10',
+        'difficulty': estimate_difficulty(1, answer / 10),
     }
 
 
@@ -39,6 +41,7 @@ def subtraction_within_10(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{a} - {b} = {answer}',
         'template_id': 'g1_sub_10',
+        'difficulty': estimate_difficulty(1, a / 10),
     }
 
 
@@ -61,6 +64,7 @@ def addition_within_20(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{a} + {b} = {answer}',
         'template_id': 'g1_add_20',
+        'difficulty': estimate_difficulty(1, answer / 20),
     }
 
 
@@ -78,6 +82,7 @@ def subtraction_within_20(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{a} - {b} = {answer}',
         'template_id': 'g1_sub_20',
+        'difficulty': estimate_difficulty(1, a / 20),
     }
 
 
@@ -101,6 +106,7 @@ def place_value(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': explanation,
         'template_id': f'g1_place_value_{kind}',
+        'difficulty': estimate_difficulty(1, num / 99),
     }
 
 
@@ -116,6 +122,7 @@ def counting_to_120(difficulty_elo):
             'options': make_options(str(n + 1), [str(n - 1), str(n), str(n + 2)]),
             'explanation': f'The number after {n} is {n + 1}.',
             'template_id': 'g1_counting_next',
+            'difficulty': estimate_difficulty(1, 0.1 + n / 120),
         }
     elif difficulty_elo < 850:
         # What comes before
@@ -127,6 +134,7 @@ def counting_to_120(difficulty_elo):
             'options': make_options(str(n - 1), [str(n + 1), str(n), str(n - 2)]),
             'explanation': f'The number before {n} is {n - 1}.',
             'template_id': 'g1_counting_before',
+            'difficulty': estimate_difficulty(1, 0.3 + n / 200),
         }
     else:
         # Skip counting
@@ -143,6 +151,7 @@ def counting_to_120(difficulty_elo):
             'options': make_options(str(answer), distractors),
             'explanation': f'Counting by {skip}s: the next number is {answer}.',
             'template_id': f'g1_counting_skip_{skip}',
+            'difficulty': estimate_difficulty(1, 0.6 + skip / 30),
         }
 
 
@@ -171,6 +180,7 @@ def comparing_numbers(difficulty_elo):
         'options': make_options(answer, distractors),
         'explanation': explanation,
         'template_id': 'g1_comparing',
+        'difficulty': estimate_difficulty(1, max(a, b) / 120),
     }
 
 
@@ -211,6 +221,7 @@ def telling_time_hour(difficulty_elo):
         'options': make_options(answer, distractors),
         'explanation': f'The time is {answer}.',
         'template_id': 'g1_time',
+        'difficulty': estimate_difficulty(1, 0.3 if minute == 0 else 0.7),
     }
 
 
@@ -238,6 +249,7 @@ def basic_shapes(difficulty_elo):
             'options': make_options(name, wrong_names[:3]),
             'explanation': explanation,
             'template_id': 'g1_shapes_sides_to_name',
+            'difficulty': estimate_difficulty(1, 0.5),
         }
     else:
         name, sides, explanation = random.choice(shapes)
@@ -259,6 +271,7 @@ def basic_shapes(difficulty_elo):
             'options': make_options(str(sides), distractors),
             'explanation': explanation,
             'template_id': 'g1_shapes_name_to_sides',
+            'difficulty': estimate_difficulty(1, 0.3),
         }
 
 
@@ -289,6 +302,7 @@ def word_problems_add_sub(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{a} {op} {b} = {answer}',
         'template_id': f'g1_word_problems_{op}',
+        'difficulty': estimate_difficulty(1, 0.4 + max(a, b) / 40),
     }
 
 

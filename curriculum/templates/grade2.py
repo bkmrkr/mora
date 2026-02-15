@@ -5,7 +5,8 @@ Each function takes difficulty_elo and returns a dict:
 """
 import random
 
-from curriculum.templates.common import arithmetic_distractors, make_options, word_problem_frame
+from curriculum.templates.common import (arithmetic_distractors, make_options,
+                                        word_problem_frame, estimate_difficulty)
 
 
 def add_sub_within_100(difficulty_elo):
@@ -33,6 +34,7 @@ def add_sub_within_100(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{a} {op} {b} = {answer}',
         'template_id': f'g2_add_sub_100_{op}',
+        'difficulty': estimate_difficulty(2, max(a, b) / 99),
     }
 
 
@@ -61,6 +63,7 @@ def add_sub_within_1000(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{a} {op} {b} = {answer}',
         'template_id': f'g2_add_sub_1000_{op}',
+        'difficulty': estimate_difficulty(2, 0.4 + max(a, b) / 2000),
     }
 
 
@@ -85,6 +88,7 @@ def intro_multiply(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{groups} groups of {per_group} = {groups} x {per_group} = {answer}',
         'template_id': 'g2_intro_multiply',
+        'difficulty': estimate_difficulty(2, answer / 60),
     }
 
 
@@ -126,6 +130,7 @@ def money(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': explanation,
         'template_id': 'g2_money',
+        'difficulty': estimate_difficulty(2, min(answer / 150, 1.0)),
     }
 
 
@@ -154,6 +159,7 @@ def telling_time_5min(difficulty_elo):
         'options': make_options(answer, distractors),
         'explanation': f'The time is {answer}.',
         'template_id': 'g2_time',
+        'difficulty': estimate_difficulty(2, 0.3 + minute / 120),
     }
 
 
@@ -177,6 +183,7 @@ def measurement_length(difficulty_elo):
             'options': make_options(answer, [wrong, 'both the same', 'cannot tell']),
             'explanation': explanation,
             'template_id': 'g2_measurement_compare',
+            'difficulty': estimate_difficulty(2, 0.2 + abs(a - b) / 40),
         }
     else:
         # Addition of lengths
@@ -193,6 +200,7 @@ def measurement_length(difficulty_elo):
             'options': make_options(str(answer), distractors),
             'explanation': f'{a} + {b} = {answer} {unit}',
             'template_id': 'g2_measurement_add',
+            'difficulty': estimate_difficulty(2, 0.4 + answer / 60),
         }
 
 
@@ -221,6 +229,7 @@ def fractions_intro(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': f'{name} of {whole} = {whole} ÷ {den} × {num} = {answer}',
         'template_id': 'g2_fractions_intro',
+        'difficulty': estimate_difficulty(2, 0.4 + den / 10),
     }
 
 
@@ -243,6 +252,7 @@ def comparing_3digit(difficulty_elo):
         'options': make_options(answer, distractors),
         'explanation': f'{max(a, b)} > {min(a, b)}',
         'template_id': 'g2_comparing_3digit',
+        'difficulty': estimate_difficulty(2, 0.3 + (1 - abs(a - b) / 900) * 0.7),
     }
 
 
@@ -275,6 +285,7 @@ def two_step_word(difficulty_elo):
         'options': make_options(str(answer), distractors),
         'explanation': explanation,
         'template_id': f'g2_two_step_{variant}',
+        'difficulty': estimate_difficulty(2, 0.5 + answer / 100),
     }
 
 
@@ -292,6 +303,7 @@ def odd_even(difficulty_elo):
                                               'neither', 'both']),
             'explanation': f'{n} is {correct} because {n} ÷ 2 = {n / 2}.',
             'template_id': 'g2_odd_even_identify',
+            'difficulty': estimate_difficulty(2, 0.2),
         }
     else:
         numbers = random.sample(range(1, 40), 4)
@@ -316,6 +328,7 @@ def odd_even(difficulty_elo):
             'options': make_options(answer, wrong[:3]),
             'explanation': f'{answer} is {target}.',
             'template_id': 'g2_odd_even_which',
+            'difficulty': estimate_difficulty(2, 0.5),
         }
 
 

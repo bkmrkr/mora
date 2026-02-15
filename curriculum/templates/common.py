@@ -1,6 +1,19 @@
 """Common utilities for question templates — distractor generation, shuffling."""
 import random
 
+# ELO difficulty bands per grade (each spans ~250 ELO points)
+GRADE_DIFFICULTY = {1: (500, 750), 2: (700, 950), 3: (900, 1150), 4: (1100, 1350)}
+
+
+def estimate_difficulty(grade, complexity):
+    """Estimate intrinsic ELO difficulty from grade and complexity (0.0–1.0).
+
+    complexity=0.0 → easiest question for that grade
+    complexity=1.0 → hardest question for that grade
+    """
+    low, high = GRADE_DIFFICULTY.get(grade, (800, 1000))
+    return round(low + complexity * (high - low))
+
 
 def arithmetic_distractors(answer, a, b, op='+', count=3):
     """Generate plausible wrong answers for arithmetic questions.

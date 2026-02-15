@@ -45,6 +45,11 @@ LLM (qwen2.5) could not reliably produce grade-appropriate educational content. 
 - `make_options()` extended: fraction distractor padding and decimal distractor padding
 - 31 new tests (179 total)
 
+### Verified — Phase 8: Playwright Browser Testing
+- Full flow walked in real browser: home → start → question → correct (skip feedback) → wrong → feedback → next → end → summary → dashboard
+- All 11 checkpoints pass: home page, question rendering, correct answer flow, wrong answer flow, feedback page, session summary, dashboard overview, dashboard index, returning student chip, session stats, console errors (zero)
+- Grade-by-grade dashboard shows all 40 skills with mastery bars and ELO ratings
+
 ### Added — Phase 7: Integration Test
 - `tests/test_integration.py` — full 20-question student journey via Flask test client
 - Verifies: session lifecycle, ELO rating updates, attempt persistence, skill variety, dashboard display, student persistence across sessions, feedback flow (correct skips, wrong shows), accuracy calculation, returning student chips

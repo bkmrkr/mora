@@ -30,11 +30,12 @@ def _setup_student_and_topic():
 
 
 def _create_question(node_id, content="What is 2+2?", correct="4"):
+    opts = ['3', '5', '6', correct] if correct not in ['3', '5', '6'] else ['3', '4', '5', '6']
     return question.create(
         curriculum_node_id=node_id,
         content=content,
         question_type='mcq',
-        options=json.dumps(['A) 3', 'B) 4', 'C) 5', 'D) 6']),
+        options=json.dumps(opts),
         correct_answer=correct,
         difficulty=600,
         estimated_p_correct=0.8,

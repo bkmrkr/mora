@@ -46,6 +46,17 @@ def _load_question_from_db(question_id):
     difficulty_score = round(norm_diff * 9) + 1
     p_correct = q['estimated_p_correct'] or 0
     options = json.loads(q['options']) if q['options'] else None
+    correct = q['correct_answer'] or ''
+
+    # Reject broken questions (e.g. placeholder ["A","B","C","D"] options)
+    if q['question_type'] == 'mcq':
+        if not options or not isinstance(options, list) or len(options) < 3:
+            logger.warning('Rejecting DB question %d: invalid options', question_id)
+            return None
+        if correct and correct not in options:
+            logger.warning('Rejecting DB question %d: answer not in options', question_id)
+            return None
+
     content = q['content'] or ''
 
     # Extract clock params from content like "[3:00]"

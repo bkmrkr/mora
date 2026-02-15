@@ -2,6 +2,17 @@
 
 ## [2026-02-15]
 
+### Changed — Phase 5 End-to-End Validation & Production Readiness
+- **Session resume guard**: `_load_question_from_db()` now validates MCQ options before returning — rejects questions with missing options, too few options, or correct answer not in options. Broken DB questions trigger fresh generation instead of being served to students
+- **DB cleanup**: 803 broken questions marked as `rejected` (792 placeholder `["A","B","C","D"]` + 11 answer/options mismatch). Only 6 valid questions remain from pre-rebuild era
+- **Test data modernized**: `test_persistence.py` helper updated from letter-prefixed options to plain-text format
+- **4 new tests** for session resume options validation (broken placeholders, answer not in options, null options, valid MCQ)
+
+### Removed — Phase 5
+- **5 Phase 2 security audit files deleted** (89 KB): `SECURITY_FINDINGS_SUMMARY.txt`, `VULNERABILITY_DIAGRAM.txt`, `SECURITY_AUDIT_MCQ_PLACEHOLDERS.md`, `QUICK_FIX_GUIDE.md`, `SECURITY_AUDIT_INDEX.md` — all described a vulnerability that Phase 3 eliminated architecturally
+- **5 stale todo files deleted** (#002-006): All proposed fixes to the placeholder/distractor pattern that Phase 3 eliminated entirely
+- **`cookies.txt` deleted**: Test artifact
+
 ### Changed — Phase 4 Hardening (post-rebuild verification & cleanup)
 - **`scripts/generate_balanced.py` + `scripts/generate_questions.py` fixed**: Both hard-coded `options=["A","B","C","D"]` instead of using actual LLM options — this was the root cause of 97.7% broken questions in the DB
 - **`scripts/question_tester.py` fixed**: Removed import of deleted `ai.distractors` module and distractor insertion code

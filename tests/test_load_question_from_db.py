@@ -77,3 +77,42 @@ def test_rejected_question_not_loaded():
     execute_db("UPDATE questions SET test_status = 'rejected' WHERE id = ?", (qid,))
     result = _load_question_from_db(qid)
     assert result is None
+
+
+def test_broken_placeholder_options_rejected():
+    """MCQ with ["A","B","C","D"] placeholder options must be rejected."""
+    qid = _make_question(
+        'What is 5+3?', '8',
+        options=['A', 'B', 'C', 'D']
+    )
+    result = _load_question_from_db(qid)
+    assert result is None, "Broken placeholder options should be rejected"
+
+
+def test_mcq_answer_not_in_options_rejected():
+    """MCQ where correct_answer is not in options must be rejected."""
+    qid = _make_question(
+        'What is 5+3?', '8',
+        options=['5', '6', '7', '9']
+    )
+    result = _load_question_from_db(qid)
+    assert result is None, "Answer not in options should be rejected"
+
+
+def test_mcq_no_options_rejected():
+    """MCQ with NULL options must be rejected."""
+    qid = _make_question('What is 5+3?', '8', q_type='mcq', options=None)
+    result = _load_question_from_db(qid)
+    assert result is None, "MCQ with no options should be rejected"
+
+
+def test_valid_mcq_accepted():
+    """MCQ with proper options should be accepted."""
+    qid = _make_question(
+        'What is 5+3?', '8',
+        options=['6', '7', '8', '9']
+    )
+    result = _load_question_from_db(qid)
+    assert result is not None
+    assert result['correct_answer'] == '8'
+    assert result['options'] == ['6', '7', '8', '9']

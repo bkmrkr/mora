@@ -1,5 +1,19 @@
 # Mora Changelog
 
+## [2026-02-15]
+
+### Fixed
+- **Hebrew questions now stay MCQ**: LLM provides 4 options directly (Hebrew answers can't generate algorithmic distractors). Invalid LLM options (wrong count, missing correct answer) trigger retry instead of fallback
+- **JSON trailing comma parsing**: LLMs frequently produce `{"key": "value",}` — now stripped before each parse attempt. Eliminates wasted generation attempts
+- **Slow first question (cold-start)**: Ollama model pre-loaded in background thread on server startup. First question no longer waits ~4s for model load
+
+### Changed
+- Hebrew prompt now requests MCQ options from LLM instead of relying on algorithmic distractor generation
+- `generate()` conditionally instructs LLM to include/exclude options based on subject
+
+### Added
+- 5 new tests (649 total): trailing comma JSON parsing (4), Hebrew MCQ with LLM options (1)
+
 ## [2026-02-14]
 
 ### Fixed

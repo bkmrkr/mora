@@ -95,6 +95,10 @@ def create_app():
     with app.app_context():
         init_db()
 
+    # Pre-load Ollama model so first question doesn't incur cold-start delay
+    from ai.ollama_client import warm_up
+    warm_up()
+
     return app
 
 

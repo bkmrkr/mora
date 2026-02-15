@@ -1,7 +1,7 @@
-"""Tests for MCQ distractor fallback to short_answer.
+"""Tests for MCQ distractor handling.
 
-When distractor generation fails (Hebrew, non-Latin scripts), the question
-should fall back to short_answer type instead of being discarded entirely.
+Hebrew questions use LLM-provided options (not algorithmic distractors).
+English questions use computed distractors as before.
 """
 from unittest.mock import patch, MagicMock
 from models import topic as topic_model
@@ -22,16 +22,19 @@ def _setup(topic_name='Hebrew', node_name='Vocabulary'):
 
 @patch('services.question_service.question_generator.generate')
 @patch('services.question_service.session_model')
-def test_hebrew_answer_falls_back_to_short_answer(mock_session, mock_gen):
-    """Hebrew answers that fail distractor generation should become short_answer."""
+def test_hebrew_with_llm_options_stays_mcq(mock_session, mock_gen):
+    """Hebrew answers with LLM-provided options should stay MCQ."""
     student, tid, nid = _setup()
 
-    # Mock: LLM returns a Hebrew answer that can't generate distractors
+    # Mock: LLM returns a Hebrew answer WITH 4 options (new behavior)
     mock_gen.return_value = (
         {
             'question': 'What is the Hebrew word for dog?',
             'correct_answer': '\u05DB\u05DC\u05D1',  # כלב
+            'options': ['\u05D7\u05EA\u05D5\u05DC', '\u05DB\u05DC\u05D1',
+                        '\u05E1\u05E4\u05E8', '\u05D1\u05D9\u05EA'],
             'explanation': 'The Hebrew word for dog is kelev.',
+            '_llm_provided_options': True,
         },
         'test-model',
         'test-prompt',
@@ -46,11 +49,60 @@ def test_hebrew_answer_falls_back_to_short_answer(mock_session, mock_gen):
             'test-session', student, tid, store_in_session=False
         )
 
-    # Should NOT be None — the question should be accepted as short_answer
     assert result is not None
-    assert result['question_type'] == 'short_answer'
-    assert result['options'] is None
-    assert result['correct_answer'] == '\u05DB\u05DC\u05D1'
+    assert result['question_type'] == 'mcq'
+    assert result['options'] is not None
+    assert len(result['options']) == 4
+    assert '\u05DB\u05DC\u05D1' in result['options']
+
+
+@patch('services.question_service.question_generator.generate')
+@patch('services.question_service.session_model')
+def test_hebrew_invalid_llm_options_retries(mock_session, mock_gen):
+    """Hebrew answers with invalid LLM options (wrong count) should retry."""
+    student, tid, nid = _setup()
+
+    # First call: bad options (only 2), second call: valid options
+    mock_gen.side_effect = [
+        (
+            {
+                'question': 'What is the Hebrew word for cat?',
+                'correct_answer': '\u05D7\u05EA\u05D5\u05DC',
+                'options': ['\u05D7\u05EA\u05D5\u05DC', '\u05DB\u05DC\u05D1'],  # only 2
+                'explanation': 'The Hebrew word for cat is chatul.',
+                '_llm_provided_options': True,
+            },
+            'test-model',
+            'test-prompt',
+        ),
+        (
+            {
+                'question': 'What is the Hebrew word for house?',
+                'correct_answer': '\u05D1\u05D9\u05EA',
+                'options': ['\u05E1\u05E4\u05E8', '\u05D1\u05D9\u05EA',
+                            '\u05DB\u05DC\u05D1', '\u05D7\u05EA\u05D5\u05DC'],
+                'explanation': 'The Hebrew word for house is bayit.',
+                '_llm_provided_options': True,
+            },
+            'test-model',
+            'test-prompt',
+        ),
+    ]
+    mock_session.get_by_id.return_value = {
+        'id': 'test-session', 'student_id': student['id'],
+        'topic_id': tid, 'current_question_id': None,
+    }
+
+    with patch('services.question_service.flask_session', {}):
+        result = question_service.generate_next(
+            'test-session', student, tid, store_in_session=False
+        )
+
+    assert result is not None
+    assert result['question_type'] == 'mcq'
+    assert len(result['options']) == 4
+    # Should have retried — used the second response
+    assert result['correct_answer'] == '\u05D1\u05D9\u05EA'
 
 
 @patch('services.question_service.question_generator.generate')

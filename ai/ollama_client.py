@@ -1,6 +1,7 @@
 """Ollama HTTP client for local LLM inference."""
 import json
 import logging
+import threading
 import time
 import urllib.request
 import urllib.error
@@ -8,6 +9,37 @@ import urllib.error
 from config.settings import OLLAMA_BASE_URL, OLLAMA_MODEL
 
 logger = logging.getLogger(__name__)
+
+
+def warm_up():
+    """Pre-load the Ollama model in a background thread.
+
+    Sends a minimal request so the model is already in memory when the first
+    real question is generated. Runs in a daemon thread so it doesn't block
+    server startup.
+    """
+    def _ping():
+        data = json.dumps({
+            'model': OLLAMA_MODEL,
+            'messages': [{'role': 'user', 'content': 'hi'}],
+            'stream': False,
+            'keep_alive': '30m',
+            'options': {'num_predict': 1},
+        }).encode()
+        req = urllib.request.Request(
+            f"{OLLAMA_BASE_URL}/api/chat",
+            data=data,
+            headers={'Content-Type': 'application/json'},
+        )
+        try:
+            t0 = time.monotonic()
+            urllib.request.urlopen(req, timeout=30)
+            logger.info('Ollama warm-up done in %.1fs', time.monotonic() - t0)
+        except Exception as e:
+            logger.warning('Ollama warm-up failed (will retry on first question): %s', e)
+
+    t = threading.Thread(target=_ping, daemon=True)
+    t.start()
 
 
 def ask(system_prompt, user_prompt, max_tokens=512, temperature=0.7):

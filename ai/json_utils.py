@@ -3,6 +3,16 @@ import json
 import re
 
 
+def _strip_trailing_commas(text):
+    """Remove trailing commas before } and ] in JSON text.
+
+    LLMs frequently produce invalid JSON like:
+        {"key": "value",}
+    This strips the trailing comma to make it valid.
+    """
+    return re.sub(r',\s*([}\]])', r'\1', text)
+
+
 def _fix_latex_escapes(text):
     r"""Fix invalid JSON escape sequences from LLM output (LaTeX, etc.).
 
@@ -53,23 +63,27 @@ def parse_ai_json(text):
     """
     cleaned = text.strip()
 
-    # Try raw parse first
-    try:
-        return json.loads(cleaned)
-    except json.JSONDecodeError:
-        pass
+    # Try raw parse first (with and without trailing comma fix)
+    for candidate in [cleaned, _strip_trailing_commas(cleaned)]:
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError:
+            pass
 
-    # Try with fixed LaTeX escapes
-    try:
-        return json.loads(_fix_latex_escapes(cleaned))
-    except json.JSONDecodeError:
-        pass
+    # Try with fixed LaTeX escapes (with and without trailing comma fix)
+    for candidate in [cleaned, _strip_trailing_commas(cleaned)]:
+        try:
+            return json.loads(_fix_latex_escapes(candidate))
+        except json.JSONDecodeError:
+            pass
 
     # Extract from markdown code block
     match = re.search(r'```(?:json)?\s*\n(.*?)\n```', cleaned, re.DOTALL)
     if match:
         block = match.group(1).strip()
-        for attempt_text in [block, _fix_latex_escapes(block)]:
+        for attempt_text in [block, _strip_trailing_commas(block),
+                             _fix_latex_escapes(block),
+                             _fix_latex_escapes(_strip_trailing_commas(block))]:
             try:
                 return json.loads(attempt_text)
             except json.JSONDecodeError:
@@ -80,7 +94,9 @@ def parse_ai_json(text):
         match = re.search(pattern, cleaned, re.DOTALL)
         if match:
             raw = match.group(0)
-            for attempt_text in [raw, _fix_latex_escapes(raw)]:
+            for attempt_text in [raw, _strip_trailing_commas(raw),
+                                 _fix_latex_escapes(raw),
+                                 _fix_latex_escapes(_strip_trailing_commas(raw))]:
                 try:
                     return json.loads(attempt_text)
                 except json.JSONDecodeError:

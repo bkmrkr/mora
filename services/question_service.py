@@ -306,15 +306,28 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
 
             # Compute distractors for MCQ (after validation, before storing)
             if q_type == QUESTION_TYPE_MCQ and q_data:
-                q_data, success, reason = insert_distractors(q_data)
-                if not success:
-                    # Fall back to short_answer instead of discarding.
-                    # Hebrew and other non-Latin answers can't generate
-                    # meaningful MCQ distractors — still valid as open-ended.
-                    logger.info('Distractor failed, falling back to short_answer: %s',
-                                reason)
-                    q_type = 'short_answer'
-                    q_data.pop('options', None)
+                if q_data.get('_llm_provided_options'):
+                    # Hebrew/non-Latin: LLM provided options directly.
+                    # Validate: must have 4 options with correct_answer present.
+                    opts = q_data.get('options', [])
+                    correct = q_data.get('correct_answer', '')
+                    if (isinstance(opts, list) and len(opts) == 4
+                            and correct in opts):
+                        logger.info('Using LLM-provided MCQ options (Hebrew)')
+                    else:
+                        # LLM options invalid — retry
+                        logger.warning('LLM options invalid (len=%s, correct_in=%s), retrying',
+                                       len(opts) if isinstance(opts, list) else 'N/A',
+                                       correct in opts if isinstance(opts, list) else False)
+                        q_data = None
+                        continue
+                else:
+                    q_data, success, reason = insert_distractors(q_data)
+                    if not success:
+                        logger.info('Distractor failed, falling back to short_answer: %s',
+                                    reason)
+                        q_type = 'short_answer'
+                        q_data.pop('options', None)
 
             # Passed all checks
             break
@@ -323,6 +336,9 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
         if store_in_session:
             flask_session['current_question'] = None
         return None
+
+    # Clean up internal flags before storing
+    q_data.pop('_llm_provided_options', None)
 
     # Store question in DB
     skill = all_skills.get(focus_node_id, {})

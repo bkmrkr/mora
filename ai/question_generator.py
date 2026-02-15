@@ -54,7 +54,7 @@ def get_subject_prompt(topic_name, node_name):
 # ============================================================================
 # HEBREW PROMPT - For Yeshiva-style Hebrew curriculum
 # ============================================================================
-HEBREW_PROMPT = """You are an expert Hebrew tutor creating questions for a yeshiva student.
+HEBREW_PROMPT = """You are an expert Hebrew tutor creating multiple-choice questions for a yeshiva student.
 
 You specialize in:
 - Hebrew reading (Ivrit)
@@ -67,8 +67,12 @@ Return ONLY valid JSON in this exact format:
 {
   "question": "The Hebrew question text (in Hebrew or English as appropriate)",
   "correct_answer": "The answer",
+  "options": ["wrong1", "wrong2", "correct_answer", "wrong3"],
   "explanation": "Step-by-step explanation in English"
 }
+
+CRITICAL: You MUST include exactly 4 options in your response. One option MUST be the correct_answer.
+The other 3 options must be plausible but wrong — they should be real Hebrew words/names from the same category.
 
 CRITICAL HEBREW RULES:
 1. For Torah/Chumash questions, use proper Hebrew names: אַבְרָהָם (Avraham), יִצְחָק (Yitzchak), יַעֲקֹב (Yaakov), משֶׁה (Moshe), אַהֲרֹן (Aharon)
@@ -78,12 +82,14 @@ CRITICAL HEBREW RULES:
 5. Keep answers appropriate for elementary students (K-4)
 6. For vocabulary questions: "What is the Hebrew word for [English]?" - answer in Hebrew
 7. For Chumash questions: ask about the story, characters, or lesson - NOT about verse numbers
+8. All 4 options must be the SAME TYPE: all Hebrew words, all English transliterations, or all English words
 
 NEVER DO:
 - Don't ask "What pasuk/verse says X?" - students won't have the text
 - Don't use English words that have Hebrew origins without transliteration
 - Don't create questions requiring outside text knowledge
 - Don't ask about Rashi commentary at early levels
+- Don't mix Hebrew and English in the options list
 
 Answer format:
 - Hebrew vocabulary: Use Hebrew script, e.g., "סֵפֶר" (sefer = book)
@@ -247,6 +253,23 @@ def generate(node_name, node_description, topic_name, skill_description,
     # Get subject-specific prompt
     system_prompt = get_subject_prompt(topic_name, node_name)
 
+    # Hebrew subjects provide their own MCQ options (non-Latin scripts can't
+    # generate algorithmic distractors). All other subjects let the system
+    # compute distractors.
+    is_hebrew = (system_prompt is HEBREW_PROMPT)
+
+    if is_hebrew:
+        options_instruction = (
+            "IMPORTANT: Include exactly 4 \"options\" in your JSON response. "
+            "One option MUST be the correct_answer. The other 3 must be plausible but wrong."
+        )
+    else:
+        options_instruction = (
+            "IMPORTANT: Do NOT include \"options\" in your response. "
+            "Only provide question, correct_answer, and explanation. "
+            "The system will generate multiple choice options automatically."
+        )
+
     user_prompt = f"""Generate a {question_type} question for:
 - Topic: {topic_name}
 - Concept: {node_name}
@@ -255,14 +278,17 @@ def generate(node_name, node_description, topic_name, skill_description,
 - Recent questions (DO NOT repeat these or ask similar ones):
 {recent_str}
 
-IMPORTANT: Do NOT include "options" in your response. Only provide question, correct_answer, and explanation.
-The system will generate multiple choice options automatically.
+{options_instruction}
 
 Return JSON only."""
 
     text, model, prompt = ask(system_prompt, user_prompt)
     logger.info('Raw LLM response for "%s": %s', node_name, text[:500])
     q_data = parse_ai_json_dict(text)
+
+    # Tag Hebrew responses so question_service knows to use LLM options
+    if is_hebrew and isinstance(q_data.get('options'), list):
+        q_data['_llm_provided_options'] = True
 
     logger.info('Generated %s question for "%s" at difficulty %.2f',
                 question_type, node_name, norm_difficulty)

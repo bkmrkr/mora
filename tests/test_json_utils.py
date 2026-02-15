@@ -34,3 +34,27 @@ def test_invalid_json_raises():
 def test_array_json():
     result = parse_ai_json('[1, 2, 3]')
     assert result == [1, 2, 3]
+
+
+def test_trailing_comma_in_object():
+    text = '{"question": "What?", "answer": "yes",}'
+    result = parse_ai_json(text)
+    assert result == {"question": "What?", "answer": "yes"}
+
+
+def test_trailing_comma_in_multiline():
+    text = '{\n  "question": "What?",\n  "answer": "yes",\n}'
+    result = parse_ai_json(text)
+    assert result == {"question": "What?", "answer": "yes"}
+
+
+def test_trailing_comma_in_array():
+    text = '["a", "b", "c",]'
+    result = parse_ai_json(text)
+    assert result == ["a", "b", "c"]
+
+
+def test_trailing_comma_with_code_block():
+    text = '```json\n{"key": "value",}\n```'
+    result = parse_ai_json(text)
+    assert result == {"key": "value"}

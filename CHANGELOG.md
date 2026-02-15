@@ -2,6 +2,13 @@
 
 ## [2026-02-15]
 
+### Added — Phase 8 Question Bank Replenishment
+- **247 validated questions generated** across all 25 curriculum nodes using rebuilt pipeline with qwen2.5
+- **Per-topic**: Math 50, Reading 50, Science 48, Social Studies 49, Hebrew 50
+- **23/25 nodes** hit target of 10 questions; 2 nodes at 8-9 (LLM dedup exhaustion on narrow topics)
+- **All questions validated**: 4 MCQ options, correct answer in options, passes structural + math checks
+- **Model comparison**: qwen2.5 produces best results; qwen3:8b generates broken letter-prefix format; phi3.5 mediocre
+
 ### Verified — Phase 7 Live Smoke Test & Pipeline Verification
 - **End-to-end generation test**: 5/5 subjects produce valid MCQ questions with correct JSON, 4 options, answer in options, and pass all validation rules (~1s per question)
 - **Stress test (50 questions)**: 90% first-attempt pass rate across all subjects (45/50). Failures are correctly caught by validation and would trigger retry in production

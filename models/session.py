@@ -4,11 +4,11 @@ import uuid
 from db.database import query_db, execute_db
 
 
-def create(student_id, topic_id=None):
+def create(student_id):
     session_id = str(uuid.uuid4())
     execute_db(
-        "INSERT INTO sessions (id, student_id, topic_id) VALUES (?, ?, ?)",
-        (session_id, student_id, topic_id),
+        "INSERT INTO sessions (id, student_id) VALUES (?, ?)",
+        (session_id, student_id),
     )
     return session_id
 

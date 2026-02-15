@@ -1,7 +1,6 @@
 """Shared test fixtures — isolated temp DB for every test."""
 import os
 import sys
-import tempfile
 
 import pytest
 
@@ -23,18 +22,3 @@ def temp_db(monkeypatch, tmp_path):
     init_db()
 
     return db_path
-
-
-@pytest.fixture
-def app(temp_db):
-    """Flask test app."""
-    from app import create_app
-    application = create_app()
-    application.config['TESTING'] = True
-    return application
-
-
-@pytest.fixture
-def client(app):
-    """Flask test client."""
-    return app.test_client()

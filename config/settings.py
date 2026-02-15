@@ -1,4 +1,4 @@
-"""Mora — centralized configuration."""
+"""Mora v2 — centralized configuration."""
 import os
 from dotenv import load_dotenv
 
@@ -6,10 +6,6 @@ load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE_DIR, 'mora.db')
-
-# Ollama
-OLLAMA_BASE_URL = os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')
-OLLAMA_MODEL = os.environ.get('OLLAMA_MODEL', 'qwen2.5')
 
 # ELO defaults
 ELO_DEFAULTS = {
@@ -29,5 +25,4 @@ DIFFICULTY_DEFAULTS = {
 # Session defaults
 SESSION_DEFAULTS = {
     'target_success_rate': 0.80,
-    'max_generation_attempts': 3,
 }

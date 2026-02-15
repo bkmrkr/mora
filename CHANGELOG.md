@@ -56,6 +56,13 @@ LLM (qwen2.5) could not reliably produce grade-appropriate educational content. 
 - All 40 skills verified: registered in service, every template produces valid 4-option MCQ
 - 10 integration tests (189 total)
 
+### Fixed — Stale Session Cookie Bug
+- `routes/home.py`: clear Flask session on `/start` to purge stale v1 cookies
+- `routes/session.py`: validate `current_question` has required v2 fields (`skill_id`, `question_id`, `correct_answer`, `options`) before using; discard and regenerate if invalid
+- `routes/session.py`: `answer()` route redirects to question page (not end page) if session data is invalid
+- Root cause: browser retained v1 session cookie with `current_question` missing `skill_id` field, causing `KeyError` in `answer_service.py`
+- Verified fix with Playwright: full flow (home → start → correct → wrong → feedback → next → end → summary → dashboard) works with zero errors
+
 ### Removed
 - All `ai/` modules (question_generator, json_utils, explainer, answer_grader, local_generators)
 - Admin blueprint and templates

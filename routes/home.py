@@ -1,5 +1,6 @@
 """Home page — student name entry."""
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import (Blueprint, render_template, redirect, url_for,
+                   request, flash, session as flask_session)
 
 from models import student as student_model
 
@@ -23,6 +24,9 @@ def start():
     if not student:
         sid = student_model.create(name)
         student = student_model.get_by_id(sid)
+
+    # Clear any stale session data from previous sessions
+    flask_session.clear()
 
     from models import session as session_model
     session_id = session_model.create(student['id'])

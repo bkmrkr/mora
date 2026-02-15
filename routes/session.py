@@ -54,6 +54,13 @@ def question(session_id):
     student = student_model.get_by_id(sess['student_id'])
 
     current = flask_session.get('current_question')
+    # Validate required v2 fields — discard stale/corrupt session data
+    required_keys = {'skill_id', 'question_id', 'correct_answer', 'options'}
+    if current and not required_keys.issubset(current.keys()):
+        logger.warning('Discarding invalid current_question: missing %s',
+                       required_keys - set(current.keys()))
+        flask_session.pop('current_question', None)
+        current = None
     if not current:
         current_skill = flask_session.get('last_skill_id')
         current = question_service.generate_next(session_id, student, current_skill)
@@ -84,8 +91,9 @@ def answer(session_id):
         return redirect(url_for('home.index'))
     student = student_model.get_by_id(sess['student_id'])
     current = flask_session.get('current_question')
-    if not current:
-        return redirect(url_for('session.end', session_id=session_id))
+    if not current or not {'skill_id', 'question_id', 'correct_answer'}.issubset(current.keys()):
+        flask_session.pop('current_question', None)
+        return redirect(url_for('session.question', session_id=session_id))
 
     submitted_qid = request.form.get('question_id', type=int)
     if submitted_qid and submitted_qid != current.get('question_id'):

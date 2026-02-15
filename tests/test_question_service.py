@@ -1,4 +1,4 @@
-"""Tests for services/question_service.py — mocking AI generator, using real DB."""
+"""Tests for services/question_service.py -- mocking AI generator, using real DB."""
 import json
 from unittest.mock import patch, MagicMock
 
@@ -18,17 +18,8 @@ def _valid_q_data():
     return {
         'question': 'What is 7 + 5?',
         'correct_answer': '12',
-        'options': None,
+        'options': ['10', '12', '14', '16'],
         'explanation': '7 + 5 = 12',
-    }
-
-
-def _valid_mcq_data():
-    return {
-        'question': 'What is 3 × 4?',
-        'correct_answer': 'B',
-        'options': ['A) 7', 'B) 12', 'C) 15', 'D) 10'],
-        'explanation': '3 × 4 = 12',
     }
 
 
@@ -61,9 +52,8 @@ def test_generate_next_stores_in_session(mock_gen, app):
             result = question_service.generate_next(session_id, student, topic_id)
     assert result is not None
     assert result['content'] == 'What is 7 + 5?'
-    # correct_answer now includes letter prefix from computed distractors
-    assert result['correct_answer'].endswith('12')
-    assert result['options'] is not None  # Computed distractors
+    assert result['correct_answer'] == '12'
+    assert result['options'] == ['10', '12', '14', '16']
 
 
 @patch('services.question_service.question_generator.generate')
@@ -151,15 +141,11 @@ def test_difficulty_score_1_to_10(mock_gen, app):
     assert 1 <= result['difficulty_score'] <= 10
 
 
-def test_pop_cached_returns_none_when_empty():
-    result = question_service.pop_cached(999, 'nonexistent-session')
-    assert result is None
-
-
 @patch('services.question_service.question_generator.generate')
 def test_empty_question_rejected(mock_gen, app):
     """Empty question field should be rejected."""
-    bad_data = {'question': '', 'correct_answer': '5', 'explanation': 'x'}
+    bad_data = {'question': '', 'correct_answer': '5', 'explanation': 'x',
+                'options': ['3', '5', '7', '9']}
     mock_gen.return_value = (bad_data, 'model', 'prompt')
     student, topic_id, node_id, session_id = _setup(app)
     with app.test_request_context():

@@ -1,4 +1,8 @@
-"""Generate adaptive questions via Ollama at a specified difficulty."""
+"""Generate adaptive questions via Ollama at a specified difficulty.
+
+One universal prompt with subject-specific rules injected.
+LLM always provides complete MCQ options — no algorithmic distractors.
+"""
 import logging
 
 from ai.ollama_client import ask
@@ -6,234 +10,88 @@ from ai.json_utils import parse_ai_json_dict
 
 logger = logging.getLogger(__name__)
 
-# Subject keywords for prompt selection
-SUBJECT_KEYWORDS = {
-    'hebrew': ['hebrew', 'ivrit', 'chumash', 'torah', 'navi', 'rashi', 'yeshiva', 'shoresh', 'binyan', 'dagesh', 'nikkud'],
-    'math': ['math', 'addition', 'subtraction', 'multiplication', 'division', 'fraction', 'number', 'geometry', 'algebra'],
-    'reading': ['reading', 'comprehension', 'fiction', 'nonfiction', 'poetry', 'story', 'passage', 'vocabulary', 'word'],
-    'science': ['science', 'physics', 'chemistry', 'biology', 'life science', 'earth science', 'weather', 'animal', 'plant'],
-    'social_studies': ['social', 'history', 'geography', 'government', 'citizen', 'community', 'map', 'culture'],
-}
-
-
-def get_subject_prompt(topic_name, node_name):
-    """Select the appropriate system prompt based on topic."""
-    topic_lower = topic_name.lower()
-    node_lower = node_name.lower()
-    combined = f"{topic_lower} {node_lower}"
-
-    # Check for Hebrew
-    for keyword in SUBJECT_KEYWORDS['hebrew']:
-        if keyword in combined:
-            return HEBREW_PROMPT
-
-    # Check for Math
-    for keyword in SUBJECT_KEYWORDS['math']:
-        if keyword in combined:
-            return MATH_PROMPT
-
-    # Check for Reading
-    for keyword in SUBJECT_KEYWORDS['reading']:
-        if keyword in combined:
-            return READING_PROMPT
-
-    # Check for Science
-    for keyword in SUBJECT_KEYWORDS['science']:
-        if keyword in combined:
-            return SCIENCE_PROMPT
-
-    # Check for Social Studies
-    for keyword in SUBJECT_KEYWORDS['social_studies']:
-        if keyword in combined:
-            return SOCIAL_STUDIES_PROMPT
-
-    # Default to generic prompt
-    return DEFAULT_PROMPT
-
-
-# ============================================================================
-# HEBREW PROMPT - For Yeshiva-style Hebrew curriculum
-# ============================================================================
-HEBREW_PROMPT = """You are an expert Hebrew tutor creating multiple-choice questions for a yeshiva student.
-
-You specialize in:
-- Hebrew reading (Ivrit)
-- Chumash (Torah) comprehension
-- Hebrew grammar (shoresh, binyan)
-- Proper Hebrew vocabulary and names
-- Nikkud (Hebrew diacritics)
-
-Return ONLY valid JSON in this exact format:
-{
-  "question": "The Hebrew question text (in Hebrew or English as appropriate)",
-  "correct_answer": "The answer",
-  "options": ["wrong1", "wrong2", "correct_answer", "wrong3"],
-  "explanation": "Step-by-step explanation in English"
-}
-
-CRITICAL: You MUST include exactly 4 options in your response. One option MUST be the correct_answer.
-The other 3 options must be plausible but wrong — they should be real Hebrew words/names from the same category.
-
-CRITICAL HEBREW RULES:
-1. For Torah/Chumash questions, use proper Hebrew names: אַבְרָהָם (Avraham), יִצְחָק (Yitzchak), יַעֲקֹב (Yaakov), משֶׁה (Moshe), אַהֲרֹן (Aharon)
-2. NEVER misspell Hebrew names - use proper transliteration: Avraham NOT "Abraham", Yitzchak NOT "Isaac", Yaakov NOT "Jacob"
-3. For Hebrew vocabulary questions, include Hebrew word with English transliteration in parentheses
-4. For Chumash questions, reference the פָּרָשָׁה (parasha) name
-5. Keep answers appropriate for elementary students (K-4)
-6. For vocabulary questions: "What is the Hebrew word for [English]?" - answer in Hebrew
-7. For Chumash questions: ask about the story, characters, or lesson - NOT about verse numbers
-8. All 4 options must be the SAME TYPE: all Hebrew words, all English transliterations, or all English words
-
-NEVER DO:
-- Don't ask "What pasuk/verse says X?" - students won't have the text
-- Don't use English words that have Hebrew origins without transliteration
-- Don't create questions requiring outside text knowledge
-- Don't ask about Rashi commentary at early levels
-- Don't mix Hebrew and English in the options list
-
-Answer format:
-- Hebrew vocabulary: Use Hebrew script, e.g., "סֵפֶר" (sefer = book)
-- Names: Use transliteration, e.g., "Moshe" not "Moses"
-- English answers: Plain English is fine"""
-
-# ============================================================================
-# MATH PROMPT
-# ============================================================================
-MATH_PROMPT = """You are an expert math tutor creating questions for elementary students (K-4).
+SYSTEM_PROMPT = """You are an expert tutor creating questions for elementary students (K-4).
 
 Return ONLY valid JSON in this exact format:
 {
   "question": "The question text",
   "correct_answer": "The answer",
-  "explanation": "Step-by-step solution"
+  "options": ["option_a", "option_b", "option_c", "option_d"],
+  "explanation": "Step-by-step explanation"
 }
 
-MATH RULES:
-1. Match difficulty to grade level:
-   - K: Numbers 1-20, basic shapes, patterns
-   - 1st: Numbers to 100, addition/subtraction to 20, time to hour/half-hour
-   - 2nd: Numbers to 1000, multi-digit operations, fractions
-   - 3rd: Multiplication/division, multi-digit, fractions
-   - 4th: Multi-digit multiplication/division, decimals
-2. Use age-appropriate numbers (no decimals for K-2, no large numbers)
-3. For word problems: include realistic, relatable scenarios
-4. Always verify your math is correct in the explanation
+CRITICAL RULES:
+1. Include exactly 4 options. One MUST be the exact correct_answer text. The other 3 must be plausible but wrong.
+2. All 4 options must be the SAME TYPE (all numbers, all words, all phrases).
+3. Options must be unique — no duplicates.
+4. The correct_answer value must appear verbatim as one of the 4 options.
+5. Keep answers concise — under 100 characters.
+6. Every question MUST have exactly ONE clear correct answer.
+7. NEVER repeat a question from the recent history provided.
+8. NEVER reference images, pictures, diagrams, graphs, or visual aids.
+9. Verify your math is correct before responding.
+10. Return ONLY the JSON, no other text."""
 
-NEVER DO:
-- Don't use numbers that require calculators
-- Don't ask multi-step problems at early levels
-- Don't use adult/teen scenarios in word problems
-- Don't write "[shows X]" - describe mathematically instead"""
+# Subject-specific rules injected into user prompt
+SUBJECT_RULES = {
+    'hebrew': """HEBREW RULES:
+- For Torah/Chumash: use proper Hebrew names (Avraham, Yitzchak, Yaakov, Moshe, Aharon)
+- Use proper transliteration: Avraham NOT "Abraham", Yitzchak NOT "Isaac"
+- For vocabulary: include Hebrew with transliteration, e.g. sefer (book)
+- All 4 options must be same type: all Hebrew, all transliterations, or all English
+- Don't ask about specific verses or Rashi at early levels
+- Keep appropriate for elementary students""",
 
-# ============================================================================
-# READING PROMPT
-# ============================================================================
-READING_PROMPT = """You are an expert reading tutor creating comprehension questions for elementary students (K-4).
+    'math': """MATH RULES:
+- K: Numbers 1-20, basic shapes, patterns
+- 1st: Numbers to 100, addition/subtraction to 20, time to hour/half-hour
+- 2nd: Numbers to 1000, multi-digit operations, fractions intro
+- 3rd: Multiplication/division, multi-digit, fractions
+- 4th: Multi-digit multiplication/division, decimals
+- Use age-appropriate numbers, no calculators needed
+- For word problems: realistic kid-friendly scenarios
+- VERIFY your arithmetic is correct in the explanation""",
 
-Return ONLY valid JSON in this exact format:
-{
-  "question": "The question text",
-  "correct_answer": "The answer",
-  "explanation": "Brief explanation"
-}
+    'reading': """READING RULES:
+- K-1: Basic recall, characters, setting
+- 2nd+: Inference, main idea, cause/effect
+- Questions should be answerable without prior knowledge
+- Don't reference specific pages or paragraphs""",
 
-READING RULES:
-1. Questions should test comprehension, NOT memorization
-2. For K-1: Focus on basic recall, characters, setting
-3. For 2nd+: Include inference, main idea, cause/effect
-4. Answer choices should all be plausible
-5. Questions should be answerable from the text (not requiring prior knowledge)
-
-Question formats by level:
-- K-1: "Who is the story about?", "Where does the story take place?"
-- 2nd-3rd: "What is the main idea?", "Why did [character] do X?"
-- 4th: "What is the author's purpose?", "How does X affect Y?"
-
-NEVER DO:
-- Don't ask about specific page numbers or paragraphs
-- Don't ask questions requiring prior knowledge not in passage
-- Don't use vocabulary above grade level"""
-
-# ============================================================================
-# SCIENCE PROMPT
-# ============================================================================
-SCIENCE_PROMPT = """You are an expert science tutor creating questions for elementary students (K-4).
-
-Return ONLY valid JSON in this exact format:
-{
-  "question": "The question text",
-  "correct_answer": "The answer",
-  "explanation": "Brief scientific explanation"
-}
-
-SCIENCE RULES:
-1. Questions should be factual and verifyable
-2. Use observable phenomena, not abstract concepts
-3. Include age-appropriate scientific vocabulary
-4. Focus on: observation, classification, prediction, simple experiments
-
-By grade:
+    'science': """SCIENCE RULES:
 - K-1: States of matter, plants, animals, weather, senses
-- 2nd: Life cycles, habitats, ecosystems, energy
-- 3rd-4th: Forces, magnets, rocks/fossils, earth/space
+- 2nd: Life cycles, habitats, ecosystems
+- 3rd-4th: Forces, magnets, rocks, earth/space
+- Use observable phenomena, not abstract concepts""",
 
-NEVER DO:
-- Don't ask about theories or unobservable phenomena
-- Don't use scary or inappropriate topics
-- Don't assume access to special equipment"""
-
-# ============================================================================
-# SOCIAL STUDIES PROMPT
-# ============================================================================
-SOCIAL_STUDIES_PROMPT = """You are an expert social studies tutor creating questions for elementary students (K-4).
-
-Return ONLY valid JSON in this exact format:
-{
-  "question": "The question text",
-  "correct_answer": "The answer",
-  "explanation": "Brief explanation"
-}
-
-SOCIAL STUDIES RULES:
-1. Questions should be factual and age-appropriate
-2. Focus on: community, geography, history basics, citizenship
-3. Map questions should be answerable without the map (describe briefly in question)
-4. History questions: focus on key people, events, holidays
-5. Geography: use familiar places
-
-By grade:
+    'social_studies': """SOCIAL STUDIES RULES:
 - K-1: Community helpers, maps, holidays, rules
 - 2nd: Urban/suburban/rural, regions, government basics
 - 3rd-4th: US history, states, branches of government
-
-NEVER DO:
-- Don't ask about controversial topics
-- Don't use political content
-- Don't assume prior knowledge of specific historical dates"""
-
-# ============================================================================
-# DEFAULT PROMPT (fallback)
-# ============================================================================
-DEFAULT_PROMPT = """You are an expert tutor creating adaptive questions for a student.
-
-Return ONLY valid JSON in this exact format:
-{
-  "question": "The question text",
-  "correct_answer": "The answer",
-  "explanation": "Step-by-step solution"
+- Focus on key people, events, holidays""",
 }
 
-Rules:
-1. Match the target difficulty level precisely.
-2. NEVER repeat a question from the recent history provided.
-3. ALWAYS generate the correct_answer field.
-4. Return ONLY the JSON, no other text.
-5. For correct_answer, provide ONLY the final answer — not a sentence.
-6. CRITICAL: Every question MUST have exactly ONE clear correct answer.
-7. Vary question formats: word problems, pure calculations, conceptual questions.
-8. Keep answers concise — under 200 characters.
-9. Use LaTeX notation for math: \\(\\sqrt{16}\\), \\(\\frac{1}{2}\\), \\(x^2\\)."""
+SUBJECT_KEYWORDS = {
+    'hebrew': ['hebrew', 'ivrit', 'chumash', 'torah', 'navi', 'rashi',
+               'yeshiva', 'shoresh', 'binyan', 'dagesh', 'nikkud'],
+    'math': ['math', 'addition', 'subtraction', 'multiplication', 'division',
+             'fraction', 'number', 'geometry', 'algebra'],
+    'reading': ['reading', 'comprehension', 'fiction', 'nonfiction', 'poetry',
+                'story', 'passage', 'vocabulary', 'word'],
+    'science': ['science', 'physics', 'chemistry', 'biology', 'life science',
+                'earth science', 'weather', 'animal', 'plant'],
+    'social_studies': ['social', 'history', 'geography', 'government',
+                       'citizen', 'community', 'map', 'culture'],
+}
 
+
+def _detect_subject(topic_name, node_name):
+    """Detect subject from topic and node names."""
+    combined = f"{topic_name} {node_name}".lower()
+    for subject, keywords in SUBJECT_KEYWORDS.items():
+        if any(kw in combined for kw in keywords):
+            return subject
+    return None
 
 
 def generate(node_name, node_description, topic_name, skill_description,
@@ -242,54 +100,50 @@ def generate(node_name, node_description, topic_name, skill_description,
 
     Returns (question_dict, model_used, prompt_used).
     """
-    # Map ELO difficulty to 0-1 scale for the prompt
-    # ELO 400 = 0.0 (easiest), ELO 1200 = 1.0 (hardest)
-    # Formula: (target - 400) / 800
-    # At skill 800: target=559 → norm=0.20; at skill 1000: target=759 → norm=0.45
+    # Map ELO difficulty to human-readable label
     norm_difficulty = max(0.0, min(1.0, (target_difficulty_elo - 400) / 800))
+    if norm_difficulty < 0.3:
+        difficulty_label = "easy"
+    elif norm_difficulty < 0.6:
+        difficulty_label = "medium"
+    else:
+        difficulty_label = "hard"
 
     recent_str = "\n".join(f"- {q}" for q in (recent_questions or [])[:20]) or "None"
 
-    # Get subject-specific prompt
-    system_prompt = get_subject_prompt(topic_name, node_name)
+    subject = _detect_subject(topic_name, node_name)
+    subject_rules = SUBJECT_RULES.get(subject, '')
 
-    # Hebrew subjects provide their own MCQ options (non-Latin scripts can't
-    # generate algorithmic distractors). All other subjects let the system
-    # compute distractors.
-    is_hebrew = (system_prompt is HEBREW_PROMPT)
-
-    if is_hebrew:
-        options_instruction = (
-            "IMPORTANT: Include exactly 4 \"options\" in your JSON response. "
-            "One option MUST be the correct_answer. The other 3 must be plausible but wrong."
+    if question_type == 'mcq':
+        format_instruction = (
+            "Include exactly 4 \"options\" in your response. "
+            "One option MUST be the exact correct_answer text. "
+            "The other 3 must be plausible but wrong."
         )
     else:
-        options_instruction = (
-            "IMPORTANT: Do NOT include \"options\" in your response. "
-            "Only provide question, correct_answer, and explanation. "
-            "The system will generate multiple choice options automatically."
+        format_instruction = (
+            "Do NOT include \"options\" — this is a short-answer question. "
+            "Only provide question, correct_answer, and explanation."
         )
 
-    user_prompt = f"""Generate a {question_type} question for:
+    user_prompt = f"""Generate a {question_type} question:
 - Topic: {topic_name}
 - Concept: {node_name}
-- Concept description: {node_description}
-- Difficulty: {norm_difficulty:.2f} (0.0=easiest, 1.0=hardest)
-- Recent questions (DO NOT repeat these or ask similar ones):
+- Description: {node_description}
+- Difficulty: {difficulty_label} ({norm_difficulty:.2f})
+- Recent questions (DO NOT repeat or ask similar):
 {recent_str}
 
-{options_instruction}
+{format_instruction}
+
+{subject_rules}
 
 Return JSON only."""
 
-    text, model, prompt = ask(system_prompt, user_prompt)
+    text, model, prompt = ask(SYSTEM_PROMPT, user_prompt)
     logger.info('Raw LLM response for "%s": %s', node_name, text[:500])
     q_data = parse_ai_json_dict(text)
 
-    # Tag Hebrew responses so question_service knows to use LLM options
-    if is_hebrew and isinstance(q_data.get('options'), list):
-        q_data['_llm_provided_options'] = True
-
-    logger.info('Generated %s question for "%s" at difficulty %.2f',
-                question_type, node_name, norm_difficulty)
+    logger.info('Generated %s question for "%s" at difficulty %s',
+                question_type, node_name, difficulty_label)
     return q_data, model, prompt

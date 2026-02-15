@@ -2,17 +2,23 @@
 
 ## [2026-02-15]
 
+### Changed — Phase 3 Rebuild (from-scratch rewrite of question pipeline)
+- **Root cause fix**: LLM now ALWAYS provides complete MCQ options. Eliminates the algorithmic distractor system that caused 97.7% of questions to have broken `["A", "B", "C", "D"]` placeholder options
+- **`ai/question_generator.py` rewritten** (296 → 150 lines): One universal `SYSTEM_PROMPT` + subject-specific `SUBJECT_RULES` dict injected into user prompt. Replaced 6 per-subject prompt constants with `_detect_subject()` auto-detection
+- **`engine/question_validator.py` rewritten** (856 → 307 lines): 5 structural rules + simplified math verification. Removed 7 over-engineered rules (answer giveaway, length bias, punctuation, visual descriptions in choices, draw imperatives, distractor quality, multiple correct answers)
+- **`services/question_service.py` rewritten** (389 → 192 lines): Deleted entire precache system (`_precache`, `pop_cached`, `precache_next`), similarity dedup, distractor insertion. Simplified to: generate → validate → MCQ options check → exact dedup → store
+- **`routes/session.py` cleaned up** (439 → 377 lines): Removed precache route, moved all imports to top level, restored SVG param extraction for session resume
+- **`engine/question_options.py` simplified** (75 → 7 lines): Just constants, removed `sanitize_answer`, `create_placeholder_options`
+
+### Removed
+- **`ai/distractors.py` deleted** (365 lines): Root cause of broken questions — algorithmic distractor generation that produced `["A", "B", "C", "D"]` placeholders
+- **`engine/question_similarity.py` deleted** (75 lines): Quadratic O(n*m) similarity dedup replaced by exact-match dedup
+- **8 test files deleted/rewritten**: `test_distractors.py`, `test_precache.py`, `test_question_similarity.py`, `test_question_options.py`, `test_distractor_fallback.py` deleted; `test_question_validator.py` (1764 → 965 lines), `test_question_service.py`, `test_ai_question_generation.py` rewritten for new architecture
+
 ### Fixed
 - **Hebrew questions now stay MCQ**: LLM provides 4 options directly (Hebrew answers can't generate algorithmic distractors). Invalid LLM options (wrong count, missing correct answer) trigger retry instead of fallback
 - **JSON trailing comma parsing**: LLMs frequently produce `{"key": "value",}` — now stripped before each parse attempt. Eliminates wasted generation attempts
 - **Slow first question (cold-start)**: Ollama model pre-loaded in background thread on server startup. First question no longer waits ~4s for model load
-
-### Changed
-- Hebrew prompt now requests MCQ options from LLM instead of relying on algorithmic distractor generation
-- `generate()` conditionally instructs LLM to include/exclude options based on subject
-
-### Added
-- 5 new tests (649 total): trailing comma JSON parsing (4), Hebrew MCQ with LLM options (1)
 
 ## [2026-02-14]
 

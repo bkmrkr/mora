@@ -1,7 +1,6 @@
-"""Question generation orchestrator with validation, dedup, and pre-caching."""
+"""Question generation orchestrator — select node, generate, validate, store."""
 import json
 import logging
-import threading
 
 from flask import session as flask_session
 
@@ -14,204 +13,68 @@ from models import session as session_model
 from engine import elo
 from engine import next_question as nq_engine
 from engine.question_validator import validate_question
-from engine.question_similarity import is_similar_to_any
-from engine.question_options import (
-    create_placeholder_options,
-    SIMILARITY_THRESHOLD,
-    QUESTION_TYPE_MCQ,
-)
+from engine.question_options import QUESTION_TYPE_MCQ
 from ai import question_generator
-from ai.distractors import insert_distractors
 from ai.local_generators import (is_clock_node, generate_clock_question,
                                  is_inequality_node, generate_inequality_question)
 from config.settings import SESSION_DEFAULTS
 
 logger = logging.getLogger(__name__)
 
-# Pre-cache: one question per (student_id, session_id)
-_precache = {}
-_precache_lock = threading.Lock()
 
-
-def pop_cached(student_id, session_id, is_correct=True):
-    """Return and remove a pre-cached question for the given outcome.
-
-    Args:
-        is_correct: whether the student answered correctly — selects the
-            appropriate cached question (harder after correct, easier after wrong).
-
-    Returns question_dict or None.
-    """
-    key = (student_id, session_id)
-    with _precache_lock:
-        cached = _precache.pop(key, None)
-    if cached is None:
-        return None
-    outcome_key = 'correct' if is_correct else 'wrong'
-    question = cached.get(outcome_key)
-    if question is None:
-        logger.info('Pre-cache miss: no %s-path question cached', outcome_key)
-        return None
-    logger.info('Pre-cache hit (%s path) for student %d session %s (diff=%.0f)',
-                outcome_key, student_id, session_id, question.get('difficulty', 0))
-    return question
-
-
-def precache_next(session_id, student, topic_id, current_question=None):
-    """Pre-generate and cache TWO questions: one for correct, one for wrong.
-
-    Uses ELO prediction to compute what the skill rating would be after each
-    outcome, then generates questions at the appropriate difficulty.
-    """
-    student_id = student['id']
-    if current_question is None:
-        return None
-
-    node_id = current_question.get('node_id')
-    difficulty = current_question.get('difficulty', 800)
-
-    # Get current skill state
-    all_skills = {
-        s['curriculum_node_id']: s
-        for s in skill_model.get_for_student(student_id)
-    }
-    skill = all_skills.get(node_id, {})
-    skill_rating = skill.get('skill_rating', 800.0)
-    uncertainty = skill.get('uncertainty', 350.0)
-
-    # Compute global streak for ELO prediction
-    recent = attempt_model.get_recent(student_id, limit=30)
-    streak = 0
-    for a in recent:
-        if a['is_correct']:
-            streak += 1
-        else:
-            break
-
-    # Predict skill after correct answer
-    rating_correct, _ = elo.update_skill(
-        skill_rating, uncertainty, difficulty, is_correct=True, streak=streak,
-    )
-    # Predict skill after wrong answer (streak resets)
-    rating_wrong, _ = elo.update_skill(
-        skill_rating, uncertainty, difficulty, is_correct=False, streak=0,
-    )
-
-    logger.info('Pre-caching dual: current=%.0f, if_correct=%.0f, if_wrong=%.0f',
-                skill_rating, rating_correct, rating_wrong)
-
-    # Generate question for each outcome with predicted skill overrides
-    result = {}
-    for outcome, predicted_rating in [('correct', rating_correct), ('wrong', rating_wrong)]:
-        overrides = {node_id: predicted_rating}
-        q = generate_next(session_id, student, topic_id,
-                          store_in_session=False, skill_overrides=overrides,
-                          last_was_correct=(outcome == 'correct'))
-        result[outcome] = q
-        if q:
-            logger.info('Pre-cached %s-path question (diff=%.0f, node=%s)',
-                        outcome, q.get('difficulty', 0), q.get('node_name'))
-
-    key = (student_id, session_id)
-    with _precache_lock:
-        _precache[key] = result
-    return result
-
-
-def generate_next(session_id, student, topic_id, store_in_session=True,
-                   skill_overrides=None, last_was_correct=None):
+def generate_next(session_id, student, topic_id, last_was_correct=None):
     """Select focus node, compute difficulty, generate question.
 
-    Three dedup layers (from kidtutor):
-      1. Session dedup — never repeat any question within the same session
-      2. Global dedup — never repeat a correctly-answered question (lifetime)
-      3. Recent texts — passed to LLM to avoid similar questions
-
+    Dedup: exact match against session + lifetime correctly-answered questions.
     Post-generation validation rejects bad LLM output and retries.
 
-    When store_in_session=True, stores in flask_session['current_question'].
-    When False (pre-caching), skips session writes.
-    skill_overrides: dict of {node_id: predicted_skill_rating} — used by
-        dual precache to generate at post-answer difficulty.
-    last_was_correct: whether the student's last answer was correct — drives
-        variety-first node selection (always switch topics after correct).
     Returns question_dict or None.
     """
     student_id = student['id']
 
-    # Get recent 30 attempts
+    # Get context
     recent_attempts = attempt_model.get_recent(student_id, limit=30)
-
-    # Get all student_skill records
     all_skills = {
         s['curriculum_node_id']: s
         for s in skill_model.get_for_student(student_id)
     }
-
-    # Get curriculum nodes for this topic
     nodes = node_model.get_for_topic(topic_id)
     if not nodes:
-        if store_in_session:
-            flask_session['current_question'] = None
+        flask_session['current_question'] = None
         return None
 
-    # Analyze recent history
-    analysis = nq_engine.analyze_recent(recent_attempts, all_skills)
-
     # Select focus node
-    current_node_id = None
-    if store_in_session:
-        current_q = flask_session.get('current_question')
-        current_node_id = current_q.get('node_id') if current_q else None
+    analysis = nq_engine.analyze_recent(recent_attempts, all_skills)
+    current_q = flask_session.get('current_question')
+    current_node_id = current_q.get('node_id') if current_q else None
     focus_node_id = nq_engine.select_focus_node(
         analysis, nodes, all_skills, current_node_id, last_was_correct
     )
 
     if focus_node_id is None:
-        if store_in_session:
-            flask_session['current_question'] = None
+        flask_session['current_question'] = None
         return None
 
     focus_node = node_model.get_by_id(focus_node_id)
     topic = topic_model.get_by_id(topic_id)
 
-    # Apply skill overrides for precache predictions
-    effective_skills = all_skills
-    if skill_overrides:
-        effective_skills = dict(all_skills)
-        for nid, predicted_rating in skill_overrides.items():
-            if nid in effective_skills:
-                effective_skills[nid] = dict(effective_skills[nid])
-                effective_skills[nid]['skill_rating'] = predicted_rating
-            else:
-                effective_skills[nid] = {'skill_rating': predicted_rating}
-
     # Compute target difficulty and question type
     target_diff, q_type = nq_engine.compute_question_params(
-        focus_node_id, effective_skills, analysis
+        focus_node_id, all_skills, analysis
     )
 
-    # --- Dedup layers ---
-    # Layer 1: Session dedup — all question texts in this session (answered)
+    # Dedup sets: session texts + globally correct texts
     session_attempts = attempt_model.get_for_session(session_id)
     session_texts = {a['content'] for a in session_attempts if a.get('content')}
-
-    # Also include the current unanswered question (not yet in attempts).
-    # Critical for precache: prevents generating a duplicate of the active question.
     sess = session_model.get_by_id(session_id)
     if sess and sess.get('current_question_id'):
         current_q_row = question_model.get_by_id(sess['current_question_id'])
         if current_q_row and current_q_row.get('content'):
             session_texts.add(current_q_row['content'])
-
-    # Layer 2: Global dedup — all correctly-answered question texts (lifetime)
     global_correct_texts = attempt_model.get_correct_texts(student_id)
+    recent_text_list = list(session_texts | global_correct_texts)
 
-    # Combined exclude set for LLM prompt
-    all_exclude = session_texts | global_correct_texts
-    recent_text_list = list(all_exclude)
-
-    # --- Check for local generators (no LLM needed) ---
+    # Try local generators first (clock, inequality)
     node_desc = focus_node.get('description', '')
     q_data = None
     model = None
@@ -223,7 +86,6 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
         )
         if q_data:
             q_type = QUESTION_TYPE_MCQ
-            logger.info('Generated local clock question for "%s"', focus_node['name'])
 
     if not q_data and is_inequality_node(focus_node['name'], node_desc):
         q_data, model, prompt = generate_inequality_question(
@@ -231,116 +93,60 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
         )
         if q_data:
             q_type = QUESTION_TYPE_MCQ
-            logger.info('Generated local inequality question for "%s"', focus_node['name'])
 
-    # --- Generate with validation + dedup retry (LLM path) ---
+    # LLM generation with validation + dedup retry
     if not q_data:
         for attempt_num in range(SESSION_DEFAULTS['max_generation_attempts']):
             try:
                 q_data, model, prompt = question_generator.generate(
-                    focus_node['name'],
-                    node_desc,
-                    topic['name'] if topic else '',
-                    node_desc,
-                    target_diff,
-                    q_type,
-                    recent_text_list,
+                    focus_node['name'], node_desc,
+                    topic['name'] if topic else '', node_desc,
+                    target_diff, q_type, recent_text_list,
                 )
             except Exception as e:
                 logger.warning('Generation attempt %d failed: %s', attempt_num + 1, e)
                 q_data = None
                 continue
 
-            if not isinstance(q_data, dict):
-                logger.warning('Generation attempt %d: non-dict result (%s)',
-                               attempt_num + 1, type(q_data).__name__)
+            if not isinstance(q_data, dict) or not q_data.get('question'):
+                logger.warning('Generation attempt %d: invalid result', attempt_num + 1)
                 q_data = None
                 continue
 
-            if not q_data.get('question'):
-                logger.warning('Generation attempt %d: empty question', attempt_num + 1)
-                q_data = None
-                continue
-
-            # Validate the generated question
-            # For MCQ, add placeholder options for validation (will be replaced with computed distractors)
-            if q_type == QUESTION_TYPE_MCQ and q_data and not q_data.get('options'):
-                correct = q_data.get('correct_answer', '')
-
-                # Sanitize and normalize the correct answer
-                from engine.question_options import sanitize_answer
-                clean_answer = sanitize_answer(correct)
-                q_data['correct_answer'] = clean_answer
-
-                # Create placeholder options (sanitized, escaped)
-                q_data['options'] = create_placeholder_options(clean_answer, attempt_num)
-
+            # Validate structure + math
             is_valid, reason = validate_question(q_data, node_desc)
             if not is_valid:
                 logger.warning('Validation rejected (attempt %d): %s', attempt_num + 1, reason)
                 q_data = None
                 continue
 
-            # Dedup check: reject if question already seen in session or globally
+            # MCQ: verify LLM provided valid options
+            if q_type == QUESTION_TYPE_MCQ:
+                opts = q_data.get('options', [])
+                correct = q_data.get('correct_answer', '')
+                if not (isinstance(opts, list) and len(opts) >= 3
+                        and correct in opts):
+                    logger.warning('Invalid MCQ options (attempt %d): %d opts, answer_in=%s',
+                                   attempt_num + 1,
+                                   len(opts) if isinstance(opts, list) else 0,
+                                   correct in opts if isinstance(opts, list) else False)
+                    q_data = None
+                    continue
+
+            # Exact dedup
             q_text = q_data['question'].strip()
-            if q_text in session_texts:
-                logger.warning('Session dedup rejected (attempt %d)', attempt_num + 1)
+            if q_text in session_texts or q_text in global_correct_texts:
+                logger.warning('Dedup rejected (attempt %d)', attempt_num + 1)
                 q_data = None
                 continue
 
-            if q_text in global_correct_texts:
-                logger.warning('Global dedup rejected (attempt %d)', attempt_num + 1)
-                q_data = None
-                continue
-
-            # Layer 3: Similarity check against correctly-answered questions
-            # Avoid similar follow-up questions after correct answers (e.g., don't ask "5+3" then "5+2")
-            is_similar, similar_to, similarity_score = is_similar_to_any(
-                q_text, list(global_correct_texts), threshold=SIMILARITY_THRESHOLD
-            )
-            if is_similar:
-                logger.warning('Similarity dedup rejected (attempt %d, score=%.2f)',
-                             attempt_num + 1, similarity_score)
-                q_data = None
-                continue
-
-            # Compute distractors for MCQ (after validation, before storing)
-            if q_type == QUESTION_TYPE_MCQ and q_data:
-                if q_data.get('_llm_provided_options'):
-                    # Hebrew/non-Latin: LLM provided options directly.
-                    # Validate: must have 4 options with correct_answer present.
-                    opts = q_data.get('options', [])
-                    correct = q_data.get('correct_answer', '')
-                    if (isinstance(opts, list) and len(opts) == 4
-                            and correct in opts):
-                        logger.info('Using LLM-provided MCQ options (Hebrew)')
-                    else:
-                        # LLM options invalid — retry
-                        logger.warning('LLM options invalid (len=%s, correct_in=%s), retrying',
-                                       len(opts) if isinstance(opts, list) else 'N/A',
-                                       correct in opts if isinstance(opts, list) else False)
-                        q_data = None
-                        continue
-                else:
-                    q_data, success, reason = insert_distractors(q_data)
-                    if not success:
-                        logger.info('Distractor failed, falling back to short_answer: %s',
-                                    reason)
-                        q_type = 'short_answer'
-                        q_data.pop('options', None)
-
-            # Passed all checks
-            break
+            break  # passed all checks
 
     if not q_data:
-        if store_in_session:
-            flask_session['current_question'] = None
+        flask_session['current_question'] = None
         return None
 
-    # Clean up internal flags before storing
-    q_data.pop('_llm_provided_options', None)
-
-    # Store question in DB
+    # Store in DB
     skill = all_skills.get(focus_node_id, {})
     skill_rating = skill.get('skill_rating', 800.0)
     p_correct = elo.p_correct(skill_rating, target_diff)
@@ -358,9 +164,6 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
         model_used=model,
     )
 
-    # Compute difficulty score (1-10) for display
-    # Use 400-1200 range to map ELO difficulty to 0-1
-    # This gives skill=800 → ~0.2 (easy but not trivial), skill=1200 → ~0.7 (challenging)
     norm_diff = max(0.0, min(1.0, (target_diff - 400) / 800))
     difficulty_score = round(norm_diff * 9) + 1
 
@@ -377,13 +180,12 @@ def generate_next(session_id, student, topic_id, store_in_session=True,
         'difficulty_score': difficulty_score,
         'p_correct': round(p_correct * 100),
         'node_description': node_desc,
-        # SVG regeneration params (small strings, not raw SVGs)
         'clock_hour': q_data.get('clock_hour'),
         'clock_minute': q_data.get('clock_minute'),
         'inequality_op': q_data.get('inequality_op'),
         'inequality_boundary': q_data.get('inequality_boundary'),
     }
-    if store_in_session:
-        flask_session['current_question'] = question_dict
-        session_model.update_current_question(session_id, question_id)
+
+    flask_session['current_question'] = question_dict
+    session_model.update_current_question(session_id, question_id)
     return question_dict

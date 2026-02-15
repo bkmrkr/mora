@@ -38,6 +38,13 @@ LLM (qwen2.5) could not reliably produce grade-appropriate educational content. 
 - `make_options()` deduplication fix — guaranteed 4 unique options even with small numbers
 - 20 route tests (148 total)
 
+### Added — Phase 6: Grades 2-4 Templates
+- `curriculum/templates/grade2.py` — 10 templates (add/sub 100/1000, intro multiply, money, time, measurement, fractions intro, comparing 3-digit, two-step, odd/even)
+- `curriculum/templates/grade3.py` — 10 templates (mult/div facts, multi-digit mult, area/perimeter, fraction compare/add/sub, rounding, word problems, elapsed time, data interpretation)
+- `curriculum/templates/grade4.py` — 10 templates (2x2 mult, long division, fraction ops with unlike denom, decimal place value/add/sub, angles, geometry, factors/multiples, multi-step word, equivalent fractions)
+- `make_options()` extended: fraction distractor padding and decimal distractor padding
+- 31 new tests (179 total)
+
 ### Removed
 - All `ai/` modules (question_generator, json_utils, explainer, answer_grader, local_generators)
 - Admin blueprint and templates

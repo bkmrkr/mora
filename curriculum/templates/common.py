@@ -68,6 +68,38 @@ def make_options(correct, distractors):
             if candidate not in seen and int(candidate) >= 0:
                 opts.append(candidate)
                 seen.add(candidate)
+    elif '/' in correct_str:
+        # Fraction answer — generate fraction distractors
+        try:
+            num, den = correct_str.split('/')
+            num, den = int(num), int(den)
+            for n_off, d_off in [(1, 0), (-1, 0), (0, 1), (1, 1), (-1, 1), (2, 0)]:
+                if len(opts) >= 3:
+                    break
+                cn = num + n_off
+                cd = den + d_off
+                if cn > 0 and cd > 0:
+                    candidate = f'{cn}/{cd}'
+                    if candidate not in seen:
+                        opts.append(candidate)
+                        seen.add(candidate)
+        except (ValueError, TypeError):
+            pass
+    else:
+        # Try float padding (for decimal answers)
+        try:
+            correct_float = float(correct_str)
+            for offset in [0.1, -0.1, 0.2, -0.2, 1.0, -1.0, 0.5]:
+                if len(opts) >= 3:
+                    break
+                val = round(correct_float + offset, 2)
+                if val >= 0:
+                    candidate = str(val)
+                    if candidate not in seen:
+                        opts.append(candidate)
+                        seen.add(candidate)
+        except (ValueError, TypeError):
+            pass
 
     all_opts = opts[:3] + [correct_str]
     random.shuffle(all_opts)

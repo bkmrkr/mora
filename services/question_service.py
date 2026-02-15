@@ -11,13 +11,18 @@ from engine import elo
 from engine.selector import analyze_recent, select_skill, compute_question_params
 from curriculum.skills import SKILLS, get_skill
 from curriculum.templates.grade1 import GRADE1_TEMPLATES
+from curriculum.templates.grade2 import GRADE2_TEMPLATES
+from curriculum.templates.grade3 import GRADE3_TEMPLATES
+from curriculum.templates.grade4 import GRADE4_TEMPLATES
 
 logger = logging.getLogger(__name__)
 
 # Registry of all template functions by skill_id
 TEMPLATES = {}
 TEMPLATES.update(GRADE1_TEMPLATES)
-# Grades 2-4 will be added here in Phase 6
+TEMPLATES.update(GRADE2_TEMPLATES)
+TEMPLATES.update(GRADE3_TEMPLATES)
+TEMPLATES.update(GRADE4_TEMPLATES)
 
 
 def generate_next(session_id, student, current_skill_id=None):

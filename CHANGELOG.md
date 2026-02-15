@@ -1,5 +1,10 @@
 # Mora v2 Changelog
 
+### Fixed — Fraction Equivalence in Short Answer Mode
+- `_to_number()` now parses fractions like "1/2" → 0.5, so "2/4" is accepted when answer is "1/2"
+- Also handles fraction-to-decimal comparison ("3/4" matches "0.75")
+- Handles division by zero safely ("5/0" returns None)
+
 ### Fixed — Mastery Progression Too Slow
 - Mastery formula overweighted ELO rating (60%) vs actual accuracy (40%) — student with 100% accuracy after 31 questions still couldn't unlock Grade 2
 - Changed mastery weights to 0.3 rating / 0.7 accuracy — accuracy-dominant for faster progression

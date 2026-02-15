@@ -99,8 +99,18 @@ def _normalize(text):
 
 
 def _to_number(text):
-    """Try to parse text as a number."""
+    """Try to parse text as a number (handles fractions like '1/2')."""
     text = text.replace(',', '').strip()
+    # Try fraction first: "1/2", "3/4"
+    if '/' in text:
+        parts = text.split('/')
+        if len(parts) == 2:
+            try:
+                num, den = float(parts[0]), float(parts[1])
+                if den != 0:
+                    return num / den
+            except (ValueError, TypeError):
+                pass
     try:
         return float(text)
     except (ValueError, TypeError):

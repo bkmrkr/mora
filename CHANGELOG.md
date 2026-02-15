@@ -2,6 +2,12 @@
 
 ## [2026-02-15]
 
+### Changed — Phase 6 Final Assessment & Hardening
+- **Explainer exception logging**: Bare `except Exception` in feedback route now logs the error before falling back to generic explanation
+- **JSON parse safety**: `_load_question_from_db()` now catches `JSONDecodeError` on malformed options instead of crashing
+- **Architecture audit**: All 6 production layers verified — zero layering violations
+- **Test coverage audit**: 4,465 lines of tests across 26 files; all core modules well-covered
+
 ### Changed — Phase 5 End-to-End Validation & Production Readiness
 - **Session resume guard**: `_load_question_from_db()` now validates MCQ options before returning — rejects questions with missing options, too few options, or correct answer not in options. Broken DB questions trigger fresh generation instead of being served to students
 - **DB cleanup**: 803 broken questions marked as `rejected` (792 placeholder `["A","B","C","D"]` + 11 answer/options mismatch). Only 6 valid questions remain from pre-rebuild era

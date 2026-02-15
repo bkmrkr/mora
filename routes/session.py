@@ -45,7 +45,11 @@ def _load_question_from_db(question_id):
     norm_diff = max(0.0, min(1.0, (difficulty - 400) / 800))
     difficulty_score = round(norm_diff * 9) + 1
     p_correct = q['estimated_p_correct'] or 0
-    options = json.loads(q['options']) if q['options'] else None
+    try:
+        options = json.loads(q['options']) if q['options'] else None
+    except (json.JSONDecodeError, TypeError):
+        logger.warning('Malformed options JSON for question %d', question_id)
+        options = None
     correct = q['correct_answer'] or ''
 
     # Reject broken questions (e.g. placeholder ["A","B","C","D"] options)
@@ -277,7 +281,8 @@ def feedback(session_id):
                 answered_question['node_name'],
                 result.get('node_description', ''),
             )
-        except Exception:
+        except Exception as e:
+            logger.warning('Failed to generate explanation: %s', e)
             explanation = {
                 'explanation': f"The correct answer was: {answered_question['correct_answer']}",
                 'encouragement': 'Keep going!',

@@ -2,6 +2,12 @@
 
 ## [2026-02-15]
 
+### Verified — Phase 7 Live Smoke Test & Pipeline Verification
+- **End-to-end generation test**: 5/5 subjects produce valid MCQ questions with correct JSON, 4 options, answer in options, and pass all validation rules (~1s per question)
+- **Stress test (50 questions)**: 90% first-attempt pass rate across all subjects (45/50). Failures are correctly caught by validation and would trigger retry in production
+- **Pipeline confirmed working**: Math, Reading, Science, Social Studies all produce high-quality questions. Hebrew quality limited by qwen2.5 model size
+- **DB state**: 803 broken questions rejected, 8 approved (Hebrew only). Fresh generation works for all subjects on demand
+
 ### Changed — Phase 6 Final Assessment & Hardening
 - **Explainer exception logging**: Bare `except Exception` in feedback route now logs the error before falling back to generic explanation
 - **JSON parse safety**: `_load_question_from_db()` now catches `JSONDecodeError` on malformed options instead of crashing

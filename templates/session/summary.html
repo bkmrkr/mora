@@ -93,6 +93,15 @@
     </div>
     {% endif %}
 
+    {% if coach_notes %}
+    <div class="coach-notes">
+        <h3>&#128218; Coach's Notes</h3>
+        {% for note in coach_notes %}
+        <p>{{ note }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     {% if focus_skill %}
     <div class="focus-skill-card">
         <div class="focus-label">Next focus</div>

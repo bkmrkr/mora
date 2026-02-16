@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Coach's Notes on session summary
+- Analyzes session performance to generate 1-2 actionable coaching insights
+- Speed analysis: praises fast recall, suggests slowing down if many slow wrong answers
+- Accuracy patterns: identifies skills close to mastery, highlights strengths after low-accuracy sessions
+- Only shows when there's something meaningful to say (avoids generic noise)
+
 ### Added — Smart session warm-up (confidence-building first question)
 - First question of each session picks from student's top 5 highest-mastery skills
 - Ensures students start each session with a question they're likely to get right

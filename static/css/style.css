@@ -740,6 +740,23 @@ body {
 }
 .imp-up { color: #16a34a; }
 .imp-down { color: #dc2626; }
+.coach-notes {
+    background: #f0fdf4;
+    border-left: 3px solid #16a34a;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+}
+.coach-notes h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+    color: #15803d;
+}
+.coach-notes p {
+    margin: 0.3rem 0;
+    font-size: 0.95rem;
+    color: #166534;
+}
 .focus-skill-card {
     text-align: center;
     padding: 1rem;

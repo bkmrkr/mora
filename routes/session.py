@@ -320,6 +320,32 @@ def end(session_id):
             mastered_names = [s['name'] for s in skills_practiced if s['mastered']]
             session_insight = f'{mastered_names[0]} is mastered!'
 
+    # Coach notes: actionable insights from session data
+    coach_notes = []
+    if skills_practiced and total >= 3:
+        # Speed analysis
+        fast_times = [a['response_time_seconds'] for a in attempts
+                      if a.get('response_time_seconds') and a['response_time_seconds'] > 0
+                      and a['is_correct']]
+        slow_wrong = [a for a in attempts
+                      if a.get('response_time_seconds') and a['response_time_seconds'] > 15
+                      and not a['is_correct']]
+        if fast_times and sum(fast_times) / len(fast_times) < 4:
+            coach_notes.append('Great speed! Your quick answers show strong recall.')
+        elif slow_wrong and len(slow_wrong) >= 2:
+            coach_notes.append("Take your time — it's okay to think before answering.")
+
+        # Accuracy pattern
+        if accuracy >= 80:
+            unmastered = [s for s in skills_practiced if not s['mastered']]
+            if unmastered:
+                closest = max(unmastered, key=lambda s: s['mastery_pct'])
+                coach_notes.append(f'{closest["name"]} is at {closest["mastery_pct"]}% — almost mastered!')
+        elif accuracy < 50 and total >= 5:
+            strong = [s for s in skills_practiced if s['session_accuracy'] >= 75]
+            if strong:
+                coach_notes.append(f'You did well on {strong[0]["name"]} — build on that strength!')
+
     # Session-to-session comparison: find skills practiced in previous session too
     skill_improvements = []
     prev_sessions = session_model.get_for_student(student['id'], limit=5)
@@ -382,4 +408,5 @@ def end(session_id):
         summary_message=summary_message,
         session_insight=session_insight,
         skill_improvements=skill_improvements,
+        coach_notes=coach_notes,
     )

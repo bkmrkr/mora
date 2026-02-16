@@ -8,6 +8,14 @@
     <p class="session-insight">{{ session_insight }}</p>
     {% endif %}
 
+    {% if session_records %}
+    <div class="session-records">
+        {% for rec in session_records %}
+        <div class="record-item">&#127942; {{ rec }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <div class="stat-cards">
         <div class="stat-card">
             <div class="stat-value">{{ total }}</div>

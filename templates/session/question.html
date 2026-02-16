@@ -111,6 +111,13 @@
         <span class="rating-change rating-up">+{{ last_result.rating_change }}</span>
         {% endif %}
     </div>
+    {% if last_result.new_records %}
+    <div class="new-record-banner">
+        {% for rec in last_result.new_records %}
+        <div class="record-item">&#127942; {{ rec }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endif %}
 
     {% if question.is_challenge %}

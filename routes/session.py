@@ -160,6 +160,25 @@ def answer(session_id):
         flask_session['streak'] = streak
         flask_session['wrong_streak'] = 0
         result['streak'] = streak
+
+        # Check for personal records
+        records = flask_session.get('records', {})
+        new_records = []
+        # Streak record
+        if streak > records.get('best_streak', 0):
+            records['best_streak'] = streak
+            if streak >= 3:  # only celebrate meaningful streaks
+                new_records.append(f'New streak record: {streak} in a row!')
+        # Speed record
+        rt = result.get('response_time_s', 0)
+        if rt > 0 and (not records.get('fastest_correct') or rt < records['fastest_correct']):
+            records['fastest_correct'] = round(rt, 1)
+            if rt <= 5:  # only celebrate fast answers
+                new_records.append(f'New speed record: {round(rt, 1)}s!')
+        flask_session['records'] = records
+        if new_records:
+            result['new_records'] = new_records
+
         flask_session['last_result'] = result  # update with streak
     else:
         flask_session['best_streak'] = max(flask_session.get('best_streak', 0), streak)
@@ -432,12 +451,21 @@ def end(session_id):
                     'improved': curr_acc > prev_acc,
                 })
 
+    # Check for new accuracy record
+    records = flask_session.get('records', {})
+    session_records = []
+    if total >= 5:
+        prev_best = records.get('best_accuracy')
+        if prev_best is None or accuracy > prev_best:
+            session_records.append(f'New accuracy record: {accuracy}%!')
+
     flask_session.pop('current_question', None)
     flask_session.pop('last_result', None)
     flask_session.pop('last_skill_id', None)
     flask_session.pop('streak', None)
     flask_session.pop('best_streak', None)
     flask_session.pop('challenge_offered', None)
+    flask_session.pop('records', None)
 
     return render_template(
         'session/summary.html',
@@ -457,4 +485,5 @@ def end(session_id):
         session_insight=session_insight,
         skill_improvements=skill_improvements,
         coach_notes=coach_notes,
+        session_records=session_records,
     )

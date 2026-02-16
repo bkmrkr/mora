@@ -1,5 +1,14 @@
 # Mora v2 Changelog
 
+### Added — Personal records tracker
+- Tracks all-time personal bests: longest streak, fastest correct answer, best session accuracy
+- Records computed from DB at session start and stored in flask_session
+- During session: streak and speed records checked after each correct answer
+- At session end: accuracy record checked (min 5 questions)
+- Golden trophy banner celebrates when a record is broken
+- Only celebrates meaningful achievements (streaks >= 3, speed <= 5s)
+- Makes the adaptive system feel like a coach tracking your personal growth
+
 ### Added — Practice mode selector (Mixed vs Focus)
 - Returning students see a choose screen: "Mixed Practice" or focus on a specific skill
 - Top 5 unlocked skills shown with progress bars, sorted by mastery (closest first)

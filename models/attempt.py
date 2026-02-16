@@ -63,6 +63,49 @@ def count_for_student(student_id):
     return row['cnt'] if row else 0
 
 
+def get_personal_records(student_id):
+    """Compute personal records: best streak, fastest correct, best session accuracy."""
+    # Best streak: longest consecutive correct answers
+    all_attempts = query_db(
+        """SELECT is_correct FROM attempts
+           WHERE student_id=? ORDER BY timestamp""",
+        (student_id,),
+    )
+    best_streak = 0
+    current = 0
+    for a in all_attempts:
+        if a['is_correct']:
+            current += 1
+            best_streak = max(best_streak, current)
+        else:
+            current = 0
+
+    # Fastest correct answer
+    fastest_row = query_db(
+        """SELECT MIN(response_time_seconds) as fastest
+           FROM attempts
+           WHERE student_id=? AND is_correct=1
+           AND response_time_seconds > 0""",
+        (student_id,), one=True,
+    )
+    fastest_correct = fastest_row['fastest'] if fastest_row and fastest_row['fastest'] else None
+
+    # Best session accuracy (min 5 questions)
+    best_acc_row = query_db(
+        """SELECT MAX(CAST(total_correct AS REAL) / total_questions * 100) as best_acc
+           FROM sessions
+           WHERE student_id=? AND total_questions >= 5 AND ended_at IS NOT NULL""",
+        (student_id,), one=True,
+    )
+    best_accuracy = round(best_acc_row['best_acc'], 1) if best_acc_row and best_acc_row['best_acc'] else None
+
+    return {
+        'best_streak': best_streak,
+        'fastest_correct': round(fastest_correct, 1) if fastest_correct else None,
+        'best_accuracy': best_accuracy,
+    }
+
+
 def get_since(student_id, since_date):
     """All attempts for a student since a date (YYYY-MM-DD string)."""
     return query_db(

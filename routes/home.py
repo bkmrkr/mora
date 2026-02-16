@@ -4,6 +4,7 @@ from flask import (Blueprint, render_template, redirect, url_for,
 
 from models import student as student_model
 from models import session as session_model
+from models import attempt as attempt_model
 from models.progress import get_for_student
 from curriculum.skills import get_skills_for_grade, get_skill, SKILLS
 from engine.elo import is_mastered
@@ -214,6 +215,10 @@ def start():
     # Set session goal (10 questions per session)
     flask_session['session_goal'] = 10
     flask_session['goal_celebrated'] = False
+
+    # Personal records for celebrating new bests
+    records = attempt_model.get_personal_records(student['id'])
+    flask_session['records'] = records
 
     # Focus mode: prefer a specific skill
     if focus_skill_id and focus_skill_id in SKILLS:

@@ -479,6 +479,20 @@ body {
     50% { transform: rotate(200deg) scale(1.3); }
     to { transform: rotate(360deg) scale(1); }
 }
+/* Personal record celebration */
+.new-record-banner {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+}
+.record-item {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #92400e;
+}
+
 /* Focus mode banner */
 .focus-mode-banner {
     display: flex;
@@ -928,6 +942,19 @@ body {
     color: var(--primary);
     font-weight: 500;
     margin-top: 0.25rem;
+}
+.session-records {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1px solid #f59e0b;
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    margin: 0.75rem auto;
+    max-width: 400px;
+}
+.session-records .record-item {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #92400e;
 }
 .stat-cards {
     display: flex;

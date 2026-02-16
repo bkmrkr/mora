@@ -13,6 +13,23 @@
     </div>
 
     {% if last_result and last_result.is_correct %}
+    {% if last_result.grade_completed %}
+    <div class="grade-celebration">
+        <div class="grade-star">&#127942;</div>
+        <div class="mastery-text">
+            <strong>Grade {{ last_result.grade_completed }} Complete!</strong>
+            <span>You mastered all {{ last_result.grade_completed | string }}{% if last_result.grade_completed == 1 %}st{% elif last_result.grade_completed == 2 %}nd{% elif last_result.grade_completed == 3 %}rd{% else %}th{% endif %} grade skills!</span>
+        </div>
+    </div>
+    {% elif last_result.just_mastered %}
+    <div class="mastery-celebration">
+        <div class="mastery-star">&#11088;</div>
+        <div class="mastery-text">
+            <strong>Skill Mastered!</strong>
+            <span>{{ last_result.skill_name }}</span>
+        </div>
+    </div>
+    {% endif %}
     <div class="result-banner correct {% if streak >= 3 %}streak-glow{% endif %}">
         {% if streak >= 10 %}
             Unstoppable! {{ streak }} in a row!

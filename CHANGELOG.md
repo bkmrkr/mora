@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — Skill mastery and grade completion celebrations
+- Detect when a student masters a skill (crosses 0.65 threshold) during a session
+- Show animated golden "Skill Mastered!" banner with spinning star on the next question
+- Detect when all 10 skills in a grade become mastered (grade completion)
+- Show special purple "Grade N Complete!" celebration with trophy for grade milestones
+- Both celebrations use CSS scale-in and glow animations for a satisfying moment
+
 ### Added — Streak tracking and encouragement
 - Track consecutive correct answers during a session
 - Streak banner with escalating messages: "Correct!" (1-2), "Nice streak! N in a row!" (3-4), "Amazing!" (5-6), "On fire!" (7-9), "Unstoppable!" (10+)

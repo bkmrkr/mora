@@ -531,6 +531,24 @@ body {
     gap: 1rem;
     margin-top: 2rem;
 }
+.focus-skill-card {
+    text-align: center;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    background: linear-gradient(135deg, #ede9fe, #dbeafe);
+    border: 1px solid var(--primary-light);
+    border-radius: var(--radius);
+}
+.focus-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+}
+.focus-name { font-size: 1.1rem; font-weight: 600; }
+.focus-detail { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.15rem; }
 
 /* Dashboard */
 .dashboard-container h1 { margin-bottom: 1.5rem; }

@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Focus skill recommendation on session summary
+- After ending a session, show "Next Focus" card with the skill closest to mastery
+- Only recommends unlocked skills (prerequisites met)
+- Shows skill name, grade, and current mastery percentage
+- Makes the adaptive engine a collaborator — students know where to focus next
+
 ### Added — Grade progress overview bar on dashboard
 - Summary bar at top of student dashboard: "N/40 skills mastered"
 - Four progress bars showing per-grade completion (e.g., "Grade 2: 10/10")

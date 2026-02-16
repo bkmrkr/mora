@@ -53,6 +53,14 @@
     </div>
     {% endif %}
 
+    {% if focus_skill %}
+    <div class="focus-skill-card">
+        <div class="focus-label">Next focus</div>
+        <div class="focus-name">{{ focus_skill.name }}</div>
+        <div class="focus-detail">Grade {{ focus_skill.grade }} — {{ focus_skill.mastery_pct }}% mastered</div>
+    </div>
+    {% endif %}
+
     <div class="summary-actions">
         <a href="{{ url_for('home.index') }}" class="btn btn-primary">Practice Again</a>
         <a href="{{ url_for('dashboard.overview', student_id=student.id) }}"

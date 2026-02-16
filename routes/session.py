@@ -8,9 +8,9 @@ from flask import (Blueprint, render_template, request, redirect,
 from models import student as student_model
 from models import session as session_model
 from models import attempt as attempt_model
-from models.progress import get as get_progress
+from models.progress import get as get_progress, get_for_student
 from services import question_service, answer_service
-from curriculum.skills import get_skill
+from curriculum.skills import get_skill, SKILLS
 from curriculum.templates.common import generate_clock_svg
 from engine import elo
 
@@ -217,6 +217,28 @@ def end(session_id):
         flask_session.get('streak', 0),
     )
 
+    # Find focus skill: unmastered skill closest to mastery threshold
+    focus_skill = None
+    all_progress = get_for_student(student['id'])
+    progress_map = {p['skill_id']: p for p in all_progress}
+    best_mastery = -1
+    for sid, sinfo in SKILLS.items():
+        prog = progress_map.get(sid)
+        mastery = prog['mastery_level'] if prog else 0.0
+        if not elo.is_mastered(mastery) and mastery > best_mastery:
+            # Check prerequisites are met
+            prereqs_met = all(
+                elo.is_mastered(progress_map.get(pid, {}).get('mastery_level', 0))
+                for pid in sinfo.get('prerequisites', [])
+            )
+            if prereqs_met or not sinfo.get('prerequisites'):
+                best_mastery = mastery
+                focus_skill = {
+                    'name': sinfo['name'],
+                    'grade': sinfo['grade'],
+                    'mastery_pct': round(mastery * 100),
+                }
+
     flask_session.pop('current_question', None)
     flask_session.pop('last_result', None)
     flask_session.pop('last_skill_id', None)
@@ -233,4 +255,5 @@ def end(session_id):
         skills_practiced=skills_practiced,
         best_streak=best_streak,
         avg_time=avg_time,
+        focus_skill=focus_skill,
     )

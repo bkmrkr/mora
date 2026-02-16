@@ -1,5 +1,10 @@
 # Mora v2 Changelog
 
+### Improved — Dashboard index with level names and "Today" badges
+- Each student card now shows their Math Level name (Starter, Grandmaster, etc.)
+- Green "Today" badge appears next to students who practiced today
+- Parents/teachers can see at a glance who practiced and their progress level
+
 ### Added — Math Level system on dashboard
 - Gamified leveling: Starter → Explorer → Learner → Scholar → Expert → Champion → Master → Grandmaster → Legend
 - Each level requires 5 more mastered skills (40 total = Legend)

@@ -11,6 +11,9 @@
             <div class="student-card-header">
                 <h3>{{ s.student.name }}</h3>
                 <span class="student-grade-badge">Grade {{ s.current_grade }}</span>
+                {% if s.practiced_today %}
+                <span class="today-badge">Today</span>
+                {% endif %}
             </div>
             <div class="mastery-bar">
                 <div class="mastery-fill {% if s.mastered_skills == s.total_skills %}mastered{% endif %}"
@@ -18,6 +21,7 @@
             </div>
             <div class="student-stats">
                 <span>{{ s.mastered_skills }}/{{ s.total_skills }} skills</span>
+                <span class="student-level">{{ s.level_name }}</span>
                 <span>{{ s.total_attempts }} attempts</span>
             </div>
         </a>

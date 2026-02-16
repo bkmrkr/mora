@@ -754,6 +754,18 @@ body {
     background: #ede9fe;
     color: var(--primary);
 }
+.today-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: 10px;
+    background: #dcfce7;
+    color: #166534;
+}
+.student-level {
+    font-weight: 600;
+    color: var(--primary);
+}
 .student-stats {
     display: flex;
     gap: 1rem;

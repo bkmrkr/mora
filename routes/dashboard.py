@@ -63,12 +63,16 @@ def index():
             if has_activity:
                 current_grade = grade
                 break
+        _, practiced_today = session_model.get_practice_streak(s['id'])
+        level = _compute_math_level(mastered)
         student_stats.append({
             'student': s,
             'total_attempts': total,
             'mastered_skills': mastered,
             'total_skills': 40,
             'current_grade': current_grade,
+            'practiced_today': practiced_today,
+            'level_name': level['name'],
         })
     return render_template('dashboard/index.html', student_stats=student_stats)
 

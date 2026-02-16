@@ -23,7 +23,7 @@ def end_session(session_id):
     """Compute totals from attempts and mark session as ended."""
     row = query_db(
         """SELECT COUNT(*) as total,
-                  SUM(CASE WHEN is_correct=1 THEN 1 ELSE 0 END) as correct
+                  COALESCE(SUM(CASE WHEN is_correct=1 THEN 1 ELSE 0 END), 0) as correct
            FROM attempts WHERE session_id=?""",
         (session_id,), one=True,
     )

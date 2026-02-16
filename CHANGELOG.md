@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Fixed — NULL total_correct in Empty Sessions
+- `end_session()` stored NULL instead of 0 for `total_correct` when session had no attempts
+- SQL `SUM()` returns NULL for 0 rows — added `COALESCE(..., 0)` to handle this
+- Dashboard now filters out 0-question sessions in the route (not just template)
+- Prevents empty "Recent Sessions" table from showing for students with no answered questions
+
 ### Fixed — Case-Sensitive Student Name Matching
 - Typing "sophia" created a new student instead of matching existing "Sophia"
 - `get_by_name()` now uses `COLLATE NOCASE` for case-insensitive lookup

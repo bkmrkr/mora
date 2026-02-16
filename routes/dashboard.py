@@ -54,6 +54,7 @@ def overview(student_id):
         grade_tree.append({'grade': grade, 'skills': skill_list})
 
     sessions = session_model.get_for_student(student_id, limit=20)
+    sessions = [s for s in sessions if s['total_questions']]
 
     return render_template(
         'dashboard/overview.html',

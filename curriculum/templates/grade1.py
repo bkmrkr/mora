@@ -286,12 +286,12 @@ def word_problems_add_sub(difficulty_elo):
         max_val = 20
 
     if op == '+':
-        a = random.randint(1, max_val - 1)
+        a = random.randint(2, max_val - 1)
         b = random.randint(1, max_val - a)
         answer = a + b
     else:
-        a = random.randint(2, max_val)
-        b = random.randint(1, a)
+        a = random.randint(3, max_val)
+        b = random.randint(1, a - 1)
         answer = a - b
 
     question = word_problem_frame(a, b, op, answer)

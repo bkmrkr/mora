@@ -182,16 +182,18 @@ def make_options(correct, distractors):
 
 def word_problem_frame(a, b, op, answer):
     """Generate a simple word problem for add/sub."""
+    birds_land = '1 more bird lands' if b == 1 else f'{b} more birds land'
+    birds_fly = '1 flies away' if b == 1 else f'{b} fly away'
     add_templates = [
         f"Emma has {a} apples. She gets {b} more. How many apples does she have now?",
-        f"There are {a} birds in a tree. {b} more birds land. How many birds are there?",
+        f"There are {a} birds in a tree. {birds_land}. How many birds are there?",
         f"Sam has {a} stickers. His friend gives him {b} more. How many stickers does Sam have?",
         f"A jar has {a} marbles. You put in {b} more. How many marbles are in the jar?",
         f"There are {a} books on a shelf. You add {b} more. How many books are on the shelf?",
     ]
     sub_templates = [
         f"Emma has {a} apples. She gives away {b}. How many apples does she have left?",
-        f"There are {a} birds in a tree. {b} fly away. How many birds are left?",
+        f"There are {a} birds in a tree. {birds_fly}. How many birds are left?",
         f"Sam has {a} stickers. He gives {b} to a friend. How many stickers does Sam have?",
         f"A jar has {a} marbles. You take out {b}. How many marbles are in the jar?",
         f"There are {a} cookies. You eat {b}. How many cookies are left?",

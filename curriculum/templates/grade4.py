@@ -323,16 +323,18 @@ def multi_step_word(difficulty_elo):
         per_pack = random.randint(4, 10)
         extra = random.randint(1, 8)
         answer = packs * per_pack + extra
+        loose_word = 'loose one' if extra == 1 else 'loose ones'
         question = (f'A store has {packs} packs of juice boxes with {per_pack} in each pack, '
-                    f'plus {extra} loose ones. How many juice boxes in total?')
+                    f'plus {extra} {loose_word}. How many juice boxes in total?')
         explanation = f'{packs} × {per_pack} = {packs * per_pack}, then {packs * per_pack} + {extra} = {answer}'
     elif variant == 'mult_sub':
         groups = random.randint(3, 8)
         per_group = random.randint(3, 8)
         used = random.randint(1, groups * per_group // 2)
         answer = groups * per_group - used
+        eaten_phrase = '1 apple is eaten' if used == 1 else f'{used} apples are eaten'
         question = (f'There are {groups} baskets with {per_group} apples each. '
-                    f'If {used} apples are eaten, how many are left?')
+                    f'If {eaten_phrase}, how many are left?')
         explanation = f'{groups} × {per_group} = {groups * per_group}, then {groups * per_group} - {used} = {answer}'
     else:
         groups = random.choice([2, 3, 4, 5, 6])
@@ -341,8 +343,8 @@ def multi_step_word(difficulty_elo):
         extra = random.randint(2, 8)
         per_group = total // groups
         answer = per_group + extra
-        question = (f'{total} students are split into {groups} equal teams. '
-                    f'Each team gets {extra} extra balls. How many things does each team have in total?')
+        question = (f'A teacher has {total} pencils to share equally among {groups} groups, '
+                    f'plus {extra} extra pencils for each group. How many pencils does each group get?')
         explanation = f'{total} ÷ {groups} = {per_group}, then {per_group} + {extra} = {answer}'
 
     distractors = arithmetic_distractors(answer, answer, 0)

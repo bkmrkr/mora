@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Fixed — Singular/Plural Grammar in Word Problems
+- `g4_multi_step_word`: "If 1 apples are eaten" → "If 1 apple is eaten" (singular)
+- `g4_multi_step_word`: "plus 1 loose ones" → "plus 1 loose one" (singular)
+- `g4_multi_step_word`: "How many things does each team have" → rewrote divide_add variant with consistent "pencils" item instead of mixing students and balls
+- `g1_word_problems`: minimum first operand raised to 2 — eliminates "Emma has 1 apples", "There are 1 birds"
+- `common.py word_problem_frame`: "1 more birds land" → "1 more bird lands", "1 fly away" → "1 flies away"
+
 ### Fixed — Degenerate "0 + 0" and "0 - 0" Questions
 - `addition_within_10`: first operand minimum changed from 0 to 1 — eliminates "What is 0 + 0?"
 - `subtraction_within_10`: first operand minimum changed from 0 to 1 — eliminates "What is 0 - 0?"

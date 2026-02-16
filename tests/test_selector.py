@@ -1,7 +1,7 @@
 """Tests for engine/selector.py — skill selection."""
 from engine.selector import (
     analyze_recent, select_skill, compute_question_params,
-    _get_eligible_skills, _least_mastered_id,
+    _get_eligible_skills,
 )
 
 

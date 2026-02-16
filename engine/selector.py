@@ -6,6 +6,8 @@ Algorithm:
 3. Score by need (low mastery), recency (not seen recently), virgin bonus
 4. Warm-start new skills from average ELO of mastered skills
 """
+import random
+
 from engine import elo
 from engine.difficulty import calibrate_from_recent
 from curriculum.skills import SKILLS
@@ -78,10 +80,14 @@ def select_skill(recent_analysis, student_progress, current_skill_id=None):
     eligible = _get_eligible_skills(student_progress)
 
     if not eligible:
-        return _least_mastered_id(student_progress)
+        # All mastered: review mode — cycle through all skills with variety
+        eligible = list(SKILLS.values())
 
     # Hard rule: exclude current skill (never same skill twice in a row)
     candidates = [s for s in eligible if s['id'] != current_skill_id]
+    if len(candidates) <= 2:
+        # Too few candidates for variety — expand to all skills (mastered included)
+        candidates = [s for s in SKILLS.values() if s['id'] != current_skill_id]
     if not candidates:
         candidates = eligible
 
@@ -97,7 +103,8 @@ def select_skill(recent_analysis, student_progress, current_skill_id=None):
         attempts = prog.get('total_attempts', 0)
         virgin_bonus = 0.5 if attempts == 0 else 0.0
 
-        score = need * (0.5 + recency_bonus) + virgin_bonus
+        # Small random jitter prevents deterministic alternation on tied scores
+        score = need * (0.5 + recency_bonus) + virgin_bonus + random.uniform(0, 0.05)
 
         if score > best_score:
             best_score = score
@@ -167,13 +174,3 @@ def _get_eligible_skills(student_progress):
     return eligible
 
 
-def _least_mastered_id(student_progress):
-    """Return the skill_id with the lowest mastery level."""
-    least_id, least_mastery = None, 1.0
-    for skill_id in SKILLS:
-        prog = student_progress.get(skill_id, {})
-        m = prog.get('mastery_level', 0.0)
-        if m < least_mastery:
-            least_mastery = m
-            least_id = skill_id
-    return least_id

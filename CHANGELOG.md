@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Fixed — Skill Selector Variety and Geometry Data
+- `selector.py`: when only 1-2 eligible skills remain, expand candidates to all skills so the same skill doesn't repeat every other question
+- `selector.py`: all-mastered students now cycle through all skills with variety instead of stuck on one
+- `selector.py`: added small random jitter to break deterministic alternation on tied scores
+- `grade4.py`: square had 4 parallel side pairs (wrong) — corrected to 2
+
 ### Fixed — Skip Counting Numbers Exceeding 120
 - `g1_counting`: skip counting by 10s could produce sequences up to 530 (e.g. "Count by 10s: 470, 480, 490, ?")
 - Capped start value so all numbers in the sequence stay within 120

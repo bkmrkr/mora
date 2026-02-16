@@ -241,7 +241,7 @@ def geometry_lines(difficulty_elo):
             distractors = ['never cross', 'are curved', 'go in the same direction']
     else:
         shapes_data = [
-            ('square', 4, 4),  # parallel pairs, perpendicular pairs
+            ('square', 2, 4),  # (parallel pairs, right angles)
             ('rectangle', 2, 4),
             ('triangle', 0, 0),
             ('trapezoid', 1, 0),

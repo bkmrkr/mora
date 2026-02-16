@@ -107,6 +107,11 @@
                      style="width: {{ question.mastery_pct }}%"></div>
             </div>
             <span class="skill-progress-label">{{ question.mastery_pct }}%</span>
+            {% if question.momentum == 'rising' %}
+            <span class="momentum-badge momentum-rising" title="Improving!">&#9650;</span>
+            {% elif question.momentum == 'falling' %}
+            <span class="momentum-badge momentum-falling" title="Needs practice">&#9660;</span>
+            {% endif %}
         </div>
 
         <div class="question-text">{{ question.content }}</div>

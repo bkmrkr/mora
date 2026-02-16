@@ -451,6 +451,18 @@ body {
     color: #6b21a8;
     align-self: center;
 }
+.momentum-badge {
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-left: 0.3rem;
+    line-height: 1;
+}
+.momentum-rising {
+    color: #16a34a;
+}
+.momentum-falling {
+    color: #dc2626;
+}
 .speed-badge {
     font-size: 0.75rem;
     font-weight: 600;

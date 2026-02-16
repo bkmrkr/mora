@@ -103,6 +103,25 @@ def generate_next(session_id, student, current_skill_id=None, retry_skill_id=Non
         else:
             difficulty_label = 'Challenge'
 
+    # Compute skill momentum from recent attempts
+    skill_attempts = attempt_model.get_recent_for_skill(student_id, skill_id, limit=6)
+    if len(skill_attempts) >= 4:
+        # Compare recent half vs older half accuracy
+        mid = len(skill_attempts) // 2
+        recent_half = skill_attempts[:mid]  # newest first
+        older_half = skill_attempts[mid:]
+        recent_acc = sum(1 for a in recent_half if a['is_correct']) / len(recent_half)
+        older_acc = sum(1 for a in older_half if a['is_correct']) / len(older_half)
+        diff = recent_acc - older_acc
+        if diff > 0.15:
+            momentum = 'rising'
+        elif diff < -0.15:
+            momentum = 'falling'
+        else:
+            momentum = 'steady'
+    else:
+        momentum = None  # not enough data
+
     question_dict = {
         'question_id': question_id,
         'skill_id': skill_id,
@@ -110,6 +129,7 @@ def generate_next(session_id, student, current_skill_id=None, retry_skill_id=Non
         'skill_grade': skill['grade'],
         'mastery_pct': mastery_pct,
         'difficulty_label': difficulty_label,
+        'momentum': momentum,
         'content': q_data['question'],
         'question_type': q_type,
         'options': q_data.get('options'),

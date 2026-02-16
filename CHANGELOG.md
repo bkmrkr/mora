@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — Skill momentum indicator on question card
+- Green ▲ arrow when recent accuracy is improving on a skill ("rising")
+- Red ▼ arrow when recent accuracy is declining ("falling")
+- Compares recent half vs older half of last 6 attempts per skill
+- Only shows after 4+ attempts on the skill (enough data for trend)
+- Helps students see direction of progress, not just current mastery level
+
 ### Added — Immediate retry after wrong answers
 - After getting a question wrong, ~50% chance the next question targets the same skill
 - Different question/template, but same skill — immediate retrieval practice

@@ -1,5 +1,13 @@
 # Mora v2 Changelog
 
+### Fixed — Question template clarity and correctness
+- Grade 1: `subtraction_within_10` no longer generates trivial `a - 0` questions
+- Grade 1: `addition_within_10` no longer generates trivial `a + 0` questions
+- Grade 2: `odd_even` explanation now uses grouping ("can be split into two equal groups") instead of division with decimals
+- Grade 3: `elapsed_time` capped start hour so end time never crosses 12 o'clock
+- Grade 4: `geometry_lines` trapezoid only asks about parallel sides (right angles vary)
+- Integration test accepts both "Not quite" and "So close" feedback headings
+
 ### Fixed — CSS variable bugs and duplicate rules from Ralph loop
 - Fixed `var(--surface)` → `var(--card)` in short-answer badge (undefined variable)
 - Fixed `var(--error)` → removed duplicate `.dot-wrong` rule (undefined variable)

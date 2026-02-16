@@ -284,10 +284,13 @@ def elapsed_time(difficulty_elo):
         distractors = [str(diff_h + 1), str(diff_h - 1) if diff_h > 1 else '0',
                        str(diff_h + 2)]
     else:
-        # Half-hour or minute differences
-        start_h = random.randint(1, 10)
-        start_m = random.choice([0, 15, 30])
+        # Half-hour or minute differences — keep within same AM/PM cycle
         diff_m = random.choice([30, 45, 60, 90, 120])
+        start_m = random.choice([0, 15, 30])
+        # Ensure end time doesn't cross 12 (confusing without AM/PM)
+        max_start_total = 12 * 60 - diff_m - start_m
+        max_start_h = max(1, max_start_total // 60)
+        start_h = random.randint(1, max_start_h)
         total_start = start_h * 60 + start_m
         total_end = total_start + diff_m
         end_h = (total_end // 60) % 12 or 12

@@ -325,10 +325,14 @@ def geometry_lines(difficulty_elo):
             ('square', 2, 4),  # (parallel pairs, right angles)
             ('rectangle', 2, 4),
             ('triangle', 0, 0),
-            ('trapezoid', 1, 0),
+            ('trapezoid', 1, None),  # right angles vary, only ask parallel
         ]
         shape, par, perp = random.choice(shapes_data)
-        prop = random.choice(['parallel', 'perpendicular'])
+        # Trapezoid: only ask about parallel sides (right angles vary by type)
+        if perp is None:
+            prop = 'parallel'
+        else:
+            prop = random.choice(['parallel', 'perpendicular'])
         if prop == 'parallel':
             answer = str(par)
             question = f'How many pairs of parallel sides does a {shape} have?'

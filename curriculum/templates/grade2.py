@@ -304,7 +304,7 @@ def odd_even(difficulty_elo):
             'correct_answer': correct,
             'options': make_options(correct, ['odd' if correct == 'even' else 'even',
                                               'neither', 'both']),
-            'explanation': f'{n} is {correct} because {n} ÷ 2 = {n / 2:g}.',
+            'explanation': f'{n} is {correct} because {n} can{"" if correct == "even" else "not"} be split into two equal groups.',
             'template_id': 'g2_odd_even_identify',
             'difficulty': estimate_difficulty(2, 0.2),
         }

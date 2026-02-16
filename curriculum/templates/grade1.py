@@ -12,8 +12,8 @@ from curriculum.templates.common import (arithmetic_distractors, make_options,
 def addition_within_10(difficulty_elo):
     """g1_add_10: Addition with sums up to 10."""
     max_sum = 7 if difficulty_elo < 700 else 10
-    a = random.randint(1, max_sum)
-    b = random.randint(0, max_sum - a)
+    a = random.randint(1, max_sum - 1)
+    b = random.randint(1, max_sum - a)
     answer = a + b
     distractors = arithmetic_distractors(answer, a, b, op='+')
     return {
@@ -30,8 +30,8 @@ def addition_within_10(difficulty_elo):
 def subtraction_within_10(difficulty_elo):
     """g1_sub_10: Subtraction within 10."""
     max_val = 7 if difficulty_elo < 700 else 10
-    a = random.randint(1, max_val)
-    b = random.randint(0, a - 1)
+    a = random.randint(2, max_val)
+    b = random.randint(1, a - 1)
     answer = a - b
     distractors = arithmetic_distractors(answer, a, b, op='-')
     return {

@@ -68,7 +68,7 @@ class TestFullStudentJourney:
                 # Load feedback and verify it shows explanation
                 fb = client.get(f'/session/{session_id}/feedback')
                 assert fb.status_code == 200
-                assert b'Not quite' in fb.data
+                assert b'Not quite' in fb.data or b'So close' in fb.data
                 # Click Next Question
                 client.post(f'/session/{session_id}/next')
             else:

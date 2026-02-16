@@ -8,10 +8,17 @@
     <div class="student-cards">
         {% for s in student_stats %}
         <a href="{{ url_for('dashboard.overview', student_id=s.student.id) }}" class="card student-card-link">
-            <h3>{{ s.student.name }}</h3>
+            <div class="student-card-header">
+                <h3>{{ s.student.name }}</h3>
+                <span class="student-grade-badge">Grade {{ s.current_grade }}</span>
+            </div>
+            <div class="mastery-bar">
+                <div class="mastery-fill {% if s.mastered_skills == s.total_skills %}mastered{% endif %}"
+                     style="width: {{ (s.mastered_skills / s.total_skills * 100)|round }}%"></div>
+            </div>
             <div class="student-stats">
-                <span>{{ s.total_attempts }} {{ "attempt" if s.total_attempts == 1 else "attempts" }}</span>
-                <span>{{ s.mastered_skills }} mastered</span>
+                <span>{{ s.mastered_skills }}/{{ s.total_skills }} skills</span>
+                <span>{{ s.total_attempts }} attempts</span>
             </div>
         </a>
         {% endfor %}

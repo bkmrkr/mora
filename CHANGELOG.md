@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Improved — Dashboard student cards with grade level and progress bar
+- Student cards now show current grade level badge (e.g., "Grade 4")
+- Overall mastery progress bar (X/40 skills) on each card
+- Current grade determined by highest grade with active practice
+- Gives parents instant snapshot of each child's progress
+
 ### Added — Focus skill recommendation on session summary
 - After ending a session, show "Next Focus" card with the skill closest to mastery
 - Only recommends unlocked skills (prerequisites met)

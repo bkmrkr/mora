@@ -19,11 +19,24 @@ def index():
         total = attempt_model.count_for_student(s['id'])
         all_skills = get_for_student(s['id'])
         mastered = sum(1 for sk in all_skills if elo.is_mastered(sk['mastery_level']))
+        # Determine current grade (highest grade with any non-mastered, unlocked skill)
+        progress_map = {sk['skill_id']: sk for sk in all_skills}
+        current_grade = 1
+        for grade in [4, 3, 2, 1]:
+            grade_skills = get_skills_for_grade(grade)
+            has_activity = any(
+                progress_map.get(gs['id'], {}).get('total_attempts', 0) > 0
+                for gs in grade_skills
+            )
+            if has_activity:
+                current_grade = grade
+                break
         student_stats.append({
             'student': s,
             'total_attempts': total,
             'mastered_skills': mastered,
-            'in_progress': len(all_skills) - mastered,
+            'total_skills': 40,
+            'current_grade': current_grade,
         })
     return render_template('dashboard/index.html', student_stats=student_stats)
 

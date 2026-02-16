@@ -608,6 +608,19 @@ body {
     transition: transform 0.2s;
 }
 .student-card-link:hover { transform: translateY(-2px); }
+.student-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.student-grade-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    background: #ede9fe;
+    color: var(--primary);
+}
 .student-stats {
     display: flex;
     gap: 1rem;

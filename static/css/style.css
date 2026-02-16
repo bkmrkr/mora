@@ -393,6 +393,10 @@ body {
 }
 
 /* Data Table */
+.table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
 .data-table {
     width: 100%;
     border-collapse: collapse;
@@ -423,4 +427,12 @@ body {
 .retry-content {
     text-align: center;
     padding: 3rem;
+}
+
+/* Small screens */
+@media (max-width: 400px) {
+    .data-table th, .data-table td {
+        padding: 0.5rem 0.35rem;
+        font-size: 0.8rem;
+    }
 }

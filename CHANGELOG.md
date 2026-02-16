@@ -1,5 +1,10 @@
 # Mora v2 Changelog
 
+### Fixed — Dashboard table clipped on small screens
+- Session history table on dashboard was clipped at 320px viewport (accuracy column cut off)
+- Added `overflow-x: auto` wrapper for horizontal scroll fallback
+- Added `@media (max-width: 400px)` with tighter padding so table fits without scrolling on small phones
+
 ### Fixed — Abandoned Sessions Lose Stats
 - When a student navigated away mid-session (clicked Home/Dashboard), the session's `total_questions` and `total_correct` stayed at 0 because they were only computed on explicit "End Session"
 - Now: starting a new session auto-ends any open sessions for the same student, computing their totals from the `attempts` table

@@ -33,6 +33,12 @@
         </div>
         {% endif %}
 
+        {% if result.skill_tip %}
+        <div class="skill-tip">
+            <strong>Tip:</strong> {{ result.skill_tip }}
+        </div>
+        {% endif %}
+
         <div class="encouragement">
             {% if result.mastery_level and result.mastery_level >= 0.5 %}
             Almost there! You're at {{ (result.mastery_level * 100)|round|int }}% mastery.

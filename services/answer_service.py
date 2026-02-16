@@ -118,6 +118,9 @@ def process_answer(student, current_question, student_answer,
 
     rating_change = round(new_rating - before_rating, 1)
 
+    skill_info = get_skill(skill_id)
+    skill_tip = skill_info.get('tip', '') if skill_info else ''
+
     return {
         'is_correct': is_correct,
         'is_close': is_close,
@@ -135,4 +138,5 @@ def process_answer(student, current_question, student_answer,
         'unlocked_skills': unlocked_skills,
         'speed_label': speed_label,
         'response_time_s': round(response_time_s, 1),
+        'skill_tip': skill_tip,
     }

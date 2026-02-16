@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Skill-specific learning tips on wrong answers
+- Each of the 40 skills now has a pedagogical tip (e.g., "Make a ten first, then add what's left")
+- Tips shown on feedback page between explanation and encouragement
+- Blue accent bar distinguishes tips from other feedback elements
+- Turns each mistake into a teaching moment with actionable strategy
+
 ### Added — Visible skill rating changes
 - Correct answers show green "+N" badge on the result banner (e.g., "+6.6")
 - Wrong answers show red "-N" badge next to skill rating on feedback page

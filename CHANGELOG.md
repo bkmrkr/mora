@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — "Coming Up Next" session preview on summary
+- Replaces single "Next focus" card with a preview of 3 upcoming skills
+- Each skill shows name, mastery bar, grade, and a reason label (Almost mastered / In progress / New skill / Getting started)
+- Skills sorted by mastery (closest to completion first)
+- Creates anticipation and gives parents a clear view of what's coming next
+- Bridges the gap between "what you did" and "what's next"
+
 ### Added — Review reason labels for mastered skills
 - Instead of generic "Review", shows why a mastered skill is being revisited
 - "Haven't practiced in N days" for skills not seen in 7+ days

@@ -102,11 +102,23 @@
     </div>
     {% endif %}
 
-    {% if focus_skill %}
-    <div class="focus-skill-card">
-        <div class="focus-label">Next focus</div>
-        <div class="focus-name">{{ focus_skill.name }}</div>
-        <div class="focus-detail">Grade {{ focus_skill.grade }} — {{ focus_skill.mastery_pct }}% mastered</div>
+    {% if next_session_preview %}
+    <div class="card">
+        <h2>Coming Up Next</h2>
+        <div class="next-preview-list">
+            {% for skill in next_session_preview %}
+            <div class="next-preview-item">
+                <div class="next-preview-top">
+                    <span class="skill-name">{{ skill.name }}</span>
+                    <span class="next-preview-reason">{{ skill.reason }}</span>
+                </div>
+                <div class="mastery-bar">
+                    <div class="mastery-fill" style="width: {{ skill.mastery_pct }}%"></div>
+                </div>
+                <span class="next-preview-detail">Grade {{ skill.grade }} — {{ skill.mastery_pct }}%</span>
+            </div>
+            {% endfor %}
+        </div>
     </div>
     {% endif %}
 

@@ -819,6 +819,15 @@ body {
 }
 .focus-name { font-size: 1.1rem; font-weight: 600; }
 .focus-detail { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.15rem; }
+.next-preview-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.next-preview-item { padding: 0.5rem 0; }
+.next-preview-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; }
+.next-preview-reason {
+    font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.03em; color: var(--primary); background: #ede9fe;
+    padding: 0.15rem 0.5rem; border-radius: 999px;
+}
+.next-preview-detail { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; display: block; }
 .answer-timeline {
     display: flex;
     gap: 6px;

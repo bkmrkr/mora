@@ -281,27 +281,40 @@ def end(session_id):
         flask_session.get('streak', 0),
     )
 
-    # Find focus skill: unmastered skill closest to mastery threshold
-    focus_skill = None
+    # Next session preview: top 3 upcoming skills with context
     all_progress = get_for_student(student['id'])
     progress_map = {p['skill_id']: p for p in all_progress}
-    best_mastery = -1
+    upcoming = []
     for sid, sinfo in SKILLS.items():
         prog = progress_map.get(sid)
         mastery = prog['mastery_level'] if prog else 0.0
-        if not elo.is_mastered(mastery) and mastery > best_mastery:
-            # Check prerequisites are met
-            prereqs_met = all(
-                elo.is_mastered(progress_map.get(pid, {}).get('mastery_level', 0))
-                for pid in sinfo.get('prerequisites', [])
-            )
-            if prereqs_met or not sinfo.get('prerequisites'):
-                best_mastery = mastery
-                focus_skill = {
-                    'name': sinfo['name'],
-                    'grade': sinfo['grade'],
-                    'mastery_pct': round(mastery * 100),
-                }
+        if elo.is_mastered(mastery):
+            continue
+        prereqs_met = all(
+            elo.is_mastered(progress_map.get(pid, {}).get('mastery_level', 0))
+            for pid in sinfo.get('prerequisites', [])
+        )
+        if not prereqs_met and sinfo.get('prerequisites'):
+            continue
+        attempts_count = prog['total_attempts'] if prog else 0
+        mastery_pct = round(mastery * 100)
+        if mastery_pct >= 50:
+            reason = 'Almost mastered'
+        elif attempts_count == 0:
+            reason = 'New skill'
+        elif mastery_pct > 0:
+            reason = 'In progress'
+        else:
+            reason = 'Getting started'
+        upcoming.append({
+            'name': sinfo['name'],
+            'grade': sinfo['grade'],
+            'mastery_pct': mastery_pct,
+            'reason': reason,
+            'sort_key': mastery,  # highest mastery first (closest to done)
+        })
+    upcoming.sort(key=lambda x: -x['sort_key'])
+    next_session_preview = upcoming[:3]
 
     # Answer timeline (ordered dots for correct/wrong)
     answer_timeline = [bool(a['is_correct']) for a in attempts]
@@ -418,7 +431,7 @@ def end(session_id):
         skills_practiced=skills_practiced,
         best_streak=best_streak,
         avg_time=avg_time,
-        focus_skill=focus_skill,
+        next_session_preview=next_session_preview,
         answer_timeline=answer_timeline,
         practice_streak=practice_streak,
         summary_headline=summary_headline,

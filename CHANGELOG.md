@@ -1,5 +1,10 @@
 # Mora v2 Changelog
 
+### Fixed — Degenerate "0 + 0" and "0 - 0" Questions
+- `addition_within_10`: first operand minimum changed from 0 to 1 — eliminates "What is 0 + 0?"
+- `subtraction_within_10`: first operand minimum changed from 0 to 1 — eliminates "What is 0 - 0?"
+- "5 + 0" and "3 - 0" still possible (valid: teaches adding/subtracting zero)
+
 ### Removed — Unused Python Imports
 - `services/question_service.py`: removed `from engine import elo` (never used) and `SKILLS` from curriculum.skills import
 - `curriculum/templates/grade2.py`: removed unused `word_problem_frame` from common import

@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — Spaced review for mastered skills
+- ~20% of questions now review mastered skills for long-term retention
+- Review questions prioritize skills not practiced recently (stalest first)
+- Purple "Review" badge shown on review questions instead of difficulty label
+- Prevents the forgetting curve — mastered skills stay sharp with periodic practice
+- 5 new tests for review selection logic
+
 ### Added — Unlock progress indicators on dashboard
 - Locked skills with multiple prerequisites now show a yellow progress bar
 - "N/M unlocked" count shows how many prerequisites are already mastered

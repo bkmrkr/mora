@@ -8,6 +8,7 @@ from models import question as question_model
 from models import session as session_model
 from models.progress import get as get_progress, get_for_student
 from engine.selector import analyze_recent, select_skill, compute_question_params
+from engine import elo
 from curriculum.skills import get_skill
 from curriculum.templates.grade1 import GRADE1_TEMPLATES
 from curriculum.templates.grade2 import GRADE2_TEMPLATES
@@ -79,16 +80,22 @@ def generate_next(session_id, student, current_skill_id=None):
 
     mastery_pct = round(prog['mastery_level'] * 100)
 
+    # Detect review mode: skill is already mastered
+    is_review = elo.is_mastered(prog['mastery_level'])
+
     # Difficulty label based on gap between question and student
-    gap = question_difficulty - prog['skill_rating']
-    if gap < -150:
-        difficulty_label = 'Warm-up'
-    elif gap < 50:
-        difficulty_label = 'On track'
-    elif gap < 200:
-        difficulty_label = 'Stretch'
+    if is_review:
+        difficulty_label = 'Review'
     else:
-        difficulty_label = 'Challenge'
+        gap = question_difficulty - prog['skill_rating']
+        if gap < -150:
+            difficulty_label = 'Warm-up'
+        elif gap < 50:
+            difficulty_label = 'On track'
+        elif gap < 200:
+            difficulty_label = 'Stretch'
+        else:
+            difficulty_label = 'Challenge'
 
     question_dict = {
         'question_id': question_id,
@@ -103,6 +110,7 @@ def generate_next(session_id, student, current_skill_id=None):
         'correct_answer': q_data['correct_answer'],
         'explanation': q_data.get('explanation', ''),
         'difficulty': question_difficulty,
+        'is_review': is_review,
     }
     # Clock params for SVG generation at render time (avoids cookie bloat)
     if 'clock_hour' in q_data:

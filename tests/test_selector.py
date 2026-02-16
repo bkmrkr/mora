@@ -1,7 +1,7 @@
 """Tests for engine/selector.py — skill selection."""
 from engine.selector import (
     analyze_recent, select_skill, compute_question_params,
-    _get_eligible_skills,
+    _get_eligible_skills, _pick_review_skill,
 )
 
 
@@ -132,6 +132,66 @@ class TestEligibleSkills:
         eligible = _get_eligible_skills(progress)
         ids = {s['id'] for s in eligible}
         assert 'g1_add_10' not in ids
+
+
+class TestSpacedReview:
+    def test_no_mastered_returns_none(self):
+        """With no mastered skills, review returns None."""
+        progress = {
+            'g1_add_10': _make_progress('g1_add_10', mastery=0.3, attempts=5),
+        }
+        result = _pick_review_skill(progress, None, {})
+        assert result is None
+
+    def test_picks_mastered_skill(self):
+        """Should return a mastered skill for review."""
+        progress = {
+            'g1_add_10': _make_progress('g1_add_10', mastery=0.8, attempts=20),
+            'g1_sub_10': _make_progress('g1_sub_10', mastery=0.3, attempts=5),
+        }
+        progress['g1_add_10']['last_updated'] = '2026-01-01'
+        result = _pick_review_skill(progress, None, {})
+        assert result == 'g1_add_10'
+
+    def test_excludes_current_skill(self):
+        """Should not return the current skill for review."""
+        progress = {
+            'g1_add_10': _make_progress('g1_add_10', mastery=0.8, attempts=20),
+        }
+        progress['g1_add_10']['last_updated'] = '2026-01-01'
+        result = _pick_review_skill(progress, 'g1_add_10', {})
+        assert result is None
+
+    def test_prefers_stalest(self):
+        """Should prefer the skill not seen recently in session."""
+        progress = {
+            'g1_add_10': _make_progress('g1_add_10', mastery=0.8, attempts=20),
+            'g1_sub_10': _make_progress('g1_sub_10', mastery=0.8, attempts=20),
+        }
+        progress['g1_add_10']['last_updated'] = '2026-01-01'
+        progress['g1_sub_10']['last_updated'] = '2026-02-01'
+        # g1_sub_10 was seen 2 questions ago, g1_add_10 not seen at all (99)
+        last_seen = {'g1_sub_10': 2}
+        result = _pick_review_skill(progress, None, last_seen)
+        assert result == 'g1_add_10'  # not seen recently, preferred
+
+    def test_review_can_be_selected(self):
+        """With mastered skills and eligible skills, review has a chance."""
+        from curriculum.skills import SKILLS
+        import random
+        progress = {
+            'g1_add_10': _make_progress('g1_add_10', mastery=0.8, attempts=20),
+        }
+        progress['g1_add_10']['last_updated'] = '2026-01-01'
+        analysis = analyze_recent([])
+        # Run many times — at least once should return a review skill
+        random.seed(42)
+        results = set()
+        for _ in range(50):
+            skill_id = select_skill(analysis, progress, current_skill_id='g1_sub_10')
+            results.add(skill_id)
+        # g1_add_10 should appear as review pick at least once
+        assert 'g1_add_10' in results
 
 
 class TestComputeQuestionParams:

@@ -402,6 +402,16 @@ body {
 .difficulty-on-track { background: #dbeafe; color: #1e40af; }
 .difficulty-stretch { background: #fef3c7; color: #92400e; }
 .difficulty-challenge { background: #fce7f3; color: #9d174d; }
+.difficulty-review { background: #f3e8ff; color: #6b21a8; }
+.review-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    background: #f3e8ff;
+    color: #6b21a8;
+    align-self: center;
+}
 .speed-badge {
     font-size: 0.75rem;
     font-weight: 600;

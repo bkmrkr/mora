@@ -63,9 +63,12 @@ def analyze_recent(recent_attempts):
 
 
 def select_skill(recent_analysis, student_progress, current_skill_id=None):
-    """Pick the skill for the next question — variety-first.
+    """Pick the skill for the next question — variety-first with spaced review.
 
-    Core rule: NEVER repeat the same skill consecutively.
+    Core rules:
+    - NEVER repeat the same skill consecutively
+    - ~20% chance to review a mastered skill (spaced repetition)
+    - Otherwise pick from unmastered, unlocked skills
 
     Args:
         recent_analysis: output from analyze_recent()
@@ -78,6 +81,11 @@ def select_skill(recent_analysis, student_progress, current_skill_id=None):
     last_seen = recent_analysis.get('last_seen', {})
 
     eligible = _get_eligible_skills(student_progress)
+
+    # Spaced review: occasionally revisit mastered skills for retention
+    review_skill = _pick_review_skill(student_progress, current_skill_id, last_seen)
+    if review_skill and eligible and random.random() < 0.2:
+        return review_skill
 
     if not eligible:
         # All mastered: review mode — cycle through all skills with variety
@@ -147,6 +155,32 @@ def compute_question_params(skill_id, student_progress, recent_analysis):
     q_type = 'mcq'
 
     return adjusted, q_type
+
+
+def _pick_review_skill(student_progress, current_skill_id, last_seen):
+    """Pick a mastered skill for spaced review, preferring stalest.
+
+    Returns skill_id or None if no mastered skills available.
+    """
+    mastered = []
+    for skill_id, skill in SKILLS.items():
+        if skill_id == current_skill_id:
+            continue
+        prog = student_progress.get(skill_id, {})
+        if not elo.is_mastered(prog.get('mastery_level', 0.0)):
+            continue
+        # Staleness: prefer skills not seen recently in this session
+        session_recency = last_seen.get(skill_id, 99)
+        # Also use last_updated from DB for cross-session staleness
+        last_updated = prog.get('last_updated', '')
+        mastered.append((skill_id, session_recency, last_updated))
+
+    if not mastered:
+        return None
+
+    # Sort by: session recency desc (not seen recently first), then DB staleness
+    mastered.sort(key=lambda x: (-x[1], x[2]))
+    return mastered[0][0]
 
 
 def _get_eligible_skills(student_progress):

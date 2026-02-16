@@ -1309,3 +1309,11 @@ body {
 }
 .tip-icon { font-size: 1.2rem; flex-shrink: 0; }
 .tip-text { line-height: 1.4; }
+
+/* Session XP counter */
+.session-xp {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #78350f; font-weight: 700; font-size: 0.8rem;
+    padding: 0.15rem 0.5rem; border-radius: 12px;
+    white-space: nowrap;
+}

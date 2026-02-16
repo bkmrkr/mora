@@ -24,7 +24,15 @@ def _get_session_stats(session_id):
     total = len(attempts)
     correct = sum(1 for a in attempts if a['is_correct'])
     accuracy = round(correct / total * 100) if total > 0 else 0
-    return {'total': total, 'correct': correct, 'accuracy': accuracy}
+    # Session XP: sum of positive rating changes
+    xp = 0
+    for a in attempts:
+        before = a.get('skill_rating_before') or 0
+        after = a.get('skill_rating_after') or 0
+        diff = after - before
+        if diff > 0:
+            xp += diff
+    return {'total': total, 'correct': correct, 'accuracy': accuracy, 'xp': round(xp, 1)}
 
 
 @session_bp.route('/<session_id>/question')

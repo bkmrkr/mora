@@ -9,6 +9,9 @@
             {% if session_stats.total > 0 %}
             <span>{{ session_stats.correct }}/{{ session_stats.total }} ({{ session_stats.accuracy }}%)</span>
             {% endif %}
+            {% if session_stats.xp > 0 %}
+            <span class="session-xp">+{{ session_stats.xp }} XP</span>
+            {% endif %}
         </div>
         <div class="goal-progress">
             <div class="goal-bar">

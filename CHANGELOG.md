@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — Session XP counter
+- Golden "+N XP" badge in the session header shows total ELO points gained
+- Computed from sum of positive rating changes across all session attempts
+- Accumulates throughout the session, giving kids a "score going up" feeling
+- Only appears after at least one correct answer (when XP > 0)
+- Makes the adaptive engine's rewards visible and gamified
+
 ### Added — Adaptive hints for struggling skills
 - When a student gets 2+ consecutive wrong on a skill, the skill's tip shows as a hint banner
 - Amber lightbulb banner appears above the question with skill-specific guidance

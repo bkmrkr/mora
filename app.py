@@ -65,7 +65,7 @@ def create_app():
         response.headers['Content-Security-Policy'] = (
             "default-src 'self'; "
             "style-src 'self' 'unsafe-inline'; "
-            "img-src 'self' data:; "
+            "img-src 'self'; "
             "script-src 'self'"
         )
         return response

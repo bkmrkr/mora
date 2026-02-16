@@ -1,5 +1,9 @@
 # Mora v2 Changelog
 
+### Hardened — Tighten CSP img-src
+- Removed `data:` from `img-src` — no data URIs used; clock SVG is inline markup
+- Final CSP: `default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; script-src 'self'`
+
 ### Removed — Dead Code Cleanup
 - Removed `strip_letter` template filter from `app.py` — v2 templates never produce letter prefixes
 - Removed `{{ option | strip_letter }}` from `question.html` — replaced with `{{ option }}`

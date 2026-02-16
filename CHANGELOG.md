@@ -1,5 +1,13 @@
 # Mora v2 Changelog
 
+### Added — Session goal with progress tracking
+- Each session starts with a goal of 10 questions
+- Progress bar and counter (e.g., "3/10") shown in session header
+- Bar fills as questions are answered, turns green when goal is reached
+- One-time celebration banner when goal is hit: "Goal reached! 10 questions done!"
+- Students can keep going past the goal — no forced stop
+- Gives young learners a clear, achievable target each session
+
 ### Improved — Per-skill session accuracy on session summary
 - Session summary now shows how many questions each skill got right (e.g., "3/4")
 - Color-coded accuracy badges: green (≥80%), yellow (≥50%), red (<50%)

@@ -58,5 +58,9 @@ def start():
             grade_progress[str(grade)] = {'mastered': mastered, 'total': len(skills)}
         flask_session['welcome'] = grade_progress
 
+    # Set session goal (10 questions per session)
+    flask_session['session_goal'] = 10
+    flask_session['goal_celebrated'] = False
+
     session_id = session_model.create(student['id'])
     return redirect(url_for('session.question', session_id=session_id))

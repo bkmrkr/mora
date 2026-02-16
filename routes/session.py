@@ -60,6 +60,17 @@ def question(session_id):
     # Welcome message (shown once on first question)
     welcome = flask_session.pop('welcome', None)
 
+    # Session goal tracking
+    session_goal = flask_session.get('session_goal', 10)
+    goal_reached = session_stats['total'] >= session_goal
+    goal_celebrated = flask_session.get('goal_celebrated', False)
+    # Mark celebrated so we only show the celebration once
+    if goal_reached and not goal_celebrated:
+        flask_session['goal_celebrated'] = True
+        show_goal_celebration = True
+    else:
+        show_goal_celebration = False
+
     # Generate clock SVG at render time (not stored in cookie)
     visual_svg = None
     if 'clock_hour' in current:
@@ -75,6 +86,9 @@ def question(session_id):
         visual_svg=visual_svg,
         streak=streak,
         welcome=welcome,
+        session_goal=session_goal,
+        goal_reached=goal_reached,
+        show_goal_celebration=show_goal_celebration,
     )
 
 

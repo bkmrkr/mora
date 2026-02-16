@@ -9,6 +9,13 @@
             <span>{{ session_stats.correct }}/{{ session_stats.total }} ({{ session_stats.accuracy }}%)</span>
             {% endif %}
         </div>
+        <div class="goal-progress">
+            <div class="goal-bar">
+                <div class="goal-fill {% if goal_reached %}goal-complete{% endif %}"
+                     style="width: {{ [session_stats.total / session_goal * 100, 100] | min }}%"></div>
+            </div>
+            <span class="goal-label">{{ session_stats.total }}/{{ session_goal }}</span>
+        </div>
         <a href="{{ url_for('session.end', session_id=session_id) }}" class="btn btn-secondary btn-sm">End Session</a>
     </div>
 
@@ -22,6 +29,16 @@
                 G{{ g }}: {{ gp.mastered }}/{{ gp.total }}
             </span>
             {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if show_goal_celebration %}
+    <div class="goal-celebration">
+        <div class="goal-star">&#127919;</div>
+        <div class="goal-text">
+            <strong>Goal reached! {{ session_goal }} questions done!</strong>
+            <span>Keep going or end your session — you decide!</span>
         </div>
     </div>
     {% endif %}

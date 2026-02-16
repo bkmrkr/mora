@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Fixed — Abandoned Sessions Lose Stats
+- When a student navigated away mid-session (clicked Home/Dashboard), the session's `total_questions` and `total_correct` stayed at 0 because they were only computed on explicit "End Session"
+- Now: starting a new session auto-ends any open sessions for the same student, computing their totals from the `attempts` table
+- Dashboard "Recent Sessions" table now correctly shows all sessions with question data, not just properly ended ones
+- Fixed 28 existing abandoned sessions in the database
+
 ### Improved — Template Question Variety
 - `g4_geometry`: expanded low-difficulty variants from 2 to 7 (was just "Parallel lines are..." / "Perpendicular lines are..." repeating verbatim — now includes real-world examples, identification, and angle questions)
 - `g4_angles`: expanded low-difficulty from 3 variants to 9+ (classify, identify example, and range-based questions — reduced max repetition from 38% to <15%)

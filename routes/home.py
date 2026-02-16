@@ -26,6 +26,12 @@ def start():
         sid = student_model.create(name)
         student = student_model.get_by_id(sid)
 
+    # End any open sessions for this student (computes totals from attempts)
+    open_sessions = session_model.get_for_student(student['id'])
+    for s in open_sessions:
+        if not s.get('ended_at'):
+            session_model.end_session(s['id'])
+
     # Clear any stale session data from previous sessions
     flask_session.clear()
 

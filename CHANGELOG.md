@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Immediate retry after wrong answers
+- After getting a question wrong, ~50% chance the next question targets the same skill
+- Different question/template, but same skill — immediate retrieval practice
+- Research-backed: spaced retrieval on failed items accelerates learning
+- Wired through `retry_skill_id` parameter in question generation pipeline
+
 ### Added — Curriculum preview on home page
 - "40 skills across 4 grades" section below the start form
 - Shows key topics per grade: addition/subtraction (1), regrouping/multiplication (2), etc.

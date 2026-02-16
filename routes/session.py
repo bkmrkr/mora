@@ -1,6 +1,7 @@
 """Session routes — the core learning loop."""
 import json
 import logging
+import random
 
 from flask import (Blueprint, render_template, request, redirect,
                    url_for, session as flask_session)
@@ -196,7 +197,15 @@ def next_question(session_id):
 
     if not flask_session.get('current_question'):
         last_skill = flask_session.get('last_skill_id')
-        next_q = question_service.generate_next(session_id, student, last_skill)
+        # After wrong answer, ~50% chance to retry the same skill
+        retry_skill = None
+        last_result = flask_session.get('last_result')
+        if last_result and not last_result.get('is_correct') and last_skill:
+            if random.random() < 0.5:
+                retry_skill = last_skill
+        next_q = question_service.generate_next(
+            session_id, student, last_skill, retry_skill_id=retry_skill
+        )
         if next_q:
             flask_session['current_question'] = next_q
     return redirect(url_for('session.question', session_id=session_id))

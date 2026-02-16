@@ -25,8 +25,11 @@ TEMPLATES.update(GRADE3_TEMPLATES)
 TEMPLATES.update(GRADE4_TEMPLATES)
 
 
-def generate_next(session_id, student, current_skill_id=None):
+def generate_next(session_id, student, current_skill_id=None, retry_skill_id=None):
     """Select skill, generate question from template, store in DB.
+
+    Args:
+        retry_skill_id: if set, force this skill (for immediate retry after wrong).
 
     Returns question_dict or None.
     """
@@ -40,8 +43,11 @@ def generate_next(session_id, student, current_skill_id=None):
     recent_attempts = attempt_model.get_recent(student_id, limit=30)
     analysis = analyze_recent(recent_attempts)
 
-    # Select skill
-    skill_id = select_skill(analysis, student_progress, current_skill_id)
+    # Select skill (retry overrides normal selection)
+    if retry_skill_id and retry_skill_id in TEMPLATES:
+        skill_id = retry_skill_id
+    else:
+        skill_id = select_skill(analysis, student_progress, current_skill_id)
     if not skill_id:
         return None
 

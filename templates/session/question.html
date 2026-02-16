@@ -105,7 +105,7 @@
             <span class="node-badge">{{ question.skill_name }}</span>
             <span class="grade-label">Grade {{ question.skill_grade }}</span>
             {% if question.is_review %}
-            <span class="review-badge">Review</span>
+            <span class="review-badge" {% if question.review_reason %}title="{{ question.review_reason }}"{% endif %}>{{ question.review_reason or 'Review' }}</span>
             {% else %}
             <span class="difficulty-label difficulty-{{ question.difficulty_label|lower|replace(' ', '-') }}">{{ question.difficulty_label }}</span>
             {% endif %}

@@ -1,5 +1,13 @@
 # Mora v2 Changelog
 
+### Added — Review reason labels for mastered skills
+- Instead of generic "Review", shows why a mastered skill is being revisited
+- "Haven't practiced in N days" for skills not seen in 7+ days
+- "Last practiced N days ago" for 2-6 day gaps
+- "Keeping sharp" for recently-practiced skills
+- "Quick refresh" as fallback
+- Explains the spaced repetition system, turning "I already know this!" into understanding
+
 ### Added — Personalized encouragement messages
 - "Great start with [skill]!" when a student encounters a skill for the first time
 - "You got [skill] this time!" when they answer correctly after previously getting it wrong (revenge correct)

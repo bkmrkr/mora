@@ -2,6 +2,7 @@
 import json
 import logging
 import random
+from datetime import datetime, date
 
 from models import attempt as attempt_model
 from models import question as question_model
@@ -89,6 +90,23 @@ def generate_next(session_id, student, current_skill_id=None, retry_skill_id=Non
     # Detect review mode: skill is already mastered
     is_review = elo.is_mastered(prog['mastery_level'])
 
+    # Review reason: explain why this mastered skill is being revisited
+    review_reason = None
+    if is_review and prog.get('last_updated'):
+        try:
+            last_date = datetime.fromisoformat(prog['last_updated']).date()
+            days_ago = (date.today() - last_date).days
+            if days_ago >= 7:
+                review_reason = f"Haven't practiced in {days_ago} days"
+            elif days_ago >= 2:
+                review_reason = f'Last practiced {days_ago} days ago'
+            else:
+                review_reason = 'Keeping sharp'
+        except (ValueError, TypeError):
+            review_reason = 'Keeping sharp'
+    elif is_review:
+        review_reason = 'Quick refresh'
+
     # Difficulty label based on gap between question and student
     if is_review:
         difficulty_label = 'Review'
@@ -137,6 +155,7 @@ def generate_next(session_id, student, current_skill_id=None, retry_skill_id=Non
         'explanation': q_data.get('explanation', ''),
         'difficulty': question_difficulty,
         'is_review': is_review,
+        'review_reason': review_reason,
     }
     # Unlock preview: what does mastering this skill unlock?
     unlock_preview = None

@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Fixed — session.js Not Loaded, Keyboard Shortcuts Broken
+- `session.js` was never included in `question.html` — only an inline script for response time existed
+- Missing features: keyboard shortcuts (A/B/C/D), double-submit prevention, button disable on submit
+- Added `data-key` attributes (A/B/C/D) to MCQ buttons in template
+- Replaced inline script with `<script src="session.js">` to load all features
+- Verified with Playwright: keyboard shortcuts, response time, and navigation all work
+
 ### Hardened — Cookie Validation Requires question_type
 - Answer route and question route now require `question_type` in session cookie validation
 - Previously, a tampered cookie missing `question_type` caused `KeyError` crash in `answer_service.py`

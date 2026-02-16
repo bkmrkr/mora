@@ -41,7 +41,7 @@
             <div class="choices-grid">
                 {% for option in question.options %}
                 <button type="submit" name="answer" value="{{ option }}"
-                        class="choice-btn">
+                        class="choice-btn" data-key="{{ 'ABCD'[loop.index0] }}">
                     <span class="choice-text">{{ option | strip_letter }}</span>
                 </button>
                 {% endfor %}
@@ -57,10 +57,5 @@
 </div>
 {% endblock %}
 {% block scripts %}
-<script>
-    const startTime = Date.now();
-    document.getElementById('answer-form').addEventListener('submit', function() {
-        document.getElementById('response_time_s').value = ((Date.now() - startTime) / 1000).toFixed(1);
-    });
-</script>
+<script src="{{ url_for('static', filename='js/session.js') }}"></script>
 {% endblock %}

@@ -115,6 +115,23 @@ body {
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
+/* Short answer mode */
+.short-answer-badge {
+    display: inline-block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+.short-answer-input {
+    font-size: 1.2rem !important;
+    text-align: center;
+    letter-spacing: 0.05em;
+}
+
 /* Flash messages */
 .flash {
     padding: 0.75rem 1rem;

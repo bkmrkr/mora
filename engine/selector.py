@@ -157,8 +157,17 @@ def compute_question_params(skill_id, student_progress, recent_analysis):
     else:
         adjusted = base_target
 
-    # MCQ only for now — short answer disabled
-    q_type = 'mcq'
+    # Question type: MCQ → short answer as mastery increases
+    mastery = prog.get('mastery_level', 0.0)
+    if total_attempts >= 5 and mastery >= 0.5:
+        # High mastery: mostly short answer (recall > recognition)
+        q_type = 'short_answer' if random.random() < 0.7 else 'mcq'
+    elif total_attempts >= 3 and mastery >= 0.3:
+        # Building mastery: occasional short answer
+        q_type = 'short_answer' if random.random() < 0.3 else 'mcq'
+    else:
+        # New or low mastery: always MCQ for scaffolding
+        q_type = 'mcq'
 
     return adjusted, q_type
 

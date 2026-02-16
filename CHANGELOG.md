@@ -1,5 +1,15 @@
 # Mora v2 Changelog
 
+### Added — Short answer mode unlocked by mastery
+- Questions gradually transition from MCQ to short answer as mastery increases
+- Low mastery (<0.3): always MCQ (scaffolded with answer choices)
+- Building mastery (0.3-0.5): 30% chance of short answer
+- High mastery (>0.5): 70% chance of short answer (recall over recognition)
+- "Type your answer" badge appears on short answer questions
+- Larger, centered input field for short answer mode
+- Natural progression: recognition → recall mirrors how real learning works
+- All 40 skills support short answer via the existing numeric/fuzzy answer matching
+
 ### Added — Per-skill sparkline dots on dashboard
 - Each skill card on the dashboard now shows a trail of the last 5 attempts as colored dots
 - Green dot = correct, red dot = wrong — instant visual learning trajectory

@@ -204,14 +204,28 @@ class TestComputeQuestionParams:
         assert isinstance(difficulty, float)
         assert q_type == 'mcq'  # mastery < 0.5
 
-    def test_high_mastery_still_mcq(self):
-        """MCQ-only mode: even high mastery gets MCQ."""
+    def test_high_mastery_can_get_short_answer(self):
+        """High mastery unlocks short answer mode."""
         progress = {
             'g1_add_10': _make_progress('g1_add_10', mastery=0.55, rating=1100, attempts=30),
         }
         analysis = analyze_recent([])
-        _, q_type = compute_question_params('g1_add_10', progress, analysis)
-        assert q_type == 'mcq'
+        # Run multiple times — should see both mcq and short_answer
+        types = set()
+        for _ in range(50):
+            _, q_type = compute_question_params('g1_add_10', progress, analysis)
+            types.add(q_type)
+        assert 'short_answer' in types, "High mastery should produce short_answer"
+
+    def test_low_mastery_always_mcq(self):
+        """Low mastery always uses MCQ for scaffolding."""
+        progress = {
+            'g1_add_10': _make_progress('g1_add_10', mastery=0.1, rating=750, attempts=2),
+        }
+        analysis = analyze_recent([])
+        for _ in range(20):
+            _, q_type = compute_question_params('g1_add_10', progress, analysis)
+            assert q_type == 'mcq'
 
     def test_warm_start(self):
         """New skill should inherit rating from proven skills."""

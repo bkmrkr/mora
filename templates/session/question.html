@@ -205,8 +205,10 @@
                 {% endfor %}
             </div>
             {% else %}
+            <div class="short-answer-badge">Type your answer</div>
             <div class="form-group">
-                <input type="text" name="answer" placeholder="Your answer" required autofocus>
+                <input type="text" name="answer" placeholder="Your answer" required autofocus
+                       class="short-answer-input" autocomplete="off" inputmode="text">
             </div>
             <button type="submit" class="btn btn-primary">Submit Answer</button>
             {% endif %}

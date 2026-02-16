@@ -493,6 +493,22 @@ body {
     color: #92400e;
 }
 
+/* Math insight banner */
+.math-insight-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border: 1px solid #93c5fd;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: #1e40af;
+}
+.math-insight-banner .insight-icon { font-size: 1rem; flex-shrink: 0; }
+.math-insight-banner .insight-text { flex: 1; line-height: 1.4; }
+
 /* Focus mode banner */
 .focus-mode-banner {
     display: flex;

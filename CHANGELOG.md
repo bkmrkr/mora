@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — "Did you know?" math insights on correct answers
+- 26 curated math facts across 20 skills shown ~30% of the time after correct answers
+- Blue lightbulb banner between the "Correct!" result and the next question
+- Facts build conceptual understanding: commutative property, inverse operations, the 9s trick
+- Grade-appropriate: simpler facts for Grade 1, deeper concepts for Grade 3-4
+- Makes Mora feel like a knowledgeable tutor, not just a quiz machine
+
 ### Added — Personal records tracker
 - Tracks all-time personal bests: longest streak, fastest correct answer, best session accuracy
 - Records computed from DB at session start and stored in flask_session

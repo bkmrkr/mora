@@ -1,5 +1,6 @@
 """Process student answers: grade, update ELO, log attempt."""
 import logging
+import random
 
 from models.progress import get as get_progress, upsert as upsert_progress
 from models import attempt as attempt_model
@@ -8,6 +9,77 @@ from engine.answer_matching import check_answer
 from curriculum.skills import get_skill, get_skills_for_grade, SKILLS
 
 logger = logging.getLogger(__name__)
+
+
+# Math insights: brief "Did you know?" facts shown on correct answers
+MATH_INSIGHTS = {
+    'g1_add_10': [
+        'Adding 0 to any number gives the same number — it\'s the identity property!',
+        'You can add numbers in any order: 3+5 = 5+3. That\'s the commutative property.',
+    ],
+    'g1_sub_10': [
+        'Subtraction is the opposite of addition: if 3+4=7, then 7-4=3.',
+    ],
+    'g1_add_20': [
+        'Making a 10 first is a mental math trick that works for any addition.',
+    ],
+    'g1_place_value': [
+        'Our number system is base-10 — each place is worth 10 times the one to its right.',
+    ],
+    'g1_counting': [
+        'Numbers go on forever! There\'s no biggest number.',
+    ],
+    'g1_shapes': [
+        'A circle has zero straight sides but infinite points along its edge.',
+        'A triangle is the strongest shape — that\'s why bridges use them!',
+    ],
+    'g2_intro_multiply': [
+        'Multiplication is a shortcut for repeated addition: 4 x 3 = 3+3+3+3.',
+        'Any number times 1 equals itself. Any number times 0 equals 0.',
+    ],
+    'g2_money': [
+        'The dollar sign ($) may come from writing "US" on top of each other.',
+    ],
+    'g2_fractions_intro': [
+        'A pizza cut into 4 slices: each slice is 1/4 of the whole pizza!',
+    ],
+    'g2_odd_even': [
+        'Even + Even = Even. Odd + Odd = Even. Even + Odd = Odd. Always!',
+    ],
+    'g3_mult_facts': [
+        'The 9s trick: for 9 x N, the digits of the answer always add to 9.',
+        'Knowing your times tables makes everything in math easier and faster.',
+    ],
+    'g3_div_facts': [
+        'Division and multiplication are inverse operations — like undo buttons!',
+    ],
+    'g3_area_perimeter': [
+        'Area is measured in square units because it covers a 2D surface.',
+        'Two shapes can have the same perimeter but very different areas.',
+    ],
+    'g3_rounding': [
+        'Rounding helps you estimate — is your grocery bill about $20 or $30?',
+    ],
+    'g3_fraction_compare': [
+        '1/2 = 2/4 = 3/6 = 4/8 — infinite fractions can be equal!',
+    ],
+    'g4_long_division': [
+        'The long division algorithm has been used for over 500 years!',
+    ],
+    'g4_decimal_place_value': [
+        'Decimals and fractions are two ways to write the same thing: 0.5 = 1/2.',
+    ],
+    'g4_angles': [
+        'A full turn is 360° — the ancient Babylonians chose 360 because it has many factors.',
+        'The angles in any triangle always add up to exactly 180°.',
+    ],
+    'g4_factors_multiples': [
+        'A prime number has exactly 2 factors: 1 and itself. 2 is the only even prime!',
+    ],
+    'g4_equivalent_fractions': [
+        'Every whole number is a fraction too: 5 = 5/1 = 10/2 = 15/3.',
+    ],
+}
 
 
 def _parse_number(s):
@@ -206,6 +278,13 @@ def process_answer(student, current_question, student_answer,
             elif mastery >= 0.55 and not now_mastered:
                 personal_message = f'{skill_name} is almost mastered — keep going!'
 
+    # Math insight: ~30% chance on correct answers
+    math_insight = None
+    if is_correct:
+        insights = MATH_INSIGHTS.get(skill_id, [])
+        if insights and random.random() < 0.3:
+            math_insight = random.choice(insights)
+
     return {
         'is_correct': is_correct,
         'is_close': is_close,
@@ -226,4 +305,5 @@ def process_answer(student, current_question, student_answer,
         'skill_tip': skill_tip,
         'mistake_hint': mistake_hint,
         'personal_message': personal_message,
+        'math_insight': math_insight,
     }

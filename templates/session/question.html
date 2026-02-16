@@ -118,6 +118,12 @@
         {% endfor %}
     </div>
     {% endif %}
+    {% if last_result.math_insight %}
+    <div class="math-insight-banner">
+        <span class="insight-icon">&#128161;</span>
+        <span class="insight-text"><strong>Did you know?</strong> {{ last_result.math_insight }}</span>
+    </div>
+    {% endif %}
     {% endif %}
 
     {% if question.is_challenge %}

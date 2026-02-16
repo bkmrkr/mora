@@ -79,12 +79,70 @@ def index():
     return render_template('home.html', student_info=student_info)
 
 
-@home_bp.route('/start', methods=['POST'])
-def start():
+@home_bp.route('/choose', methods=['POST'])
+def choose():
+    """Show practice mode selector for returning students."""
     name = request.form.get('student_name', '').strip()
+    if not name:
+        return redirect(url_for('home.index'))
+
+    student = student_model.get_by_name(name)
+    if not student:
+        # New student — skip choice, go straight to start
+        return redirect(url_for('home.start',
+                                student_name=name, mode='mixed'))
+
+    progress = get_for_student(student['id'])
+    if not progress:
+        # No history — skip choice
+        return redirect(url_for('home.start',
+                                student_name=name, mode='mixed'))
+
+    progress_map = {p['skill_id']: p for p in progress}
+    mastered = sum(1 for p in progress if is_mastered(p['mastery_level']))
+
+    # Build list of unlocked, unmastered skills sorted by mastery (closest first)
+    skill_options = []
+    for sid, sinfo in SKILLS.items():
+        prog = progress_map.get(sid)
+        m = prog['mastery_level'] if prog else 0.0
+        if is_mastered(m):
+            continue
+        prereqs_met = all(
+            is_mastered(progress_map.get(pid, {}).get('mastery_level', 0))
+            for pid in sinfo.get('prerequisites', [])
+        )
+        if not prereqs_met and sinfo.get('prerequisites'):
+            continue
+        attempts = prog['total_attempts'] if prog else 0
+        skill_options.append({
+            'id': sid,
+            'name': sinfo['name'],
+            'grade': sinfo['grade'],
+            'mastery_pct': round(m * 100),
+            'attempts': attempts,
+        })
+    # Sort: skills with progress first (closest to mastery), then new skills
+    skill_options.sort(key=lambda x: (-x['mastery_pct'], -x['attempts']))
+    skill_options = skill_options[:5]  # top 5
+
+    return render_template('choose_mode.html',
+                           student=student,
+                           skill_options=skill_options,
+                           level=_level_name(mastered),
+                           mastered=mastered)
+
+
+@home_bp.route('/start', methods=['POST', 'GET'])
+def start():
+    # Support both form POST and redirect with query params
+    name = request.form.get('student_name', '') or request.args.get('student_name', '')
+    name = name.strip()
     if not name:
         flash('Please enter your name.')
         return redirect(url_for('home.index'))
+    mode = request.form.get('mode', '') or request.args.get('mode', 'mixed')
+    focus_skill_id = request.form.get('focus_skill', '') or request.args.get('focus_skill', '')
 
     student = student_model.get_by_name(name)
     if not student:
@@ -156,6 +214,13 @@ def start():
     # Set session goal (10 questions per session)
     flask_session['session_goal'] = 10
     flask_session['goal_celebrated'] = False
+
+    # Focus mode: prefer a specific skill
+    if focus_skill_id and focus_skill_id in SKILLS:
+        flask_session['focus_skill_id'] = focus_skill_id
+        skill_info = get_skill(focus_skill_id)
+        if skill_info:
+            flask_session['focus_skill_name'] = skill_info['name']
 
     session_id = session_model.create(student['id'])
     return redirect(url_for('session.question', session_id=session_id))

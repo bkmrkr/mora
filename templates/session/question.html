@@ -23,6 +23,13 @@
         <a href="{{ url_for('session.end', session_id=session_id) }}" class="btn btn-secondary btn-sm">End Session</a>
     </div>
 
+    {% if focus_skill_name %}
+    <div class="focus-mode-banner">
+        <span class="focus-mode-icon">&#127919;</span>
+        <span class="focus-mode-text">Focus: {{ focus_skill_name }}</span>
+    </div>
+    {% endif %}
+
     {% if welcome %}
     <div class="welcome-banner">
         <strong>Welcome back, {{ student.name }}!</strong>

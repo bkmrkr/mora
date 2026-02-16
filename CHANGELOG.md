@@ -1,5 +1,14 @@
 # Mora v2 Changelog
 
+### Added — Practice mode selector (Mixed vs Focus)
+- Returning students see a choose screen: "Mixed Practice" or focus on a specific skill
+- Top 5 unlocked skills shown with progress bars, sorted by mastery (closest first)
+- Focus mode keeps every question on the chosen skill (repeats allowed)
+- Golden "Focus: [Skill]" banner in session header shows active focus mode
+- New students and those with no progress skip the choose screen entirely
+- Gives students agency — "what do you want to work on?" — while still being guided
+- Captures the original premise: a tutor who asks what you need, not just what it thinks
+
 ### Added — Rich student cards on home page
 - Replaced simple name chips with full progress cards for each returning student
 - Each card shows: name, math level badge, mastery progress bar, last session accuracy, focus skill

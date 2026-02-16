@@ -54,7 +54,9 @@ def question(session_id):
         current = None
     if not current:
         current_skill = flask_session.get('last_skill_id')
-        current = question_service.generate_next(session_id, student, current_skill)
+        focus_skill = flask_session.get('focus_skill_id')
+        current = question_service.generate_next(
+            session_id, student, current_skill, focus_skill_id=focus_skill)
         if current:
             # Bonus challenge: 5th question of the session if not already offered
             session_stats_pre = _get_session_stats(session_id)
@@ -94,6 +96,7 @@ def question(session_id):
         visual_svg = generate_clock_svg(current['clock_hour'], current['clock_minute'])
 
     math_level = flask_session.get('math_level', 'Starter')
+    focus_skill_name = flask_session.get('focus_skill_name')
 
     return render_template(
         'session/question.html',
@@ -111,6 +114,7 @@ def question(session_id):
         practice_streak=practice_streak,
         math_level=math_level,
         welcome_insights=welcome_insights,
+        focus_skill_name=focus_skill_name,
     )
 
 
@@ -171,8 +175,10 @@ def answer(session_id):
 
     if result['is_correct']:
         # Generate next question immediately
+        focus_skill = flask_session.get('focus_skill_id')
         next_q = question_service.generate_next(
-            session_id, student, current['skill_id']
+            session_id, student, current['skill_id'],
+            focus_skill_id=focus_skill,
         )
         if next_q:
             # Bonus challenge check
@@ -218,6 +224,7 @@ def next_question(session_id):
 
     if not flask_session.get('current_question'):
         last_skill = flask_session.get('last_skill_id')
+        focus_skill = flask_session.get('focus_skill_id')
         # After wrong answer, ~50% chance to retry the same skill
         retry_skill = None
         last_result = flask_session.get('last_result')
@@ -225,7 +232,8 @@ def next_question(session_id):
             if random.random() < 0.5:
                 retry_skill = last_skill
         next_q = question_service.generate_next(
-            session_id, student, last_skill, retry_skill_id=retry_skill
+            session_id, student, last_skill, retry_skill_id=retry_skill,
+            focus_skill_id=focus_skill,
         )
         if next_q:
             # Bonus challenge check

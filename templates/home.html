@@ -17,7 +17,7 @@
         <h3>Returning students:</h3>
         <div class="student-cards-grid">
             {% for si in student_info %}
-            <form action="{{ url_for('home.start') }}" method="post" class="student-card-form">
+            <form action="{{ url_for('home.choose') }}" method="post" class="student-card-form">
                 <input type="hidden" name="student_name" value="{{ si.student.name }}">
                 <button type="submit" class="student-card">
                     <div class="student-card-header">

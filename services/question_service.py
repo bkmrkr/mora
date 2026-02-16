@@ -26,11 +26,13 @@ TEMPLATES.update(GRADE3_TEMPLATES)
 TEMPLATES.update(GRADE4_TEMPLATES)
 
 
-def generate_next(session_id, student, current_skill_id=None, retry_skill_id=None):
+def generate_next(session_id, student, current_skill_id=None,
+                   retry_skill_id=None, focus_skill_id=None):
     """Select skill, generate question from template, store in DB.
 
     Args:
         retry_skill_id: if set, force this skill (for immediate retry after wrong).
+        focus_skill_id: if set, strongly prefer this skill (focus practice mode).
 
     Returns question_dict or None.
     """
@@ -44,11 +46,14 @@ def generate_next(session_id, student, current_skill_id=None, retry_skill_id=Non
     recent_attempts = attempt_model.get_recent(student_id, limit=30)
     analysis = analyze_recent(recent_attempts)
 
-    # Select skill (retry overrides normal selection)
+    # Select skill (retry overrides focus, focus overrides normal selection)
     is_retry = False
     if retry_skill_id and retry_skill_id in TEMPLATES:
         skill_id = retry_skill_id
         is_retry = True
+    elif focus_skill_id and focus_skill_id in TEMPLATES:
+        # Focus mode: always use this skill (repeats allowed)
+        skill_id = focus_skill_id
     else:
         skill_id = select_skill(analysis, student_progress, current_skill_id)
     if not skill_id:

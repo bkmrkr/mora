@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Mora — Choose Practice{% endblock %}
+{% block content %}
+<div class="choose-container">
+    <h1>Hi {{ student.name }}!</h1>
+    <p class="choose-subtitle">{{ level }} — {{ mastered }}/40 skills mastered</p>
+
+    <div class="choose-options">
+        <form action="{{ url_for('home.start') }}" method="post">
+            <input type="hidden" name="student_name" value="{{ student.name }}">
+            <input type="hidden" name="mode" value="mixed">
+            <button type="submit" class="choose-card choose-mixed">
+                <div class="choose-icon">&#127922;</div>
+                <div class="choose-label">Mixed Practice</div>
+                <div class="choose-desc">Mora picks the best skills for you</div>
+            </button>
+        </form>
+
+        {% if skill_options %}
+        <div class="choose-divider">or focus on a skill</div>
+        <div class="choose-skills">
+            {% for skill in skill_options %}
+            <form action="{{ url_for('home.start') }}" method="post" class="choose-skill-form">
+                <input type="hidden" name="student_name" value="{{ student.name }}">
+                <input type="hidden" name="mode" value="focus">
+                <input type="hidden" name="focus_skill" value="{{ skill.id }}">
+                <button type="submit" class="choose-skill-card">
+                    <div class="choose-skill-info">
+                        <span class="choose-skill-name">{{ skill.name }}</span>
+                        <span class="choose-skill-grade">G{{ skill.grade }}</span>
+                    </div>
+                    <div class="choose-skill-bar">
+                        <div class="choose-skill-fill" style="width: {{ skill.mastery_pct }}%"></div>
+                    </div>
+                    <span class="choose-skill-pct">{{ skill.mastery_pct }}%</span>
+                </button>
+            </form>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

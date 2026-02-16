@@ -1,5 +1,9 @@
 # Mora v2 Changelog
 
+### Changed — MCQ Only Mode
+- Disabled short answer mode; all questions now use multiple choice
+- Short answer can be re-enabled later by restoring the mastery threshold check
+
 ### Fixed — Skill Selector Variety and Geometry Data
 - `selector.py`: when only 1-2 eligible skills remain, expand candidates to all skills so the same skill doesn't repeat every other question
 - `selector.py`: all-mastered students now cycle through all skills with variety instead of stuck on one

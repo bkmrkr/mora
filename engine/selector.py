@@ -143,10 +143,8 @@ def compute_question_params(skill_id, student_progress, recent_analysis):
     else:
         adjusted = base_target
 
-    # MCQ for low mastery, short_answer when more confident
-    # Threshold must be below mastery_threshold (0.65) or skills get excluded first
-    mastery = prog.get('mastery_level', 0.0)
-    q_type = 'short_answer' if mastery >= 0.5 else 'mcq'
+    # MCQ only for now — short answer disabled
+    q_type = 'mcq'
 
     return adjusted, q_type
 

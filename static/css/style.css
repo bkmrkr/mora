@@ -1324,6 +1324,22 @@ body {
     margin-top: 0.5rem;
 }
 
+/* Sparkline dots — recent attempt trail */
+.sparkline-dots {
+    display: flex;
+    gap: 4px;
+    margin-top: 0.4rem;
+    align-items: center;
+}
+.sparkline-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.dot-correct { background: var(--success); }
+.dot-wrong { background: var(--error); }
+
 /* Data Table */
 .table-wrap {
     overflow-x: auto;

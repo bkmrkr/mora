@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — Per-skill sparkline dots on dashboard
+- Each skill card on the dashboard now shows a trail of the last 5 attempts as colored dots
+- Green dot = correct, red dot = wrong — instant visual learning trajectory
+- Uses a single bulk query (200 recent attempts) grouped by skill for efficiency
+- Sparklines appear between the mastery bar and stats, only for skills with attempts
+- At a glance, parents and students can see "mostly green = doing well" vs "red-green-red = struggling"
+
 ### Added — Rush detection for guessing behavior
 - Detects when MCQ answers are submitted in under 1.5 seconds (likely clicking without reading)
 - Shows amber clock warning: "Take your time — read the question carefully before answering."

@@ -169,6 +169,13 @@
                     <div class="mastery-fill {% if skill.mastered %}mastered{% endif %}"
                          style="width: {{ skill.mastery_pct }}%"></div>
                 </div>
+                {% if skill.sparkline %}
+                <div class="sparkline-dots">
+                    {% for correct in skill.sparkline %}
+                    <span class="sparkline-dot {% if correct %}dot-correct{% else %}dot-wrong{% endif %}"></span>
+                    {% endfor %}
+                </div>
+                {% endif %}
                 <div class="node-stats">
                     <span>{{ skill.mastery_pct }}%</span>
                     <span>{{ skill.skill_rating }} ELO</span>

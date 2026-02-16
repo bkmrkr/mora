@@ -88,6 +88,16 @@ def overview(student_id):
     all_progress = get_for_student(student_id)
     progress_by_skill = {p['skill_id']: p for p in all_progress}
 
+    # Fetch recent attempts for sparklines (one query, group by skill)
+    recent_attempts = attempt_model.get_recent(student_id, limit=200)
+    sparkline_map = {}  # skill_id -> list of bools (oldest first, max 5)
+    for a in reversed(recent_attempts):  # reversed = oldest first
+        sid = a.get('q_skill_id') or a.get('skill_id', '')
+        if sid not in sparkline_map:
+            sparkline_map[sid] = []
+        if len(sparkline_map[sid]) < 5:
+            sparkline_map[sid].append(bool(a['is_correct']))
+
     grade_tree = []
     for grade in [1, 2, 3, 4]:
         skills = get_skills_for_grade(grade)
@@ -124,6 +134,7 @@ def overview(student_id):
                 'prereq_names': prereq_names,
                 'prereqs_met_count': prereqs_met_count,
                 'prereqs_total': len(prereqs),
+                'sparkline': sparkline_map.get(s['id'], []),
             })
         grade_tree.append({'grade': grade, 'skills': skill_list})
 

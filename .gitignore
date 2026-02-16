@@ -8,3 +8,6 @@ mora.db
 *.log
 *.log.*
 cookies.txt
+*.png
+.playwright-mcp/
+.claude/

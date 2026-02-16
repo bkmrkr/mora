@@ -38,12 +38,14 @@
         <div class="skills-list">
             {% for skill in skills_practiced %}
             <div class="skill-row">
-                <span class="skill-name">{{ skill.name }}</span>
+                <div class="skill-row-top">
+                    <span class="skill-name">{{ skill.name }}</span>
+                    <span class="session-accuracy {% if skill.session_accuracy >= 80 %}acc-good{% elif skill.session_accuracy >= 50 %}acc-ok{% else %}acc-low{% endif %}">{{ skill.session_correct }}/{{ skill.session_total }}</span>
+                </div>
                 <div class="mastery-bar">
                     <div class="mastery-fill {% if skill.mastered %}mastered{% endif %}"
                          style="width: {{ skill.mastery_pct }}%"></div>
                 </div>
-                <span class="skill-rating">{{ skill.skill_rating }} ELO</span>
                 {% if skill.mastered %}
                 <span class="mastered-badge">Mastered!</span>
                 {% endif %}

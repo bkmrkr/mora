@@ -194,17 +194,32 @@ def end(session_id):
     correct = sess['total_correct'] or 0
     accuracy = round(correct / total * 100) if total > 0 else 0
 
-    skill_ids = set(a['skill_id'] for a in attempts if a.get('skill_id'))
+    # Per-skill session accuracy
+    skill_attempts = {}
+    for a in attempts:
+        sid = a.get('skill_id')
+        if not sid:
+            continue
+        if sid not in skill_attempts:
+            skill_attempts[sid] = {'correct': 0, 'total': 0}
+        skill_attempts[sid]['total'] += 1
+        if a['is_correct']:
+            skill_attempts[sid]['correct'] += 1
+
     skills_practiced = []
-    for sid in skill_ids:
+    for sid, counts in skill_attempts.items():
         skill = get_skill(sid)
         prog = get_progress(student['id'], sid)
         if skill:
+            session_acc = round(counts['correct'] / counts['total'] * 100) if counts['total'] > 0 else 0
             skills_practiced.append({
                 'name': skill['name'],
                 'mastery_pct': round(prog['mastery_level'] * 100),
                 'skill_rating': round(prog['skill_rating'], 1),
                 'mastered': elo.is_mastered(prog['mastery_level']),
+                'session_correct': counts['correct'],
+                'session_total': counts['total'],
+                'session_accuracy': session_acc,
             })
 
     # Average response time

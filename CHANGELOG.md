@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Improved — Per-skill session accuracy on session summary
+- Session summary now shows how many questions each skill got right (e.g., "3/4")
+- Color-coded accuracy badges: green (≥80%), yellow (≥50%), red (<50%)
+- Replaces simple skill list with actionable per-skill breakdown
+- Students see exactly which skills need more practice
+
 ### Added — Mastery count badges on home page student chips
 - Returning student buttons now show "N/40" mastery badge (e.g., "Sophia 36/40")
 - Only shown when student has at least 1 mastered skill

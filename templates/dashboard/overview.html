@@ -9,8 +9,15 @@
         <h2>Grade {{ grade_group.grade }}</h2>
         <div class="node-grid">
             {% for skill in grade_group.skills %}
-            <div class="node-card {% if skill.mastered %}node-mastered{% elif skill.total_attempts > 0 %}node-active{% else %}node-untouched{% endif %}">
-                <div class="node-name">{{ skill.name }}</div>
+            <div class="node-card {% if skill.locked %}node-locked{% elif skill.mastered %}node-mastered{% elif skill.total_attempts > 0 %}node-active{% else %}node-untouched{% endif %}">
+                <div class="node-name">
+                    {% if skill.locked %}&#128274; {% endif %}
+                    {% if skill.mastered %}&#9989; {% endif %}
+                    {{ skill.name }}
+                </div>
+                {% if skill.locked %}
+                <div class="node-prereqs">Needs: {{ skill.prereq_names|join(', ') }}</div>
+                {% else %}
                 <div class="mastery-bar">
                     <div class="mastery-fill {% if skill.mastered %}mastered{% endif %}"
                          style="width: {{ skill.mastery_pct }}%"></div>
@@ -20,6 +27,7 @@
                     <span>{{ skill.skill_rating }} ELO</span>
                     <span>{{ skill.total_attempts }} {{ "try" if skill.total_attempts == 1 else "tries" }}</span>
                 </div>
+                {% endif %}
             </div>
             {% endfor %}
         </div>

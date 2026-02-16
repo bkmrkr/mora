@@ -1,5 +1,13 @@
 # Mora v2 Changelog
 
+### Added — Prerequisite skill tree on dashboard
+- Dashboard skill cards now show lock/unlock/mastered status
+- Locked skills display lock icon and "Needs: ..." with prerequisite names
+- Mastered skills show green checkmark
+- Locked cards are faded (opacity 0.6) to visually distinguish from active skills
+- Makes the adaptive prerequisite DAG visible — students see their learning path
+- Fixed edge case: mastered skills with unmastered prerequisites don't show as locked
+
 ### Improved — Encouraging feedback on wrong answers
 - Context-aware encouragement messages based on current mastery level
 - "Almost there!" for skills near mastery (50%+), "Making progress!" for 25%+, "Every mistake helps you learn" for new skills

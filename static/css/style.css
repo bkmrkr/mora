@@ -568,7 +568,13 @@ body {
 .node-mastered { background: #f0fdf4; border-color: #bbf7d0; }
 .node-active { background: #faf5ff; border-color: #e9d5ff; }
 .node-untouched { background: var(--bg); }
+.node-locked { background: #f8fafc; border-color: #e2e8f0; opacity: 0.6; }
 .node-name { font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; }
+.node-prereqs {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
 .node-stats {
     display: flex;
     gap: 0.75rem;

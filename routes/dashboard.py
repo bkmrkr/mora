@@ -5,7 +5,7 @@ from models import student as student_model
 from models import attempt as attempt_model
 from models import session as session_model
 from models.progress import get_for_student
-from curriculum.skills import get_skills_for_grade
+from curriculum.skills import get_skills_for_grade, get_skill
 from engine import elo
 
 dashboard_bp = Blueprint('dashboard', __name__)
@@ -44,12 +44,29 @@ def overview(student_id):
         for s in skills:
             prog = progress_by_skill.get(s['id'])
             mastery = prog['mastery_level'] if prog else 0.0
+            # Check if prerequisites are met
+            prereqs = s.get('prerequisites', [])
+            prereqs_met = all(
+                elo.is_mastered(progress_by_skill.get(pid, {}).get('mastery_level', 0))
+                for pid in prereqs
+            )
+            is_mastered = elo.is_mastered(mastery)
+            locked = bool(prereqs) and not prereqs_met and not is_mastered
+            prereq_names = []
+            if locked:
+                for pid in prereqs:
+                    ps = get_skill(pid)
+                    if ps and not elo.is_mastered(
+                            progress_by_skill.get(pid, {}).get('mastery_level', 0)):
+                        prereq_names.append(ps['name'])
             skill_list.append({
                 'name': s['name'],
                 'skill_rating': round(prog['skill_rating'], 1) if prog else 800,
                 'mastery_pct': round(mastery * 100),
-                'mastered': elo.is_mastered(mastery),
+                'mastered': is_mastered,
                 'total_attempts': prog['total_attempts'] if prog else 0,
+                'locked': locked,
+                'prereq_names': prereq_names,
             })
         grade_tree.append({'grade': grade, 'skills': skill_list})
 

@@ -79,10 +79,18 @@ class TestDecimalAddSub:
 
 
 class TestAngles:
-    def test_low_difficulty_classify(self):
-        for _ in range(10):
+    def test_low_difficulty_valid_answer(self):
+        """Low difficulty has classify, identify, and range variants."""
+        type_names = {'acute', 'right', 'obtuse'}
+        for _ in range(30):
             result = GRADE4_TEMPLATES['g4_angles'][0](600)
-            assert result['correct_answer'] in ('acute', 'right', 'obtuse')
+            ans = result['correct_answer']
+            # classify → type names; identify → degree strings; range → descriptions
+            valid = (ans in type_names or
+                     ans.isdigit() or
+                     '°' in ans or
+                     'than' in ans or 'exactly' in ans or 'between' in ans)
+            assert valid, f'Unexpected answer: {ans!r} for question: {result["question"]}'
 
 
 class TestEquivalentFractions:

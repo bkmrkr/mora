@@ -182,21 +182,54 @@ def decimal_add_sub(difficulty_elo):
 def angles(difficulty_elo):
     """g4_angles: Classify and measure angles."""
     if difficulty_elo < 750:
-        # Classify angle type
-        angle = random.choice([
-            (random.randint(10, 80), 'acute'),
-            (90, 'right'),
-            (random.randint(100, 170), 'obtuse'),
-        ])
-        degrees, correct = angle
-        question = f'An angle measures {degrees}°. What type of angle is it?'
-        wrong = [t for t in ['acute', 'right', 'obtuse', 'straight'] if t != correct]
+        variant = random.choice(['classify', 'identify', 'range'])
+        if variant == 'classify':
+            # Classify angle type from measurement
+            angle = random.choice([
+                (random.randint(10, 80), 'acute'),
+                (90, 'right'),
+                (random.randint(100, 170), 'obtuse'),
+            ])
+            degrees, correct = angle
+            question = f'An angle measures {degrees}°. What type of angle is it?'
+            wrong = [t for t in ['acute', 'right', 'obtuse', 'straight'] if t != correct]
+            explanation = f'A {degrees}° angle is {correct} ({"less than 90°" if correct == "acute" else "exactly 90°" if correct == "right" else "greater than 90°"}).'
+        elif variant == 'identify':
+            # Pick an angle type and ask for an example
+            atype = random.choice(['acute', 'right', 'obtuse'])
+            if atype == 'acute':
+                correct = str(random.choice([15, 25, 30, 45, 60, 75]))
+                wrong_vals = ['90', '120', '180']
+            elif atype == 'right':
+                correct = '90'
+                wrong_vals = ['45', '120', '180']
+            else:
+                correct = str(random.choice([100, 110, 120, 135, 150, 170]))
+                wrong_vals = ['45', '90', '180']
+            article = 'an' if atype in ('acute', 'obtuse') else 'a'
+            question = f'Which of these is {article} {atype} angle?'
+            wrong = wrong_vals
+            explanation = f'{correct}° is {atype} ({"less than 90°" if atype == "acute" else "exactly 90°" if atype == "right" else "between 90° and 180°"}).'
+        else:
+            # What range does a type fall in?
+            atype = random.choice(['acute', 'right', 'obtuse', 'straight'])
+            ranges = {
+                'acute': ('less than 90°', ['exactly 90°', 'between 90° and 180°', 'exactly 180°']),
+                'right': ('exactly 90°', ['less than 90°', 'between 90° and 180°', 'exactly 180°']),
+                'obtuse': ('between 90° and 180°', ['less than 90°', 'exactly 90°', 'exactly 180°']),
+                'straight': ('exactly 180°', ['less than 90°', 'exactly 90°', 'between 90° and 180°']),
+            }
+            correct, wrong = ranges[atype]
+            article = 'An' if atype in ('acute', 'obtuse') else 'A'
+            question = f'{article} {atype} angle measures...'
+            explanation = f'{article} {atype} angle measures {correct}.'
+
         return {
             'skill_id': 'g4_angles',
             'question': question,
             'correct_answer': correct,
             'options': make_options(correct, wrong[:3]),
-            'explanation': f'A {degrees}° angle is {correct} ({"less than 90°" if correct == "acute" else "exactly 90°" if correct == "right" else "greater than 90°"}).',
+            'explanation': explanation,
             'template_id': 'g4_angles_classify',
             'difficulty': estimate_difficulty(4, 0.2),
         }
@@ -230,15 +263,63 @@ def angles(difficulty_elo):
 def geometry_lines(difficulty_elo):
     """g4_geometry: Identify parallel and perpendicular lines."""
     if difficulty_elo < 750:
-        variant = random.choice(['parallel', 'perpendicular'])
-        if variant == 'parallel':
-            question = 'Parallel lines are lines that...'
-            answer = 'never cross'
-            distractors = ['cross at a right angle', 'cross at any angle', 'are the same line']
-        else:
-            question = 'Perpendicular lines are lines that...'
-            answer = 'cross at a right angle'
-            distractors = ['never cross', 'are curved', 'go in the same direction']
+        variants = [
+            {
+                'question': 'Parallel lines are lines that...',
+                'answer': 'never cross',
+                'distractors': ['cross at a right angle', 'cross at any angle', 'are the same line'],
+                'explanation': 'Parallel lines go in the same direction and never cross.',
+                'tid': 'parallel_def',
+            },
+            {
+                'question': 'Perpendicular lines are lines that...',
+                'answer': 'cross at a right angle',
+                'distractors': ['never cross', 'are curved', 'go in the same direction'],
+                'explanation': 'Perpendicular lines meet at a 90-degree (right) angle.',
+                'tid': 'perpendicular_def',
+            },
+            {
+                'question': 'What kind of lines never cross each other?',
+                'answer': 'parallel',
+                'distractors': ['perpendicular', 'diagonal', 'curved'],
+                'explanation': 'Parallel lines go in the same direction and never cross.',
+                'tid': 'parallel_id',
+            },
+            {
+                'question': 'What kind of lines meet at a right angle (90°)?',
+                'answer': 'perpendicular',
+                'distractors': ['parallel', 'diagonal', 'horizontal'],
+                'explanation': 'Perpendicular lines cross at exactly 90 degrees.',
+                'tid': 'perpendicular_id',
+            },
+            {
+                'question': 'Railroad tracks are an example of _____ lines.',
+                'answer': 'parallel',
+                'distractors': ['perpendicular', 'curved', 'intersecting'],
+                'explanation': 'Railroad tracks run side by side and never cross — they are parallel.',
+                'tid': 'parallel_real',
+            },
+            {
+                'question': 'The corner of a book shows _____ lines.',
+                'answer': 'perpendicular',
+                'distractors': ['parallel', 'curved', 'diagonal'],
+                'explanation': 'The edges of a book corner meet at a right angle — they are perpendicular.',
+                'tid': 'perpendicular_real',
+            },
+            {
+                'question': 'What angle do perpendicular lines make?',
+                'answer': '90 degrees',
+                'distractors': ['45 degrees', '180 degrees', '60 degrees'],
+                'explanation': 'Perpendicular lines always cross at 90 degrees (a right angle).',
+                'tid': 'perpendicular_angle',
+            },
+        ]
+        v = random.choice(variants)
+        question = v['question']
+        answer = v['answer']
+        distractors = v['distractors']
+        explanation = v['explanation']
+        template_id = f'g4_geometry_{v["tid"]}'
     else:
         shapes_data = [
             ('square', 2, 4),  # (parallel pairs, right angles)
@@ -275,8 +356,8 @@ def geometry_lines(difficulty_elo):
         'question': question,
         'correct_answer': answer,
         'options': make_options(answer, distractors),
-        'explanation': f'{answer} is correct.',
-        'template_id': f'g4_geometry_{variant}',
+        'explanation': explanation,
+        'template_id': template_id,
         'difficulty': estimate_difficulty(4, 0.3),
     }
 

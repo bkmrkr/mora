@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Improved — Template Question Variety
+- `g4_geometry`: expanded low-difficulty variants from 2 to 7 (was just "Parallel lines are..." / "Perpendicular lines are..." repeating verbatim — now includes real-world examples, identification, and angle questions)
+- `g4_angles`: expanded low-difficulty from 3 variants to 9+ (classify, identify example, and range-based questions — reduced max repetition from 38% to <15%)
+- Fixed grammar: "an right angle" → "a right angle", "an straight angle" → "a straight angle"
+- Added proper explanations to all geometry low-difficulty variants
+
 ### Changed — MCQ Only Mode
 - Disabled short answer mode; all questions now use multiple choice
 - Short answer can be re-enabled later by restoring the mastery threshold check

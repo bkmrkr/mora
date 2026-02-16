@@ -301,7 +301,8 @@ def factors_multiples(difficulty_elo):
         n = random.randint(3, 12)
         pos = random.randint(3, 8)
         answer = n * pos
-        question = f'What is the {pos}th multiple of {n}?'
+        suffix = 'rd' if pos == 3 else 'th'
+        question = f'What is the {pos}{suffix} multiple of {n}?'
         distractors = [str(n * (pos + 1)), str(n * (pos - 1)), str(n + pos)]
         return {
             'skill_id': 'g4_factors_multiples',

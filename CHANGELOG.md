@@ -1,5 +1,8 @@
 # Mora v2 Changelog
 
+### Fixed — Ordinal Suffix in Factors Template
+- `g4_factors_multiples`: "What is the 3th multiple" → "What is the 3rd multiple"
+
 ### Fixed — Singular/Plural Grammar in Word Problems
 - `g4_multi_step_word`: "If 1 apples are eaten" → "If 1 apple is eaten" (singular)
 - `g4_multi_step_word`: "plus 1 loose ones" → "plus 1 loose one" (singular)

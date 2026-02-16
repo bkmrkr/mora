@@ -26,6 +26,13 @@
             </div>
         </div>
 
+        {% if result.mistake_hint %}
+        <div class="mistake-hint">
+            <span class="hint-icon">&#128161;</span>
+            <span>{{ result.mistake_hint }}</span>
+        </div>
+        {% endif %}
+
         {% if result.explanation %}
         <div class="explanation-box">
             <h3>Explanation</h3>

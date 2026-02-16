@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — Mistake pattern analysis on wrong answers
+- Analyzes the student's wrong answer vs correct answer to identify what went wrong
+- Detects off-by-1 (counting error), off-by-10/100 (place value), swapped digits, wrong operation
+- Shows a blue lightbulb hint above the explanation: e.g., "Off by 10 — check your tens place"
+- Three layers of feedback: mistake hint → explanation → skill tip
+- Only triggers for numeric answers where a pattern is detected
+
 ### Added — Skill momentum indicator on question card
 - Green ▲ arrow when recent accuracy is improving on a skill ("rising")
 - Red ▼ arrow when recent accuracy is declining ("falling")

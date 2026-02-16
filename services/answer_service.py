@@ -10,6 +10,61 @@ from curriculum.skills import get_skill, get_skills_for_grade, SKILLS
 logger = logging.getLogger(__name__)
 
 
+def _parse_number(s):
+    """Try to parse a string as a number (int or float)."""
+    s = s.strip()
+    try:
+        if '/' in s:
+            parts = s.split('/')
+            return float(parts[0]) / float(parts[1])
+        if '.' in s:
+            return float(s)
+        return int(s)
+    except (ValueError, ZeroDivisionError):
+        return None
+
+
+def _analyze_mistake(student_answer, correct_answer, skill_id):
+    """Detect common mistake patterns and return a helpful hint."""
+    sa = _parse_number(student_answer)
+    ca = _parse_number(correct_answer)
+
+    if sa is None or ca is None:
+        return ''
+
+    diff = sa - ca
+
+    # Off-by-one (most common for counting/addition/subtraction)
+    if abs(diff) == 1:
+        return 'You were off by 1 — try counting again carefully.'
+
+    # Off by 10 (place value error)
+    if abs(diff) == 10:
+        return 'Off by 10 — check your tens place.'
+
+    # Off by 100
+    if abs(diff) == 100:
+        return 'Off by 100 — check your hundreds place.'
+
+    # Swapped digits (e.g., answered 21 instead of 12)
+    cs = correct_answer.strip()
+    ss = student_answer.strip()
+    if len(cs) == 2 and len(ss) == 2 and cs[0] == ss[1] and cs[1] == ss[0]:
+        return 'Looks like the digits got swapped — check tens and ones.'
+
+    # Wrong operation (e.g., added instead of subtracted, or vice versa)
+    if ca != 0 and sa != 0:
+        if abs(diff) == 2 * min(abs(sa), abs(ca)):
+            return 'Double-check which operation the problem is asking for.'
+
+    # Multiplication vs addition confusion (common in grade 2-3)
+    if 'mult' in skill_id or 'div' in skill_id:
+        if abs(diff) > 0:
+            return 'Remember: multiplication means equal groups, not adding.'
+
+    return ''
+
+
 def process_answer(student, current_question, student_answer,
                    response_time_s, session_id):
     """Grade answer, update ELO, record attempt.
@@ -121,6 +176,11 @@ def process_answer(student, current_question, student_answer,
     skill_info = get_skill(skill_id)
     skill_tip = skill_info.get('tip', '') if skill_info else ''
 
+    # Mistake analysis: identify what the student likely confused
+    mistake_hint = ''
+    if not is_correct:
+        mistake_hint = _analyze_mistake(student_answer, correct_answer, skill_id)
+
     return {
         'is_correct': is_correct,
         'is_close': is_close,
@@ -139,4 +199,5 @@ def process_answer(student, current_question, student_answer,
         'speed_label': speed_label,
         'response_time_s': round(response_time_s, 1),
         'skill_tip': skill_tip,
+        'mistake_hint': mistake_hint,
     }

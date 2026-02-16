@@ -603,6 +603,22 @@ body {
 .answer-row .label { font-weight: 600; min-width: 120px; }
 .wrong-text { color: var(--danger); }
 .correct-text { color: var(--success); font-weight: 600; }
+.mistake-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #eff6ff;
+    border-left: 3px solid #3b82f6;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    color: #1e40af;
+}
+.hint-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
 .explanation-box {
     background: #fefce8;
     border-radius: 8px;

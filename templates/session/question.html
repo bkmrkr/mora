@@ -69,7 +69,10 @@
 
     {% if last_result and last_result.is_correct %}
     {% if last_result.grade_completed %}
-    <div class="grade-celebration">
+    <div class="grade-celebration confetti-container">
+        <div class="confetti-burst">
+            {% for i in range(12) %}<span class="confetti-piece"></span>{% endfor %}
+        </div>
         <div class="grade-star">&#127942;</div>
         <div class="mastery-text">
             <strong>Grade {{ last_result.grade_completed }} Complete!</strong>
@@ -77,7 +80,10 @@
         </div>
     </div>
     {% elif last_result.just_mastered %}
-    <div class="mastery-celebration">
+    <div class="mastery-celebration confetti-container">
+        <div class="confetti-burst">
+            {% for i in range(12) %}<span class="confetti-piece"></span>{% endfor %}
+        </div>
         <div class="mastery-star">&#11088;</div>
         <div class="mastery-text">
             <strong>Skill Mastered!</strong>

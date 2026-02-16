@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — Confetti celebration for mastery milestones
+- CSS-only confetti burst animation on "Skill Mastered!" and "Grade Complete!" banners
+- 12 colorful particles explode outward and fade over 1.2 seconds
+- Each particle has unique color, trajectory, delay, and shape (square/rectangle/circle)
+- Fires automatically on page load when mastery is achieved — no JS needed
+- Makes mastery milestones feel exciting and rewarding for grade 1-4 students
+
 ### Added — Practice heatmap on dashboard
 - GitHub-style 4-week calendar grid on student overview page
 - Shows which days had practice sessions with green intensity levels (0-3)

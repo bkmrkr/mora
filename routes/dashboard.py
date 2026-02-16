@@ -201,6 +201,43 @@ def overview(student_id):
     mastery_timeline.sort(key=lambda x: x['date'], reverse=True)
     mastery_timeline = mastery_timeline[:8]
 
+    # Achievement badges — computed from existing data
+    badges = []
+    if total_mastered >= 1:
+        badges.append({'icon': '&#11088;', 'name': 'First Mastery', 'desc': 'Mastered your first skill'})
+    if total_mastered >= 10:
+        badges.append({'icon': '&#127775;', 'name': 'Rising Star', 'desc': '10 skills mastered'})
+    if total_mastered >= 20:
+        badges.append({'icon': '&#128293;', 'name': 'Halfway There', 'desc': '20 skills mastered'})
+    if total_mastered >= 40:
+        badges.append({'icon': '&#127942;', 'name': 'Legend', 'desc': 'All 40 skills mastered!'})
+    for gs in grade_summary:
+        if gs['complete']:
+            badges.append({'icon': '&#127891;', 'name': f'Grade {gs["grade"]} Complete',
+                           'desc': f'Mastered all Grade {gs["grade"]} skills'})
+    # Perfect session badge (any session with 10+ questions and 100% accuracy)
+    perfect = any(
+        (s['total_questions'] or 0) >= 10 and s['total_correct'] == s['total_questions']
+        for s in sessions
+    )
+    if perfect:
+        badges.append({'icon': '&#128175;', 'name': 'Perfect Session', 'desc': '100% on 10+ questions'})
+    # Speed badge (check if any session has avg time < 4s)
+    for s in sessions:
+        s_attempts = attempt_model.get_for_session(s['id'])
+        times = [a['response_time_seconds'] for a in s_attempts
+                 if a.get('response_time_seconds') and a['response_time_seconds'] > 0
+                 and a['is_correct']]
+        if len(times) >= 5 and sum(times) / len(times) < 4:
+            badges.append({'icon': '&#9889;', 'name': 'Speed Demon', 'desc': 'Avg under 4s on correct answers'})
+            break
+    if streak_days >= 3:
+        badges.append({'icon': '&#128170;', 'name': 'Streak Star', 'desc': f'{streak_days} day practice streak'})
+    if total_questions >= 100:
+        badges.append({'icon': '&#128218;', 'name': 'Century', 'desc': '100+ questions answered'})
+    if total_questions >= 500:
+        badges.append({'icon': '&#127793;', 'name': 'Dedicated', 'desc': '500+ questions answered'})
+
     return render_template(
         'dashboard/overview.html',
         student=student,
@@ -217,4 +254,5 @@ def overview(student_id):
         accuracy_trend=accuracy_trend,
         math_level=math_level,
         mastery_timeline=mastery_timeline,
+        badges=badges,
     )

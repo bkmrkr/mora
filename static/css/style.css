@@ -1060,6 +1060,25 @@ body {
     background: rgba(255,255,255,0.2);
     color: white;
 }
+.badges-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+.badge-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1px solid #f59e0b;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    cursor: default;
+}
+.badge-icon { font-size: 1.1rem; }
+.badge-name { font-weight: 600; color: #92400e; }
 .mastery-timeline {
     display: flex;
     flex-direction: column;

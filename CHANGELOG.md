@@ -1,5 +1,14 @@
 # Mora v2 Changelog
 
+### Added — Achievement badges on dashboard
+- Golden badge pills showing milestones: First Mastery, Rising Star (10), Halfway There (20), Legend (40)
+- Grade completion badges for each completed grade
+- Performance badges: Speed Demon (avg < 4s), Perfect Session (100% on 10+ Qs)
+- Volume badges: Century (100+ Qs), Dedicated (500+ Qs)
+- Streak Star for 3+ day practice streaks
+- All computed from existing data — no schema changes
+- Hover tooltip shows description of each achievement
+
 ### Added — "Coming Up Next" session preview on summary
 - Replaces single "Next focus" card with a preview of 3 upcoming skills
 - Each skill shows name, mastery bar, grade, and a reason label (Almost mastered / In progress / New skill / Getting started)

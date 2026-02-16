@@ -24,6 +24,17 @@
         {% endif %}
     </div>
 
+    {% if badges %}
+    <div class="badges-section">
+        {% for badge in badges %}
+        <div class="badge-item" title="{{ badge.desc }}">
+            <span class="badge-icon">{{ badge.icon | safe }}</span>
+            <span class="badge-name">{{ badge.name }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <div class="grade-overview-bar">
         <div class="overview-total">
             {{ total_mastered }}/{{ total_skills }} skills mastered

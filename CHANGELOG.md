@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Answer timeline on session summary
+- Visual dot timeline showing correct (green) and wrong (red outlined) answers in order
+- Hover tooltips show question number and result (e.g., "Q3: Wrong")
+- Students see their learning trajectory at a glance — patterns of improvement become visible
+- Placed between stat cards and skills list for natural reading flow
+
 ### Added — Session goal with progress tracking
 - Each session starts with a goal of 10 questions
 - Progress bar and counter (e.g., "3/10") shown in session header

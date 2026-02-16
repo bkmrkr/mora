@@ -32,6 +32,18 @@
         {% endif %}
     </div>
 
+    {% if answer_timeline %}
+    <div class="card">
+        <h2>Your Session</h2>
+        <div class="answer-timeline">
+            {% for correct in answer_timeline %}
+            <div class="timeline-dot {% if correct %}dot-correct{% else %}dot-wrong{% endif %}"
+                 title="Q{{ loop.index }}: {% if correct %}Correct{% else %}Wrong{% endif %}"></div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     {% if skills_practiced %}
     <div class="card">
         <h2>Skills Practiced</h2>

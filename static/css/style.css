@@ -609,6 +609,20 @@ body {
 }
 .focus-name { font-size: 1.1rem; font-weight: 600; }
 .focus-detail { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.15rem; }
+.answer-timeline {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding: 0.5rem 0;
+}
+.timeline-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: default;
+}
+.dot-correct { background: var(--success); }
+.dot-wrong { background: var(--danger-light); border: 2px solid var(--danger); }
 
 /* Dashboard */
 .dashboard-container h1 { margin-bottom: 1.5rem; }

@@ -268,6 +268,9 @@ def end(session_id):
                     'mastery_pct': round(mastery * 100),
                 }
 
+    # Answer timeline (ordered dots for correct/wrong)
+    answer_timeline = [bool(a['is_correct']) for a in attempts]
+
     flask_session.pop('current_question', None)
     flask_session.pop('last_result', None)
     flask_session.pop('last_skill_id', None)
@@ -285,4 +288,5 @@ def end(session_id):
         best_streak=best_streak,
         avg_time=avg_time,
         focus_skill=focus_skill,
+        answer_timeline=answer_timeline,
     )

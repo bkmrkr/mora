@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Smart session warm-up (confidence-building first question)
+- First question of each session picks from student's top 5 highest-mastery skills
+- Ensures students start each session with a question they're likely to get right
+- Research-backed: early success builds confidence and engagement for the rest of the session
+- Only activates when student has 3+ attempts and 40%+ mastery on at least one skill
+
 ### Added — Mastery timeline on dashboard
 - Shows the 8 most recently mastered skills with star, name, grade badge, and date
 - Placed prominently between grade overview and focus skill

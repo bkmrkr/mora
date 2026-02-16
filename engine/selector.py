@@ -82,6 +82,12 @@ def select_skill(recent_analysis, student_progress, current_skill_id=None):
 
     eligible = _get_eligible_skills(student_progress)
 
+    # Session warm-up: first question picks a high-confidence skill
+    if current_skill_id is None:
+        warmup = _pick_warmup_skill(student_progress)
+        if warmup:
+            return warmup
+
     # Spaced review: occasionally revisit mastered skills for retention
     review_skill = _pick_review_skill(student_progress, current_skill_id, last_seen)
     if review_skill and eligible and random.random() < 0.2:
@@ -181,6 +187,29 @@ def _pick_review_skill(student_progress, current_skill_id, last_seen):
     # Sort by: session recency desc (not seen recently first), then DB staleness
     mastered.sort(key=lambda x: (-x[1], x[2]))
     return mastered[0][0]
+
+
+def _pick_warmup_skill(student_progress):
+    """Pick a high-confidence skill for session warm-up.
+
+    Prefers skills with high mastery that the student knows well,
+    giving them a confidence-building first question.
+    Returns skill_id or None.
+    """
+    candidates = []
+    for skill_id, skill in SKILLS.items():
+        prog = student_progress.get(skill_id, {})
+        mastery = prog.get('mastery_level', 0.0)
+        attempts = prog.get('total_attempts', 0)
+        # Need at least some practice and decent mastery
+        if attempts >= 3 and mastery >= 0.4:
+            candidates.append((skill_id, mastery))
+    if not candidates:
+        return None
+    # Sort by mastery descending, pick randomly from top 5
+    candidates.sort(key=lambda x: x[1], reverse=True)
+    top = candidates[:5]
+    return random.choice(top)[0]
 
 
 def _get_eligible_skills(student_progress):

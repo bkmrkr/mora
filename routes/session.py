@@ -8,35 +8,14 @@ from flask import (Blueprint, render_template, request, redirect,
 from models import student as student_model
 from models import session as session_model
 from models import attempt as attempt_model
-from models.progress import get as get_progress, get_for_student
+from models.progress import get as get_progress
 from services import question_service, answer_service
-from curriculum.skills import get_skill, get_skills_for_grade
+from curriculum.skills import get_skill
 from curriculum.templates.common import generate_clock_svg
 from engine import elo
 
 logger = logging.getLogger(__name__)
 session_bp = Blueprint('session', __name__)
-
-
-def _get_skill_progress(student_id):
-    """Per-skill mastery data for sidebar."""
-    progress_rows = get_for_student(student_id)
-    progress_by_skill = {r['skill_id']: r for r in progress_rows}
-    result = []
-    for grade in [1, 2, 3, 4]:
-        skills = get_skills_for_grade(grade)
-        grade_skills = []
-        for s in skills:
-            prog = progress_by_skill.get(s['id'])
-            mastery = prog['mastery_level'] if prog else 0.0
-            grade_skills.append({
-                'name': s['name'],
-                'mastery_pct': round(mastery * 100),
-                'mastered': elo.is_mastered(mastery),
-                'attempts': prog['total_attempts'] if prog else 0,
-            })
-        result.append({'grade': grade, 'skills': grade_skills})
-    return result
 
 
 def _get_session_stats(session_id):
@@ -186,8 +165,9 @@ def end(session_id):
     if not sess:
         return redirect(url_for('home.index'))
 
-    session_model.end_session(session_id)
-    sess = session_model.get_by_id(session_id)
+    if not sess.get('ended_at'):
+        session_model.end_session(session_id)
+        sess = session_model.get_by_id(session_id)
     student = student_model.get_by_id(sess['student_id'])
     attempts = attempt_model.get_for_session(session_id)
 

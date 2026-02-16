@@ -1,5 +1,14 @@
 # Mora v2 Changelog
 
+### Fixed — Summary Page Overwrites ended_at on Refresh
+- `end_session()` was called every time the summary page was visited, overwriting `ended_at` timestamp
+- Added guard: only call `end_session()` if session not already ended
+- Refreshing the summary page now preserves the original end timestamp
+
+### Removed — Dead _get_skill_progress Function
+- Removed unused `_get_skill_progress()` from `routes/session.py` — sidebar progress was a v1 feature
+- Removed unused `get_for_student` import and `get_skills_for_grade` import
+
 ### Fixed — Missing Result Banner Styling
 - `result-banner` class used in `question.html` had no CSS definition — "Correct!" notification was unstyled plain text
 - Added `.result-banner` and `.result-banner.correct` styles: green background, bold green text, rounded corners

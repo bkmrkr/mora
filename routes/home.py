@@ -3,6 +3,7 @@ from flask import (Blueprint, render_template, redirect, url_for,
                    request, flash, session as flask_session)
 
 from models import student as student_model
+from models import session as session_model
 
 home_bp = Blueprint('home', __name__)
 
@@ -28,6 +29,5 @@ def start():
     # Clear any stale session data from previous sessions
     flask_session.clear()
 
-    from models import session as session_model
     session_id = session_model.create(student['id'])
     return redirect(url_for('session.question', session_id=session_id))

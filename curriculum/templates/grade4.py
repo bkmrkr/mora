@@ -4,6 +4,7 @@ Each function takes difficulty_elo and returns a dict:
   question, correct_answer, options, explanation, template_id, skill_id
 """
 import random
+from math import gcd, lcm
 
 from curriculum.templates.common import arithmetic_distractors, make_options, estimate_difficulty
 
@@ -59,7 +60,6 @@ def fraction_ops(difficulty_elo):
     d1, d2 = random.choice(dens)
     op = random.choice(['+', '-'])
 
-    from math import lcm, gcd
     lcd = lcm(d1, d2)
 
     # Pick numerators; for subtraction, ensure non-zero result

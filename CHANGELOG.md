@@ -1,5 +1,9 @@
 # Mora v2 Changelog
 
+### Cleaned up — Move Local Imports to Module Level
+- `grade4.py`: moved `from math import gcd, lcm` to top-level (was re-imported on every fraction_ops call)
+- `home.py`: moved `from models import session` to top-level (was inside start() function)
+
 ### Fixed — Eliminate Zero-Result Subtraction and Two-Step Questions
 - `g1_sub_10` and `g1_sub_20`: prevented n - n = 0 questions (e.g. "What is 6 - 6?")
 - `g2_two_step`: prevented add_then_sub variant from producing zero (e.g. "gets 3 more, gives away 9" from 6)

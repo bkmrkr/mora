@@ -1,5 +1,10 @@
 # Mora v2 Changelog
 
+### Fixed — Money Template Grammar
+- `g2_money`: "How many cents are 5 pennys worth?" → "pennies" (correct plural)
+- `g2_money`: "How many cents is ..." → "How many cents are ..." (consistent grammar)
+- `g2_odd_even`: explanation "16 ÷ 2 = 8.0" → "16 ÷ 2 = 8" (remove unnecessary .0)
+
 ### Fixed — Elapsed Time Distractor Format Mismatch
 - `g3_elapsed_time`: when answer was "2 hours", distractors showed "150 minutes" instead of "2 hours 30 minutes"
 - Distractors now use `_fmt_elapsed()` helper to match answer format (hours+minutes vs minutes-only)

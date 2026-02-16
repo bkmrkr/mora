@@ -101,8 +101,9 @@ def money(difficulty_elo):
         coin_name, coin_val = random.choice(list(coins.items()))
         count = random.randint(2, 6)
         answer = count * coin_val
-        question = f'How many cents are {count} {coin_name}s worth?'
-        explanation = f'{count} {coin_name}s = {count} x {coin_val} = {answer} cents'
+        plural = 'pennies' if coin_name == 'penny' else f'{coin_name}s'
+        question = f'How many cents are {count} {plural} worth?'
+        explanation = f'{count} {plural} = {count} x {coin_val} = {answer} cents'
     else:
         # Mixed coins
         q = random.randint(0, 3)
@@ -118,7 +119,7 @@ def money(difficulty_elo):
         if d: parts.append(f'{d} dime{"s" if d > 1 else ""}')
         if n: parts.append(f'{n} nickel{"s" if n > 1 else ""}')
         if p: parts.append(f'{p} penn{"ies" if p > 1 else "y"}')
-        question = f'How many cents is {", ".join(parts)} worth?'
+        question = f'How many cents are {", ".join(parts)} worth?'
         explanation = f'{" + ".join(parts)} = {answer} cents'
 
     distractors = [str(answer + 5), str(answer - 5), str(answer + 10)]
@@ -302,7 +303,7 @@ def odd_even(difficulty_elo):
             'correct_answer': correct,
             'options': make_options(correct, ['odd' if correct == 'even' else 'even',
                                               'neither', 'both']),
-            'explanation': f'{n} is {correct} because {n} ÷ 2 = {n / 2}.',
+            'explanation': f'{n} is {correct} because {n} ÷ 2 = {n / 2:g}.',
             'template_id': 'g2_odd_even_identify',
             'difficulty': estimate_difficulty(2, 0.2),
         }

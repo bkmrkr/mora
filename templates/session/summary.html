@@ -2,8 +2,11 @@
 {% block title %}Mora — Session Summary{% endblock %}
 {% block content %}
 <div class="summary-container">
-    <h1>Session Complete!</h1>
-    <p class="subtitle">Great work, {{ student.name }}!</p>
+    <h1>{{ summary_headline }}</h1>
+    <p class="subtitle">{{ summary_message }}</p>
+    {% if session_insight %}
+    <p class="session-insight">{{ session_insight }}</p>
+    {% endif %}
 
     <div class="stat-cards">
         <div class="stat-card">

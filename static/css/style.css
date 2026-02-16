@@ -547,6 +547,12 @@ body {
 /* Summary */
 .summary-container { text-align: center; }
 .summary-container h1 { margin-bottom: 0.25rem; }
+.session-insight {
+    font-size: 0.95rem;
+    color: var(--primary);
+    font-weight: 500;
+    margin-top: 0.25rem;
+}
 .stat-cards {
     display: flex;
     justify-content: center;

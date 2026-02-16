@@ -180,14 +180,14 @@ class TestSession:
 
         resp = client.get(f'/session/{session_id}/end')
         assert resp.status_code == 200
-        assert b'Session Complete' in resp.data
+        assert b'Session Summary' in resp.data
         assert b'TestKid' in resp.data
 
     def test_end_session_zero_questions(self, client):
         session_id = self._start_session(client)
         resp = client.get(f'/session/{session_id}/end')
         assert resp.status_code == 200
-        assert b'Session Complete' in resp.data
+        assert b'Session Summary' in resp.data
 
     def test_invalid_session_redirects_home(self, client):
         resp = client.get('/session/nonexistent-id/question',

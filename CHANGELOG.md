@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Improved — Personalized session summary messages
+- Summary headline adapts to performance: "Outstanding!" (90%+), "Great Session!" (70%+), "Good Effort!" (50%+), or encouraging message
+- Subtitle personalized with student name and performance-appropriate phrasing
+- Session insight highlights best skill or skill needing work (e.g., "Perfect on Place Value!")
+- Makes the summary feel like a personal coach reviewing each session
+
 ### Added — Focus skill card with "Practice Now" on dashboard
 - Dashboard overview now shows "Next Focus" card with the skill closest to mastery
 - Prominent "Practice Now" button starts a new session directly from the dashboard

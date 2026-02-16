@@ -85,7 +85,7 @@ class TestFullStudentJourney:
         # 2. End session
         resp = client.get(f'/session/{session_id}/end')
         assert resp.status_code == 200
-        assert b'Session Complete' in resp.data
+        assert b'Session Summary' in resp.data
         assert b'IntegrationKid' in resp.data
 
         # 3. Verify attempt records
@@ -206,7 +206,7 @@ class TestFullStudentJourney:
         session_id = self._start_session(client, 'EmptyKid')
         resp = client.get(f'/session/{session_id}/end')
         assert resp.status_code == 200
-        assert b'Session Complete' in resp.data
+        assert b'Session Summary' in resp.data
 
 
 class TestAllTemplatesViable:

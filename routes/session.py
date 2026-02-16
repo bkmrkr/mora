@@ -276,6 +276,33 @@ def end(session_id):
     # Practice streak
     practice_streak, _ = session_model.get_practice_streak(student['id'])
 
+    # Personalized summary message
+    if accuracy >= 90:
+        summary_headline = 'Outstanding!'
+        summary_message = f'You nailed it, {student["name"]}!'
+    elif accuracy >= 70:
+        summary_headline = 'Great Session!'
+        summary_message = f'Solid work, {student["name"]}!'
+    elif accuracy >= 50:
+        summary_headline = 'Good Effort!'
+        summary_message = f'Keep it up, {student["name"]}!'
+    else:
+        summary_headline = 'Session Complete!'
+        summary_message = f'Every practice session makes you stronger, {student["name"]}!'
+
+    # Session insight — find the best and worst skill this session
+    session_insight = None
+    if skills_practiced:
+        best = max(skills_practiced, key=lambda s: s['session_accuracy'])
+        worst = min(skills_practiced, key=lambda s: s['session_accuracy'])
+        if best['session_accuracy'] == 100 and len(skills_practiced) > 1:
+            session_insight = f'Perfect on {best["name"]}!'
+        elif worst['session_accuracy'] < 50 and len(skills_practiced) > 1:
+            session_insight = f'{worst["name"]} needs more practice — you\'ll get there!'
+        elif any(s['mastered'] for s in skills_practiced):
+            mastered_names = [s['name'] for s in skills_practiced if s['mastered']]
+            session_insight = f'{mastered_names[0]} is mastered!'
+
     flask_session.pop('current_question', None)
     flask_session.pop('last_result', None)
     flask_session.pop('last_skill_id', None)
@@ -295,4 +322,7 @@ def end(session_id):
         focus_skill=focus_skill,
         answer_timeline=answer_timeline,
         practice_streak=practice_streak,
+        summary_headline=summary_headline,
+        summary_message=summary_message,
+        session_insight=session_insight,
     )

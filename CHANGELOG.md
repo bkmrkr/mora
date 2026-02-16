@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Skill unlock notifications
+- When a student masters a skill, check if any new skills are now unlocked (all prerequisites met)
+- Show blue "Unlocked: Skill Name (Grade N)" banner on the next question
+- Traverses the prerequisite DAG to find newly eligible skills
+- Only shows skills that aren't already mastered
+
 ### Added — Skill progress bar on question page
 - Show real-time mastery progress bar below the skill name on every question
 - Displays current mastery percentage and grade level (e.g., "Grade 1")

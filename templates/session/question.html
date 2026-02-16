@@ -30,6 +30,11 @@
         </div>
     </div>
     {% endif %}
+    {% if last_result.unlocked_skills %}
+    <div class="unlock-banner">
+        &#128275; Unlocked: {% for s in last_result.unlocked_skills %}{{ s.name }} (Grade {{ s.grade }}){% if not loop.last %}, {% endif %}{% endfor %}
+    </div>
+    {% endif %}
     <div class="result-banner correct {% if streak >= 3 %}streak-glow{% endif %}">
         {% if streak >= 10 %}
             Unstoppable! {{ streak }} in a row!

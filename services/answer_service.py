@@ -5,7 +5,7 @@ from models.progress import get as get_progress, upsert as upsert_progress
 from models import attempt as attempt_model
 from engine import elo
 from engine.answer_matching import check_answer
-from curriculum.skills import get_skill, get_skills_for_grade
+from curriculum.skills import get_skill, get_skills_for_grade, SKILLS
 
 logger = logging.getLogger(__name__)
 
@@ -76,8 +76,9 @@ def process_answer(student, current_question, student_answer,
     now_mastered = elo.is_mastered(mastery)
     just_mastered = now_mastered and not was_mastered
 
-    # Check grade completion
+    # Check grade completion and newly unlocked skills
     grade_completed = None
+    unlocked_skills = []
     if just_mastered:
         skill_info = get_skill(skill_id)
         if skill_info:
@@ -89,6 +90,23 @@ def process_answer(student, current_question, student_answer,
             )
             if all_mastered:
                 grade_completed = grade
+
+        # Find skills that have this skill as a prerequisite
+        for sid, s in SKILLS.items():
+            if skill_id not in s.get('prerequisites', []):
+                continue
+            # Check if ALL prerequisites are now met
+            all_prereqs_met = all(
+                elo.is_mastered(get_progress(student_id, pid)['mastery_level'])
+                for pid in s['prerequisites']
+            )
+            if all_prereqs_met:
+                # Only include if not already mastered
+                if not elo.is_mastered(get_progress(student_id, sid)['mastery_level']):
+                    unlocked_skills.append({
+                        'name': s['name'],
+                        'grade': s['grade'],
+                    })
 
     return {
         'is_correct': is_correct,
@@ -103,4 +121,5 @@ def process_answer(student, current_question, student_answer,
         'mastery_level': round(mastery, 3),
         'just_mastered': just_mastered,
         'grade_completed': grade_completed,
+        'unlocked_skills': unlocked_skills,
     }

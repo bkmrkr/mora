@@ -2,7 +2,44 @@
 const startTime = Date.now();
 let submitted = false;
 
+// --- Text-to-Speech for questions ---
+function speakQuestion() {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+
+    var el = document.querySelector('.question-text');
+    if (!el) return;
+
+    // Get text and convert math symbols to spoken words
+    var text = el.textContent.trim();
+    text = text.replace(/\+/g, ' plus ')
+               .replace(/\u2212/g, ' minus ')   // unicode minus
+               .replace(/ - /g, ' minus ')
+               .replace(/\u00d7/g, ' times ')    // ×
+               .replace(/\u00f7/g, ' divided by ') // ÷
+               .replace(/\*/g, ' times ')
+               .replace(/=/g, ' equals ')
+               .replace(/</g, ' is less than ')
+               .replace(/>/g, ' is greater than ')
+               .replace(/\?/g, '?')
+               .replace(/\s+/g, ' ');
+
+    var utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
+    window.speechSynthesis.speak(utterance);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Auto-speak the question on load
+    speakQuestion();
+
+    // Wire up replay button
+    var speakBtn = document.getElementById('speak-btn');
+    if (speakBtn) {
+        speakBtn.addEventListener('click', function() { speakQuestion(); });
+    }
+
     const form = document.getElementById('answer-form');
     const timeField = document.getElementById('response_time_s');
 

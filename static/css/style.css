@@ -874,6 +874,26 @@ body {
     line-height: 1.5;
 }
 
+.speak-btn {
+    background: none;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    transition: background 0.15s, border-color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.speak-btn:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: white;
+}
+
 /* MCQ Choices */
 .choices-grid {
     display: grid;

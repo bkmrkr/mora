@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — Text-to-speech for questions
+- Questions are automatically read aloud when the page loads using the Web Speech API
+- Speaker button (🔈) below question text to replay at any time
+- Math symbols converted to spoken words (+→plus, -→minus, ×→times, ÷→divided by, =→equals)
+- Speech rate set to 0.9 for clear, child-friendly pacing
+- Zero dependencies — uses browser-native speechSynthesis
+
 ### Fixed — Question template clarity and correctness
 - Grade 1: `subtraction_within_10` no longer generates trivial `a - 0` questions
 - Grade 1: `addition_within_10` no longer generates trivial `a + 0` questions

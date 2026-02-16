@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Session-to-session skill comparison ("You vs Last Time")
+- End-of-session summary compares accuracy per skill against the previous session
+- Shows green ▲ for improved skills, red ▼ for declined skills (e.g., "40% → 80% ▲")
+- Only appears when there's skill overlap between sessions
+- Connects practice sessions into a visible learning arc
+
 ### Added — Mistake pattern analysis on wrong answers
 - Analyzes the student's wrong answer vs correct answer to identify what went wrong
 - Detects off-by-1 (counting error), off-by-10/100 (place value), swapped digits, wrong operation

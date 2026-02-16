@@ -717,6 +717,29 @@ body {
     gap: 1rem;
     margin-top: 2rem;
 }
+.improvements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.improvement-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+.improvement-row:last-child { border-bottom: none; }
+.improvement-name {
+    font-weight: 500;
+    color: var(--text);
+}
+.improvement-change {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+.imp-up { color: #16a34a; }
+.imp-down { color: #dc2626; }
 .focus-skill-card {
     text-align: center;
     padding: 1rem;

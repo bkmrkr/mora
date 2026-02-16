@@ -320,6 +320,45 @@ def end(session_id):
             mastered_names = [s['name'] for s in skills_practiced if s['mastered']]
             session_insight = f'{mastered_names[0]} is mastered!'
 
+    # Session-to-session comparison: find skills practiced in previous session too
+    skill_improvements = []
+    prev_sessions = session_model.get_for_student(student['id'], limit=5)
+    # Find the most recent *other* ended session
+    prev_session = None
+    for ps in prev_sessions:
+        if ps['id'] != session_id and ps.get('ended_at'):
+            prev_session = ps
+            break
+    if prev_session:
+        prev_attempts = attempt_model.get_for_session(prev_session['id'])
+        prev_skill_acc = {}
+        for a in prev_attempts:
+            sid = a.get('skill_id')
+            if not sid:
+                continue
+            if sid not in prev_skill_acc:
+                prev_skill_acc[sid] = {'correct': 0, 'total': 0}
+            prev_skill_acc[sid]['total'] += 1
+            if a['is_correct']:
+                prev_skill_acc[sid]['correct'] += 1
+        # Compare overlapping skills
+        for sid, counts in skill_attempts.items():
+            if sid not in prev_skill_acc:
+                continue
+            skill_info_cmp = get_skill(sid)
+            if not skill_info_cmp:
+                continue
+            prev = prev_skill_acc[sid]
+            prev_acc = round(prev['correct'] / prev['total'] * 100) if prev['total'] > 0 else 0
+            curr_acc = round(counts['correct'] / counts['total'] * 100) if counts['total'] > 0 else 0
+            if curr_acc != prev_acc:
+                skill_improvements.append({
+                    'name': skill_info_cmp['name'],
+                    'prev_accuracy': prev_acc,
+                    'curr_accuracy': curr_acc,
+                    'improved': curr_acc > prev_acc,
+                })
+
     flask_session.pop('current_question', None)
     flask_session.pop('last_result', None)
     flask_session.pop('last_skill_id', None)
@@ -342,4 +381,5 @@ def end(session_id):
         summary_headline=summary_headline,
         summary_message=summary_message,
         session_insight=session_insight,
+        skill_improvements=skill_improvements,
     )

@@ -76,6 +76,23 @@
     </div>
     {% endif %}
 
+    {% if skill_improvements %}
+    <div class="card">
+        <h2>You vs Last Time</h2>
+        <div class="improvements-list">
+            {% for imp in skill_improvements %}
+            <div class="improvement-row">
+                <span class="improvement-name">{{ imp.name }}</span>
+                <span class="improvement-change {% if imp.improved %}imp-up{% else %}imp-down{% endif %}">
+                    {{ imp.prev_accuracy }}% &#8594; {{ imp.curr_accuracy }}%
+                    {% if imp.improved %}&#9650;{% else %}&#9660;{% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     {% if focus_skill %}
     <div class="focus-skill-card">
         <div class="focus-label">Next focus</div>

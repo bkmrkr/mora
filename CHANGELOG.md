@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — Themed word problem cards
+- Word problem questions display in a visually distinct story card with a theme emoji
+- Keyword detection maps question content to 16 themes: apple, cookie, bird, sticker, marble, book, ticket, flower, coin, toy, pie, pizza, pencil, car, fish, star
+- Only activates for skill_ids containing "word" (g1_word_problems, g2_two_step, g3_mult_div_word, g4_multi_step_word)
+- Golden gradient background card with large emoji makes word problems feel like mini-stories
+- Adds visual variety and engagement to the most text-heavy question type
+
 ### Added — "Why this question?" metacognition helper
 - Subtle italic text below progress bar explains why the adaptive system chose this question
 - "New skill! Your prerequisites are all mastered." for first encounter

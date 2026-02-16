@@ -139,7 +139,14 @@
         <div class="unlock-preview">&#128275; Mastering this unlocks: {{ question.unlock_preview }}</div>
         {% endif %}
 
+        {% if question.story_theme %}
+        <div class="story-card">
+            <span class="story-emoji">{{ question.story_theme.emoji }}</span>
+            <div class="question-text">{{ question.content }}</div>
+        </div>
+        {% else %}
         <div class="question-text">{{ question.content }}</div>
+        {% endif %}
 
         {% if visual_svg %}
         <div class="clock-visual">

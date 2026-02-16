@@ -180,6 +180,26 @@ def generate_next(session_id, student, current_skill_id=None, retry_skill_id=Non
         why_reason = None
     question_dict['why_reason'] = why_reason
 
+    # Story theme for word problems — visual variety
+    story_theme = None
+    if 'word' in skill_id:
+        content_lower = q_data['question'].lower()
+        themes = [
+            ('apple', '🍎', 'apple'), ('cookie', '🍪', 'cookie'),
+            ('bird', '🐦', 'bird'), ('sticker', '⭐', 'sticker'),
+            ('marble', '🔮', 'marble'), ('book', '📚', 'book'),
+            ('ticket', '🎟', 'ticket'), ('flower', '🌸', 'flower'),
+            ('coin', '🪙', 'coin'), ('toy', '🧸', 'toy'),
+            ('pie', '🥧', 'pie'), ('pizza', '🍕', 'pizza'),
+            ('pencil', '✏️', 'pencil'), ('car', '🚗', 'car'),
+            ('fish', '🐟', 'fish'), ('star', '⭐', 'star'),
+        ]
+        for keyword, emoji, theme_name in themes:
+            if keyword in content_lower:
+                story_theme = {'emoji': emoji, 'name': theme_name}
+                break
+    question_dict['story_theme'] = story_theme
+
     # Unlock preview: what does mastering this skill unlock?
     unlock_preview = None
     if not is_review and mastery_pct < 65:

@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Mastery timeline on dashboard
+- Shows the 8 most recently mastered skills with star, name, grade badge, and date
+- Placed prominently between grade overview and focus skill
+- Celebrates achievements and shows learning velocity over time
+- Parents/teachers can see when each skill was mastered
+
 ### Added — Session-to-session skill comparison ("You vs Last Time")
 - End-of-session summary compares accuracy per skill against the previous session
 - Shows green ▲ for improved skills, red ▼ for declined skills (e.g., "40% → 80% ▲")

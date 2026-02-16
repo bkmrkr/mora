@@ -990,6 +990,39 @@ body {
     background: rgba(255,255,255,0.2);
     color: white;
 }
+.mastery-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+.timeline-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+.timeline-item:last-child { border-bottom: none; }
+.timeline-star { font-size: 1rem; }
+.timeline-skill {
+    flex: 1;
+    font-weight: 500;
+    color: var(--text);
+}
+.timeline-grade {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: var(--text-muted);
+}
+.timeline-date {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    min-width: 5rem;
+    text-align: right;
+}
 .dashboard-focus {
     display: flex;
     align-items: center;

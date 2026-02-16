@@ -186,6 +186,21 @@ def overview(student_id):
             'date': s['started_at'][:10] if s.get('started_at') else '',
         })
 
+    # Mastery timeline: recently mastered skills with dates
+    mastery_timeline = []
+    for sid, prog in progress_by_skill.items():
+        if elo.is_mastered(prog['mastery_level']):
+            skill_info = get_skill(sid)
+            if skill_info:
+                mastery_timeline.append({
+                    'name': skill_info['name'],
+                    'grade': skill_info['grade'],
+                    'date': prog['last_updated'][:10] if prog.get('last_updated') else '',
+                })
+    # Sort by date descending (most recent first), limit to 8
+    mastery_timeline.sort(key=lambda x: x['date'], reverse=True)
+    mastery_timeline = mastery_timeline[:8]
+
     return render_template(
         'dashboard/overview.html',
         student=student,
@@ -201,4 +216,5 @@ def overview(student_id):
         overall_accuracy=overall_accuracy,
         accuracy_trend=accuracy_trend,
         math_level=math_level,
+        mastery_timeline=mastery_timeline,
     )

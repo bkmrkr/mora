@@ -41,6 +41,22 @@
         </div>
     </div>
 
+    {% if mastery_timeline %}
+    <div class="card">
+        <h2>Mastery Timeline</h2>
+        <div class="mastery-timeline">
+            {% for item in mastery_timeline %}
+            <div class="timeline-item">
+                <span class="timeline-star">&#11088;</span>
+                <span class="timeline-skill">{{ item.name }}</span>
+                <span class="timeline-grade">G{{ item.grade }}</span>
+                <span class="timeline-date">{{ item.date }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     {% if focus_skill %}
     <div class="dashboard-focus">
         <div class="focus-info">

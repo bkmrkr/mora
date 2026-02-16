@@ -1,5 +1,9 @@
 # Mora v2 Changelog
 
+### Removed — Unused Python Imports
+- `services/question_service.py`: removed `from engine import elo` (never used) and `SKILLS` from curriculum.skills import
+- `curriculum/templates/grade2.py`: removed unused `word_problem_frame` from common import
+
 ### Fixed — Summary Page Overwrites ended_at on Refresh
 - `end_session()` was called every time the summary page was visited, overwriting `ended_at` timestamp
 - Added guard: only call `end_session()` if session not already ended

@@ -6,7 +6,7 @@ Each function takes difficulty_elo and returns a dict:
 import random
 
 from curriculum.templates.common import (arithmetic_distractors, make_options,
-                                        word_problem_frame, estimate_difficulty)
+                                        estimate_difficulty)
 
 
 def add_sub_within_100(difficulty_elo):

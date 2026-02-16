@@ -7,9 +7,8 @@ from models import attempt as attempt_model
 from models import question as question_model
 from models import session as session_model
 from models.progress import get as get_progress, get_for_student
-from engine import elo
 from engine.selector import analyze_recent, select_skill, compute_question_params
-from curriculum.skills import SKILLS, get_skill
+from curriculum.skills import get_skill
 from curriculum.templates.grade1 import GRADE1_TEMPLATES
 from curriculum.templates.grade2 import GRADE2_TEMPLATES
 from curriculum.templates.grade3 import GRADE3_TEMPLATES

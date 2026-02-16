@@ -18,6 +18,12 @@
             <div class="stat-value">{{ accuracy }}%</div>
             <div class="stat-label">Accuracy</div>
         </div>
+        {% if best_streak and best_streak >= 2 %}
+        <div class="stat-card stat-streak">
+            <div class="stat-value">{{ best_streak }}</div>
+            <div class="stat-label">Best Streak</div>
+        </div>
+        {% endif %}
     </div>
 
     {% if skills_practiced %}

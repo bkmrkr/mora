@@ -13,8 +13,18 @@
     </div>
 
     {% if last_result and last_result.is_correct %}
-    <div class="result-banner correct">
-        Correct! {{ last_result.skill_name }} — Rating: {{ last_result.skill_rating }}
+    <div class="result-banner correct {% if streak >= 3 %}streak-glow{% endif %}">
+        {% if streak >= 10 %}
+            Unstoppable! {{ streak }} in a row!
+        {% elif streak >= 7 %}
+            On fire! {{ streak }} in a row!
+        {% elif streak >= 5 %}
+            Amazing! {{ streak }} in a row!
+        {% elif streak >= 3 %}
+            Nice streak! {{ streak }} in a row!
+        {% else %}
+            Correct!
+        {% endif %}
     </div>
     {% endif %}
 

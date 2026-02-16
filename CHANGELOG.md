@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — Streak tracking and encouragement
+- Track consecutive correct answers during a session
+- Streak banner with escalating messages: "Correct!" (1-2), "Nice streak! N in a row!" (3-4), "Amazing!" (5-6), "On fire!" (7-9), "Unstoppable!" (10+)
+- Animated streak banner with gradient background and pulse glow for streaks of 3+
+- Broken streak encouragement on feedback page: "Good effort — you had N in a row!"
+- Best streak stat card on session summary page (shown for streaks of 2+)
+
 ### Fixed — Dashboard table clipped on small screens
 - Session history table on dashboard was clipped at 320px viewport (accuracy column cut off)
 - Added `overflow-x: auto` wrapper for horizontal scroll fallback

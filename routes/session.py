@@ -55,6 +55,7 @@ def question(session_id):
 
     last_result = flask_session.get('last_result')
     session_stats = _get_session_stats(session_id)
+    streak = flask_session.get('streak', 0)
 
     # Generate clock SVG at render time (not stored in cookie)
     visual_svg = None
@@ -69,6 +70,7 @@ def question(session_id):
         last_result=last_result,
         session_stats=session_stats,
         visual_svg=visual_svg,
+        streak=streak,
     )
 
 
@@ -105,6 +107,19 @@ def answer(session_id):
     flask_session['last_result'] = result
     flask_session['last_skill_id'] = current['skill_id']
     session_model.update_last_result(session_id, json.dumps(result))
+
+    # Track streak
+    streak = flask_session.get('streak', 0)
+    if result['is_correct']:
+        streak += 1
+        flask_session['streak'] = streak
+        result['streak'] = streak
+        flask_session['last_result'] = result  # update with streak
+    else:
+        flask_session['best_streak'] = max(flask_session.get('best_streak', 0), streak)
+        result['broken_streak'] = streak  # how many they had before missing
+        flask_session['last_result'] = result
+        flask_session['streak'] = 0
 
     flask_session.pop('current_question', None)
     session_model.update_current_question(session_id, None)
@@ -188,9 +203,16 @@ def end(session_id):
                 'mastered': elo.is_mastered(prog['mastery_level']),
             })
 
+    best_streak = max(
+        flask_session.get('best_streak', 0),
+        flask_session.get('streak', 0),
+    )
+
     flask_session.pop('current_question', None)
     flask_session.pop('last_result', None)
     flask_session.pop('last_skill_id', None)
+    flask_session.pop('streak', None)
+    flask_session.pop('best_streak', None)
 
     return render_template(
         'session/summary.html',
@@ -200,4 +222,5 @@ def end(session_id):
         correct=correct,
         accuracy=accuracy,
         skills_practiced=skills_practiced,
+        best_streak=best_streak,
     )

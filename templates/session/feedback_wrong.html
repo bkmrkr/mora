@@ -10,6 +10,9 @@
         <div class="feedback-header">
             <span class="feedback-icon">&#10060;</span>
             <h2>Not quite!</h2>
+            {% if result.broken_streak and result.broken_streak >= 3 %}
+            <p class="streak-broken">Good effort — you had {{ result.broken_streak }} in a row!</p>
+            {% endif %}
         </div>
 
         <div class="answer-comparison">

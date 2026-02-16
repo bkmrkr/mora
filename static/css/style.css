@@ -172,6 +172,21 @@ body {
 .result-banner.correct {
     background: var(--success-light);
     color: var(--success);
+    animation: slideDown 0.3s ease-out;
+}
+.result-banner.streak-glow {
+    background: linear-gradient(135deg, var(--success-light), #fef3c7);
+    border: 2px solid var(--warning);
+    font-size: 1.1rem;
+    animation: slideDown 0.3s ease-out, pulse 1.5s ease-in-out;
+}
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    50% { box-shadow: 0 0 12px 4px rgba(245, 158, 11, 0.3); }
 }
 
 /* Clock Visual */
@@ -249,9 +264,16 @@ body {
 .feedback-card.wrong { border-color: var(--danger-light); }
 .feedback-header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem;
     margin-bottom: 1rem;
+}
+.streak-broken {
+    width: 100%;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
 }
 .feedback-icon { font-size: 1.5rem; }
 .answer-comparison {
@@ -304,6 +326,8 @@ body {
 .stat-good .stat-value { color: var(--success); }
 .stat-ok .stat-value { color: var(--warning); }
 .stat-low .stat-value { color: var(--danger); }
+.stat-streak .stat-value { color: var(--warning); }
+.stat-streak { border-color: var(--warning); }
 
 /* Skills List */
 .skills-list { text-align: left; }

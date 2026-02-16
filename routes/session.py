@@ -207,6 +207,11 @@ def end(session_id):
                 'mastered': elo.is_mastered(prog['mastery_level']),
             })
 
+    # Average response time
+    times = [a['response_time_seconds'] for a in attempts
+             if a.get('response_time_seconds') and a['response_time_seconds'] > 0]
+    avg_time = round(sum(times) / len(times), 1) if times else None
+
     best_streak = max(
         flask_session.get('best_streak', 0),
         flask_session.get('streak', 0),
@@ -227,4 +232,5 @@ def end(session_id):
         accuracy=accuracy,
         skills_practiced=skills_practiced,
         best_streak=best_streak,
+        avg_time=avg_time,
     )

@@ -61,6 +61,9 @@
         {% else %}
             Correct!
         {% endif %}
+        {% if last_result.speed_label %}
+        <span class="speed-badge">{{ last_result.speed_label }}</span>
+        {% endif %}
     </div>
     {% endif %}
 

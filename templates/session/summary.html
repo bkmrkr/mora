@@ -24,6 +24,12 @@
             <div class="stat-label">Best Streak</div>
         </div>
         {% endif %}
+        {% if avg_time %}
+        <div class="stat-card">
+            <div class="stat-value">{{ avg_time }}s</div>
+            <div class="stat-label">Avg Speed</div>
+        </div>
+        {% endif %}
     </div>
 
     {% if skills_practiced %}

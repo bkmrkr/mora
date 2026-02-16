@@ -108,6 +108,14 @@ def process_answer(student, current_question, student_answer,
                         'grade': s['grade'],
                     })
 
+    # Speed feedback for correct answers
+    speed_label = None
+    if is_correct and response_time_s > 0:
+        if response_time_s <= 3:
+            speed_label = 'Lightning!'
+        elif response_time_s <= 6:
+            speed_label = 'Quick!'
+
     return {
         'is_correct': is_correct,
         'is_close': is_close,
@@ -122,4 +130,6 @@ def process_answer(student, current_question, student_answer,
         'just_mastered': just_mastered,
         'grade_completed': grade_completed,
         'unlocked_skills': unlocked_skills,
+        'speed_label': speed_label,
+        'response_time_s': round(response_time_s, 1),
     }

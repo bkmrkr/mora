@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Speed feedback and average response time
+- "Lightning!" badge on correct answers under 3 seconds, "Quick!" under 6 seconds
+- Speed badge appears as a pill on the green correct banner
+- Average response time stat card on session summary page
+- Rewards fluency and confidence — not just accuracy
+
 ### Added — Difficulty indicator and personalized welcome
 - Show difficulty label on each question: Warm-up / On track / Stretch / Challenge
 - Label is computed from the gap between question difficulty and student's skill rating

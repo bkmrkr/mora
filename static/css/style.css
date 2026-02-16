@@ -334,6 +334,14 @@ body {
 .difficulty-on-track { background: #dbeafe; color: #1e40af; }
 .difficulty-stretch { background: #fef3c7; color: #92400e; }
 .difficulty-challenge { background: #fce7f3; color: #9d174d; }
+.speed-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+    padding: 0.1rem 0.5rem;
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
+}
 .skill-progress-row {
     display: flex;
     align-items: center;

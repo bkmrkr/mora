@@ -12,14 +12,19 @@
         <button type="submit" class="btn btn-primary">Start Practice</button>
     </form>
 
-    {% if students %}
+    {% if student_info %}
     <div class="returning-students">
         <h3>Returning students:</h3>
         <div class="student-chips">
-            {% for s in students %}
+            {% for si in student_info %}
             <form action="{{ url_for('home.start') }}" method="post" class="chip-form">
-                <input type="hidden" name="student_name" value="{{ s.name }}">
-                <button type="submit" class="student-chip">{{ s.name }}</button>
+                <input type="hidden" name="student_name" value="{{ si.student.name }}">
+                <button type="submit" class="student-chip">
+                    {{ si.student.name }}
+                    {% if si.mastered > 0 %}
+                    <span class="chip-mastery">{{ si.mastered }}/40</span>
+                    {% endif %}
+                </button>
             </form>
             {% endfor %}
         </div>

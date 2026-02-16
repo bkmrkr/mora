@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Mastery count badges on home page student chips
+- Returning student buttons now show "N/40" mastery badge (e.g., "Sophia 36/40")
+- Only shown when student has at least 1 mastered skill
+- Purple pill badge inside chip button, fades on hover
+- Progress visible at a glance before starting a session
+
 ### Improved — Dashboard student cards with grade level and progress bar
 - Student cards now show current grade level badge (e.g., "Grade 4")
 - Overall mastery progress bar (X/40 skills) on each card

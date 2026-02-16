@@ -14,7 +14,12 @@ home_bp = Blueprint('home', __name__)
 @home_bp.route('/')
 def index():
     students = student_model.get_all()
-    return render_template('home.html', students=students)
+    student_info = []
+    for s in students:
+        progress = get_for_student(s['id'])
+        mastered = sum(1 for p in progress if is_mastered(p['mastery_level']))
+        student_info.append({'student': s, 'mastered': mastered})
+    return render_template('home.html', student_info=student_info)
 
 
 @home_bp.route('/start', methods=['POST'])

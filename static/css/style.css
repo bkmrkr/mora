@@ -143,6 +143,16 @@ body {
     border: 1px solid var(--border);
 }
 .student-chip:hover { background: var(--primary-light); color: white; }
+.student-chip:hover .chip-mastery { background: rgba(255,255,255,0.3); color: white; }
+.chip-mastery {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.1rem 0.35rem;
+    border-radius: 8px;
+    background: #ede9fe;
+    color: var(--primary);
+    margin-left: 0.3rem;
+}
 .student-chips {
     display: flex;
     flex-wrap: wrap;

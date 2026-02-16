@@ -1,5 +1,10 @@
 # Mora v2 Changelog
 
+### Fixed — Fraction Subtraction Producing Zero
+- `g4_fraction_ops`: subtracting equivalent fractions (e.g. 2/6 - 1/3) gave "0/1" as answer
+- Now regenerates numerators when adjusted values are equal, ensuring non-zero result
+- Simplified swap logic for subtraction (removed redundant double-recalculation)
+
 ### Fixed — Ordinal Suffix in Factors Template
 - `g4_factors_multiples`: "What is the 3th multiple" → "What is the 3rd multiple"
 

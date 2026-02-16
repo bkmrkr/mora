@@ -59,27 +59,30 @@ def fraction_ops(difficulty_elo):
     d1, d2 = random.choice(dens)
     op = random.choice(['+', '-'])
 
-    n1 = random.randint(1, d1 - 1)
-    n2 = random.randint(1, d2 - 1)
-
-    # Find LCD
     from math import lcm, gcd
     lcd = lcm(d1, d2)
+
+    # Pick numerators; for subtraction, ensure non-zero result
+    n1 = random.randint(1, d1 - 1)
+    n2 = random.randint(1, d2 - 1)
     adj_n1 = n1 * (lcd // d1)
     adj_n2 = n2 * (lcd // d2)
+
+    if op == '-' and adj_n1 == adj_n2:
+        # Equivalent fractions — regenerate to avoid zero result
+        while adj_n1 == adj_n2:
+            n1 = random.randint(1, d1 - 1)
+            n2 = random.randint(1, d2 - 1)
+            adj_n1 = n1 * (lcd // d1)
+            adj_n2 = n2 * (lcd // d2)
 
     if op == '+':
         result_num = adj_n1 + adj_n2
     else:
-        if adj_n1 <= adj_n2:
+        if adj_n1 < adj_n2:
             n1, n2 = n2, n1
             d1, d2 = d2, d1
-            adj_n1, adj_n2 = n2 * (lcd // d2), n1 * (lcd // d1)
-            # Recalculate after swap
-            adj_n1 = n1 * (lcd // d1)
-            adj_n2 = n2 * (lcd // d2)
-            if adj_n1 <= adj_n2:
-                adj_n1, adj_n2 = adj_n2, adj_n1
+            adj_n1, adj_n2 = adj_n2, adj_n1
         result_num = adj_n1 - adj_n2
 
     # Simplify

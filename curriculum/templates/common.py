@@ -25,7 +25,7 @@ def generate_clock_svg(hour, minute, size=200):
     r = size / 2 - 10
 
     parts = [
-        f'<svg width="{size}" height="{size}" viewBox="0 0 {size} {size}" xmlns="http://www.w3.org/2000/svg">',
+        f'<svg width="{size}" height="{size}" viewBox="0 0 {size} {size}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Clock face">',
         f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="white" stroke="#2C3E50" stroke-width="3"/>',
     ]
 

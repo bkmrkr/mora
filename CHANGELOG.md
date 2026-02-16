@@ -1,5 +1,9 @@
 # Mora v2 Changelog
 
+### Improved — Clock SVG Accessibility
+- Added `role="img"` and `aria-label="Clock face"` to clock SVG element
+- Screen readers now announce the clock image properly
+
 ### Fixed — Short Answer Mode Was Unreachable
 - Short answer threshold (0.7) was higher than mastery threshold (0.65)
 - Skills got mastered and excluded from the eligible pool before reaching 0.7

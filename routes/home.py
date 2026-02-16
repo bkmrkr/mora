@@ -212,8 +212,18 @@ def start():
     if streak_days >= 2:
         flask_session['practice_streak'] = streak_days
 
-    # Set session goal (10 questions per session)
-    flask_session['session_goal'] = 10
+    # Adaptive session goal based on recent history
+    recent_sessions = session_model.get_for_student(student['id'], limit=10)
+    completed = [s['total_questions'] for s in recent_sessions
+                 if s.get('total_questions') and s['total_questions'] >= 3]
+    if len(completed) >= 3:
+        completed.sort()
+        median = completed[len(completed) // 2]
+        # Goal is median + 2, clamped to 5-25
+        goal = max(5, min(median + 2, 25))
+    else:
+        goal = 10
+    flask_session['session_goal'] = goal
     flask_session['goal_celebrated'] = False
 
     # Personal records for celebrating new bests

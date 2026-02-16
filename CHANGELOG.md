@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Changed — Adaptive session goals
+- Session goal now adapts based on student's recent session lengths
+- Computed as median of last 10 completed sessions + 2, clamped to 5-25
+- New students default to 10 questions (unchanged)
+- Returning students get a personalized, slightly stretching target
+- A student who usually does 5 questions sees a goal of 7; one who does 20 sees 22
+
 ### Added — Confetti celebration for mastery milestones
 - CSS-only confetti burst animation on "Skill Mastered!" and "Grade Complete!" banners
 - 12 colorful particles explode outward and fade over 1.2 seconds

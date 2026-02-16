@@ -1310,6 +1310,25 @@ body {
 .tip-icon { font-size: 1.2rem; flex-shrink: 0; }
 .tip-text { line-height: 1.4; }
 
+/* Week summary card */
+.week-summary-card {
+    background: linear-gradient(135deg, #eff6ff, #e0f2fe);
+    border: 1px solid #93c5fd; border-radius: var(--radius);
+    padding: 1.25rem; margin-bottom: 1.5rem;
+}
+.week-summary-card h2 { margin: 0 0 0.75rem; font-size: 1.1rem; color: #1e40af; }
+.week-stats { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+.week-stat { text-align: center; }
+.week-stat-value { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+.week-stat-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; }
+.week-xp { color: #d97706; }
+.week-masteries { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+.week-mastery-label { font-size: 0.85rem; color: #64748b; margin-right: 0.25rem; }
+.week-mastery-pill {
+    background: #dcfce7; color: #166534; font-size: 0.8rem; font-weight: 500;
+    padding: 0.2rem 0.6rem; border-radius: 12px;
+}
+
 /* Session XP counter */
 .session-xp {
     background: linear-gradient(135deg, #fbbf24, #f59e0b);

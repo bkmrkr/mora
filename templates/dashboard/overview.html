@@ -35,6 +35,40 @@
     </div>
     {% endif %}
 
+    {% if week_summary %}
+    <div class="week-summary-card">
+        <h2>This Week</h2>
+        <div class="week-stats">
+            <div class="week-stat">
+                <div class="week-stat-value">{{ week_summary.total }}</div>
+                <div class="week-stat-label">Questions</div>
+            </div>
+            <div class="week-stat">
+                <div class="week-stat-value">{{ week_summary.accuracy }}%</div>
+                <div class="week-stat-label">Accuracy</div>
+            </div>
+            <div class="week-stat">
+                <div class="week-stat-value">{{ week_summary.skills_practiced }}</div>
+                <div class="week-stat-label">Skills</div>
+            </div>
+            {% if week_summary.xp > 0 %}
+            <div class="week-stat">
+                <div class="week-stat-value week-xp">+{{ week_summary.xp }}</div>
+                <div class="week-stat-label">XP</div>
+            </div>
+            {% endif %}
+        </div>
+        {% if week_summary.new_masteries %}
+        <div class="week-masteries">
+            <span class="week-mastery-label">Mastered this week:</span>
+            {% for name in week_summary.new_masteries %}
+            <span class="week-mastery-pill">{{ name }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
     <div class="grade-overview-bar">
         <div class="overview-total">
             {{ total_mastered }}/{{ total_skills }} skills mastered

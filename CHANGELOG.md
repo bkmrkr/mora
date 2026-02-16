@@ -1,5 +1,14 @@
 # Mora v2 Changelog
 
+### Added — "This Week" progress card on dashboard
+- Blue gradient summary card at top of student dashboard showing weekly activity
+- Questions answered, accuracy %, skills practiced, and XP gained this week
+- Green pills listing any skills mastered during the current week
+- Uses ISO week boundaries (Monday start) for consistent date filtering
+- Cross-references mastery timeline for newly mastered skills — no extra DB query
+- `get_since(student_id, since_date)` added to attempt model for date-range queries
+- Gives kids and parents a quick "how's this week going?" snapshot
+
 ### Added — Session XP counter
 - Golden "+N XP" badge in the session header shows total ELO points gained
 - Computed from sum of positive rating changes across all session attempts

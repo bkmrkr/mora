@@ -61,3 +61,15 @@ def count_for_student(student_id):
         (student_id,), one=True,
     )
     return row['cnt'] if row else 0
+
+
+def get_since(student_id, since_date):
+    """All attempts for a student since a date (YYYY-MM-DD string)."""
+    return query_db(
+        """SELECT a.*, q.skill_id as q_skill_id
+           FROM attempts a
+           JOIN questions q ON a.question_id = q.id
+           WHERE a.student_id=? AND a.timestamp >= ?
+           ORDER BY a.timestamp""",
+        (student_id, since_date),
+    )

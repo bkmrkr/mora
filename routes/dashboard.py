@@ -1,4 +1,6 @@
 """Dashboard routes — grade progression per student."""
+from datetime import date, timedelta
+
 from flask import Blueprint, render_template, redirect, url_for
 
 from models import student as student_model
@@ -238,6 +240,37 @@ def overview(student_id):
     if total_questions >= 500:
         badges.append({'icon': '&#127793;', 'name': 'Dedicated', 'desc': '500+ questions answered'})
 
+    # "This Week" summary
+    week_start = (date.today() - timedelta(days=date.today().weekday())).isoformat()
+    week_attempts = attempt_model.get_since(student_id, week_start)
+    week_summary = None
+    if week_attempts:
+        week_total = len(week_attempts)
+        week_correct = sum(1 for a in week_attempts if a['is_correct'])
+        week_accuracy = round(week_correct / week_total * 100) if week_total > 0 else 0
+        week_skills = set(a['skill_id'] for a in week_attempts)
+        # XP this week
+        week_xp = 0
+        for a in week_attempts:
+            before = a.get('skill_rating_before') or 0
+            after = a.get('skill_rating_after') or 0
+            diff = after - before
+            if diff > 0:
+                week_xp += diff
+        # New masteries this week (skills whose last_updated is this week)
+        week_new_masteries = []
+        for item in mastery_timeline:
+            if item['date'] >= week_start:
+                week_new_masteries.append(item['name'])
+        week_summary = {
+            'total': week_total,
+            'correct': week_correct,
+            'accuracy': week_accuracy,
+            'skills_practiced': len(week_skills),
+            'xp': round(week_xp, 1),
+            'new_masteries': week_new_masteries,
+        }
+
     return render_template(
         'dashboard/overview.html',
         student=student,
@@ -255,6 +288,7 @@ def overview(student_id):
         math_level=math_level,
         mastery_timeline=mastery_timeline,
         badges=badges,
+        week_summary=week_summary,
     )
 
 

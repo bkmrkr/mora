@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Bonus Challenge on 5th question
+- The 5th question of each session is marked as a "Bonus Challenge" with a golden gradient banner and ⚡ icon
+- Question card gets an amber border to distinguish it visually
+- One-time per session (tracked via flask_session flag)
+- Adds a gamification moment that breaks up the routine and builds excitement mid-session
+
 ### Added — Visible keyboard shortcuts on answer buttons
 - Each MCQ choice now shows its keyboard shortcut (A/B/C/D) as a styled key badge
 - Added number key support (1/2/3/4) as alternative shortcuts

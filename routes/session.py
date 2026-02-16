@@ -48,6 +48,12 @@ def question(session_id):
         current_skill = flask_session.get('last_skill_id')
         current = question_service.generate_next(session_id, student, current_skill)
         if current:
+            # Bonus challenge: 5th question of the session if not already offered
+            session_stats_pre = _get_session_stats(session_id)
+            if (session_stats_pre['total'] == 4
+                    and not flask_session.get('challenge_offered')):
+                current['is_challenge'] = True
+                flask_session['challenge_offered'] = True
             flask_session['current_question'] = current
 
     if not current:
@@ -159,6 +165,11 @@ def answer(session_id):
             session_id, student, current['skill_id']
         )
         if next_q:
+            # Bonus challenge check
+            stats_now = _get_session_stats(session_id)
+            if stats_now['total'] == 4 and not flask_session.get('challenge_offered'):
+                next_q['is_challenge'] = True
+                flask_session['challenge_offered'] = True
             flask_session['current_question'] = next_q
         return redirect(url_for('session.question', session_id=session_id))
     return redirect(url_for('session.feedback', session_id=session_id))
@@ -207,6 +218,11 @@ def next_question(session_id):
             session_id, student, last_skill, retry_skill_id=retry_skill
         )
         if next_q:
+            # Bonus challenge check
+            stats = _get_session_stats(session_id)
+            if stats['total'] == 4 and not flask_session.get('challenge_offered'):
+                next_q['is_challenge'] = True
+                flask_session['challenge_offered'] = True
             flask_session['current_question'] = next_q
     return redirect(url_for('session.question', session_id=session_id))
 
@@ -390,6 +406,7 @@ def end(session_id):
     flask_session.pop('last_skill_id', None)
     flask_session.pop('streak', None)
     flask_session.pop('best_streak', None)
+    flask_session.pop('challenge_offered', None)
 
     return render_template(
         'session/summary.html',

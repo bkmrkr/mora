@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Mora — Session Detail{% endblock %}
+{% block content %}
+<div class="dashboard-container">
+    <div class="session-detail-header">
+        <a href="{{ url_for('dashboard.overview', student_id=student.id) }}" class="back-link">&larr; {{ student.name }}'s Progress</a>
+        <h1>Session Detail</h1>
+        <div class="session-detail-date">{{ sess.started_at[:16] if sess.started_at else '' }}</div>
+    </div>
+
+    <div class="session-detail-stats">
+        <div class="dash-stat">
+            <div class="dash-stat-value">{{ total_questions }}</div>
+            <div class="dash-stat-label">Questions</div>
+        </div>
+        <div class="dash-stat">
+            <div class="dash-stat-value">{{ total_correct }}</div>
+            <div class="dash-stat-label">Correct</div>
+        </div>
+        <div class="dash-stat">
+            <div class="dash-stat-value">{{ accuracy }}%</div>
+            <div class="dash-stat-label">Accuracy</div>
+        </div>
+        {% if best_streak >= 2 %}
+        <div class="dash-stat">
+            <div class="dash-stat-value">{{ best_streak }}</div>
+            <div class="dash-stat-label">Best Streak</div>
+        </div>
+        {% endif %}
+        {% if avg_time %}
+        <div class="dash-stat">
+            <div class="dash-stat-value">{{ avg_time }}s</div>
+            <div class="dash-stat-label">Avg Speed</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="timeline-dots">
+        {% for entry in timeline %}
+        <div class="timeline-dot {% if entry.is_correct %}dot-correct{% else %}dot-wrong{% endif %}"
+             title="Q{{ entry.num }}: {{ entry.skill_name }} — {% if entry.is_correct %}Correct{% else %}Wrong{% endif %}">
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="timeline-list">
+        {% for entry in timeline %}
+        <div class="timeline-entry {% if entry.is_correct %}entry-correct{% else %}entry-wrong{% endif %}">
+            <div class="timeline-num">{{ entry.num }}</div>
+            <div class="timeline-indicator {% if entry.is_correct %}ind-correct{% else %}ind-wrong{% endif %}">
+                {% if entry.is_correct %}&#10003;{% else %}&#10007;{% endif %}
+            </div>
+            <div class="timeline-detail">
+                <div class="timeline-skill-name">{{ entry.skill_name }}</div>
+                <div class="timeline-question">{{ entry.content[:80] }}{% if entry.content|length > 80 %}...{% endif %}</div>
+                {% if not entry.is_correct %}
+                <div class="timeline-answers">
+                    <span class="timeline-given">{{ entry.answer_given }}</span>
+                    <span class="timeline-arrow">&rarr;</span>
+                    <span class="timeline-correct-answer">{{ entry.correct_answer }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% if entry.response_time %}
+            <div class="timeline-time">{{ entry.response_time }}s</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="dashboard-actions">
+        <a href="{{ url_for('dashboard.overview', student_id=student.id) }}" class="btn btn-secondary">Back to Progress</a>
+        <a href="{{ url_for('home.index') }}" class="btn btn-primary">Practice More</a>
+    </div>
+</div>
+{% endblock %}

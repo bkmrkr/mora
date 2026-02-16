@@ -256,3 +256,61 @@ def overview(student_id):
         mastery_timeline=mastery_timeline,
         badges=badges,
     )
+
+
+@dashboard_bp.route('/<int:student_id>/session/<session_id>')
+def session_detail(student_id, session_id):
+    student = student_model.get_by_id(student_id)
+    if not student:
+        return redirect(url_for('dashboard.index'))
+
+    sess = session_model.get_by_id(session_id)
+    if not sess or sess['student_id'] != student_id:
+        return redirect(url_for('dashboard.overview', student_id=student_id))
+
+    attempts = attempt_model.get_for_session(session_id)
+
+    # Build timeline entries with skill names
+    timeline = []
+    for i, a in enumerate(attempts):
+        skill_info = get_skill(a['skill_id'])
+        skill_name = skill_info['name'] if skill_info else a['skill_id']
+        resp_time = a.get('response_time_seconds') or 0
+        timeline.append({
+            'num': i + 1,
+            'skill_name': skill_name,
+            'is_correct': bool(a['is_correct']),
+            'answer_given': a.get('answer_given', ''),
+            'correct_answer': a.get('correct_answer', ''),
+            'content': a.get('content', ''),
+            'response_time': round(resp_time, 1) if resp_time else None,
+        })
+
+    total_q = len(attempts)
+    total_c = sum(1 for a in attempts if a['is_correct'])
+    accuracy = round(total_c / total_q * 100) if total_q > 0 else 0
+    times = [a['response_time_seconds'] for a in attempts
+             if a.get('response_time_seconds') and a['response_time_seconds'] > 0]
+    avg_time = round(sum(times) / len(times), 1) if times else None
+
+    # Compute best streak
+    best_streak = 0
+    current_streak = 0
+    for a in attempts:
+        if a['is_correct']:
+            current_streak += 1
+            best_streak = max(best_streak, current_streak)
+        else:
+            current_streak = 0
+
+    return render_template(
+        'dashboard/session_detail.html',
+        student=student,
+        sess=sess,
+        timeline=timeline,
+        total_questions=total_q,
+        total_correct=total_c,
+        accuracy=accuracy,
+        avg_time=avg_time,
+        best_streak=best_streak,
+    )

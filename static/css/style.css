@@ -1257,3 +1257,45 @@ body {
     .stat-cards { flex-wrap: wrap; }
     .goal-bar { width: 40px; }
 }
+
+/* Session Detail Timeline */
+.session-detail-header { margin-bottom: 1.5rem; }
+.back-link { color: var(--primary); text-decoration: none; font-size: 0.9rem; }
+.back-link:hover { text-decoration: underline; }
+.session-detail-date { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
+.session-detail-stats { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.session-row:hover { background: #f0f0ff; }
+.session-row a { color: var(--primary); text-decoration: none; font-weight: 500; }
+.session-row a:hover { text-decoration: underline; }
+.timeline-dots {
+    display: flex; gap: 4px; flex-wrap: wrap; padding: 1rem;
+    background: var(--bg); border-radius: var(--radius); margin-bottom: 1.5rem;
+    border: 1px solid var(--border);
+}
+.timeline-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+}
+.dot-correct { background: var(--success, #22c55e); }
+.dot-wrong { background: var(--danger, #ef4444); }
+.timeline-list { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+.timeline-entry {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    padding: 0.75rem 1rem; border-radius: var(--radius);
+    background: var(--bg); border: 1px solid var(--border);
+}
+.timeline-num { color: var(--text-muted); font-size: 0.8rem; min-width: 1.5rem; padding-top: 0.15rem; }
+.timeline-indicator {
+    width: 24px; height: 24px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; font-size: 0.75rem;
+    flex-shrink: 0; font-weight: 700;
+}
+.ind-correct { background: #dcfce7; color: #16a34a; }
+.ind-wrong { background: #fee2e2; color: #dc2626; }
+.timeline-detail { flex: 1; min-width: 0; }
+.timeline-skill-name { font-weight: 600; font-size: 0.9rem; }
+.timeline-question { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.15rem; }
+.timeline-answers { margin-top: 0.25rem; font-size: 0.85rem; }
+.timeline-given { color: #dc2626; text-decoration: line-through; }
+.timeline-arrow { color: var(--text-muted); margin: 0 0.25rem; }
+.timeline-correct-answer { color: #16a34a; font-weight: 600; }
+.timeline-time { color: var(--text-muted); font-size: 0.8rem; white-space: nowrap; padding-top: 0.15rem; }

@@ -159,8 +159,8 @@
             </thead>
             <tbody>
                 {% for sess in sessions if sess.total_questions %}
-                <tr>
-                    <td>{{ sess.started_at[:16] if sess.started_at else '-' }}</td>
+                <tr class="session-row">
+                    <td><a href="{{ url_for('dashboard.session_detail', student_id=student.id, session_id=sess.id) }}">{{ sess.started_at[:16] if sess.started_at else '-' }}</a></td>
                     <td>{{ sess.total_questions }}</td>
                     <td>{{ sess.total_correct or 0 }}</td>
                     <td>{{ ((sess.total_correct or 0) / sess.total_questions * 100)|round(1) }}%</td>

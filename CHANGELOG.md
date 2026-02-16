@@ -1,5 +1,14 @@
 # Mora v2 Changelog
 
+### Added — Session detail timeline on dashboard
+- Clickable session dates in the Recent Sessions table open a full session timeline
+- Dot visualization at top shows green/red pattern for instant "how did it go?" view
+- Each question shows skill name, question text, response time, and correct/wrong indicator
+- Wrong answers show the given answer (strikethrough) with arrow to the correct answer
+- Summary stats: questions, correct, accuracy, best streak, avg speed
+- Back link to student progress page for easy navigation
+- Gives parents/teachers a complete picture of what happened in each session
+
 ### Added — Themed word problem cards
 - Word problem questions display in a visually distinct story card with a theme emoji
 - Keyword detection maps question content to 16 themes: apple, cookie, bird, sticker, marble, book, ticket, flower, coin, toy, pie, pizza, pencil, car, fish, star

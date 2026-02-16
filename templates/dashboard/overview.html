@@ -78,7 +78,36 @@
 
     {% if sessions %}
     <div class="card">
-        <h2>Recent Sessions</h2>
+        <h2>Practice Summary</h2>
+        <div class="dashboard-stats">
+            <div class="dash-stat">
+                <div class="dash-stat-value">{{ total_questions }}</div>
+                <div class="dash-stat-label">Questions</div>
+            </div>
+            <div class="dash-stat">
+                <div class="dash-stat-value">{{ overall_accuracy }}%</div>
+                <div class="dash-stat-label">Accuracy</div>
+            </div>
+            <div class="dash-stat">
+                <div class="dash-stat-value">{{ sessions|length }}</div>
+                <div class="dash-stat-label">Sessions</div>
+            </div>
+        </div>
+
+        {% if accuracy_trend|length > 1 %}
+        <h3>Accuracy Trend</h3>
+        <div class="accuracy-chart">
+            {% for pt in accuracy_trend %}
+            <div class="chart-bar-wrap" title="{{ pt.date }}: {{ pt.accuracy }}% ({{ pt.questions }} questions)">
+                <div class="chart-bar {% if pt.accuracy >= 80 %}bar-great{% elif pt.accuracy >= 60 %}bar-good{% else %}bar-needs-work{% endif %}"
+                     style="height: {{ pt.accuracy }}%"></div>
+                <div class="chart-label">{{ pt.accuracy }}%</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <h3>Recent Sessions</h3>
         <div class="table-wrap">
         <table class="data-table">
             <thead>

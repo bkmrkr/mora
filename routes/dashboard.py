@@ -130,6 +130,23 @@ def overview(student_id):
     # Practice streak
     streak_days, practiced_today = session_model.get_practice_streak(student_id)
 
+    # Overall stats
+    total_questions = sum(s['total_questions'] or 0 for s in sessions)
+    total_correct = sum(s['total_correct'] or 0 for s in sessions)
+    overall_accuracy = round(total_correct / total_questions * 100) if total_questions > 0 else 0
+
+    # Accuracy trend for chart (oldest first, last 10 sessions)
+    accuracy_trend = []
+    for s in reversed(sessions[:10]):
+        q = s['total_questions'] or 0
+        c = s['total_correct'] or 0
+        acc = round(c / q * 100) if q > 0 else 0
+        accuracy_trend.append({
+            'accuracy': acc,
+            'questions': q,
+            'date': s['started_at'][:10] if s.get('started_at') else '',
+        })
+
     return render_template(
         'dashboard/overview.html',
         student=student,
@@ -141,4 +158,7 @@ def overview(student_id):
         focus_skill=focus_skill,
         streak_days=streak_days,
         practiced_today=practiced_today,
+        total_questions=total_questions,
+        overall_accuracy=overall_accuracy,
+        accuracy_trend=accuracy_trend,
     )

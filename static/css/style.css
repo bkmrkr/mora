@@ -855,6 +855,58 @@ body {
 }
 .dashboard-focus .focus-name { font-size: 1.1rem; font-weight: 600; }
 .dashboard-focus .focus-detail { font-size: 0.85rem; color: var(--text-muted); }
+.dashboard-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.dash-stat {
+    flex: 1;
+    text-align: center;
+    padding: 0.75rem;
+    background: var(--bg);
+    border-radius: 8px;
+}
+.dash-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+.dash-stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+.accuracy-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 120px;
+    padding: 0.5rem 0;
+    margin-bottom: 1.5rem;
+}
+.chart-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+}
+.chart-bar {
+    width: 100%;
+    min-height: 4px;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.3s;
+}
+.bar-great { background: #22c55e; }
+.bar-good { background: #f59e0b; }
+.bar-needs-work { background: #ef4444; }
+.chart-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
 .dashboard-actions {
     display: flex;
     gap: 1rem;

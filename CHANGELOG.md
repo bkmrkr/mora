@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Dashboard practice summary with accuracy trend chart
+- Practice Summary section with total questions, overall accuracy, and session count
+- Visual bar chart showing accuracy per session (last 10), color-coded by performance
+- Green bars for 80%+ accuracy, amber for 60-79%, red for below 60%
+- Gives students and parents a clear view of learning trajectory over time
+
 ### Added — Struggle detection with warm encouragement
 - Tracks consecutive wrong answers during a session
 - After 3+ wrong in a row, shows a warm encouragement message with amber styling

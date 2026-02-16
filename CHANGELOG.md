@@ -1,5 +1,16 @@
 # Mora v2 Changelog
 
+### Fixed — Short Answer Mode Was Unreachable
+- Short answer threshold (0.7) was higher than mastery threshold (0.65)
+- Skills got mastered and excluded from the eligible pool before reaching 0.7
+- Lowered short answer threshold to 0.5 — students type answers once they're getting ~50% right on a skill
+- Verified in Playwright: text input renders, correct/wrong answers graded, feedback works
+
+### Added — Styled Error Pages (404/500)
+- Created `templates/error.html` extending `base.html` — proper nav, "Go Home" button
+- Error handler now renders template instead of Flask's bare default HTML
+- 404 and 500 pages show consistent app styling
+
 ### Fixed — Ended Sessions Could Be Resumed via Direct URL
 - Navigating to `/session/<ended_id>/question` would generate new questions for an ended session
 - Added `ended_at` guard to question, answer, feedback, and next_question routes

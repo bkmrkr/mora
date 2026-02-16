@@ -142,11 +142,11 @@ class TestComputeQuestionParams:
         analysis = analyze_recent([])
         difficulty, q_type = compute_question_params('g1_add_10', progress, analysis)
         assert isinstance(difficulty, float)
-        assert q_type == 'mcq'  # mastery < 0.7
+        assert q_type == 'mcq'  # mastery < 0.5
 
     def test_high_mastery_short_answer(self):
         progress = {
-            'g1_add_10': _make_progress('g1_add_10', mastery=0.75, rating=1100, attempts=30),
+            'g1_add_10': _make_progress('g1_add_10', mastery=0.55, rating=1100, attempts=30),
         }
         analysis = analyze_recent([])
         _, q_type = compute_question_params('g1_add_10', progress, analysis)

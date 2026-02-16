@@ -6,7 +6,7 @@ import re
 import traceback
 import argparse
 
-from flask import Flask, request as flask_request, Response
+from flask import Flask, render_template, request as flask_request, Response
 
 from db.database import init_db
 from routes.home import home_bp
@@ -83,8 +83,12 @@ def create_app():
                          flask_request.full_path.rstrip('?'),
                          traceback.format_exc())
         if isinstance(error, HTTPException):
-            return error.get_response()
-        return "Internal Server Error", 500
+            return render_template('error.html',
+                                   error_code=error.code,
+                                   error_message=error.description), error.code
+        return render_template('error.html',
+                               error_code=500,
+                               error_message='Internal Server Error'), 500
 
     with app.app_context():
         init_db()

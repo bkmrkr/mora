@@ -1,5 +1,10 @@
 # Mora v2 Changelog
 
+### Added — Math Level badge visible during practice sessions
+- Student's Math Level (e.g., "Grandmaster") shown as a purple pill badge in the session header
+- Makes the gamification visible during actual practice, not just on the dashboard
+- Level computed at session start and stored in flask_session
+
 ### Improved — Dashboard index with level names and "Today" badges
 - Each student card now shows their Math Level name (Starter, Grandmaster, etc.)
 - Green "Today" badge appears next to students who practiced today

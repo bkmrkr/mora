@@ -171,6 +171,14 @@ body {
     flex-wrap: wrap;
 }
 .student-name { font-weight: 600; }
+.session-level-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    background: #ede9fe;
+    color: #6b21a8;
+}
 
 /* Result banner (correct answer notification) */
 .result-banner {

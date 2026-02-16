@@ -4,6 +4,7 @@
 <div class="session-container">
     <div class="session-header">
         <span class="student-name">{{ student.name }}</span>
+        <span class="session-level-badge">{{ math_level }}</span>
         <div class="session-stats">
             {% if session_stats.total > 0 %}
             <span>{{ session_stats.correct }}/{{ session_stats.total }} ({{ session_stats.accuracy }}%)</span>

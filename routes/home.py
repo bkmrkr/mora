@@ -10,6 +10,19 @@ from engine.elo import is_mastered
 
 home_bp = Blueprint('home', __name__)
 
+_LEVELS = [
+    (40, 'Legend'), (35, 'Grandmaster'), (30, 'Master'), (25, 'Champion'),
+    (20, 'Expert'), (15, 'Scholar'), (10, 'Learner'), (5, 'Explorer'),
+    (0, 'Starter'),
+]
+
+
+def _level_name(mastered_count):
+    for threshold, name in _LEVELS:
+        if mastered_count >= threshold:
+            return name
+    return 'Starter'
+
 
 @home_bp.route('/')
 def index():
@@ -57,6 +70,12 @@ def start():
             )
             grade_progress[str(grade)] = {'mastered': mastered, 'total': len(skills)}
         flask_session['welcome'] = grade_progress
+
+    # Math level for session header
+    total_mastered = sum(
+        1 for r in progress_rows if is_mastered(r['mastery_level'])
+    ) if progress_rows else 0
+    flask_session['math_level'] = _level_name(total_mastered)
 
     # Practice streak
     streak_days, _ = session_model.get_practice_streak(student['id'])

@@ -77,6 +77,8 @@ def question(session_id):
     if 'clock_hour' in current:
         visual_svg = generate_clock_svg(current['clock_hour'], current['clock_minute'])
 
+    math_level = flask_session.get('math_level', 'Starter')
+
     return render_template(
         'session/question.html',
         session_id=session_id,
@@ -91,6 +93,7 @@ def question(session_id):
         goal_reached=goal_reached,
         show_goal_celebration=show_goal_celebration,
         practice_streak=practice_streak,
+        math_level=math_level,
     )
 
 

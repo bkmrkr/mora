@@ -47,10 +47,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Auto-focus text input
-    const input = document.getElementById('answer-input');
-    if (input) {
-        input.focus();
-    }
 
 });

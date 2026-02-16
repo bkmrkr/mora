@@ -2,7 +2,6 @@
 import logging
 import logging.handlers
 import os
-import re
 import traceback
 import argparse
 
@@ -37,10 +36,6 @@ def create_app():
     app.register_blueprint(home_bp)
     app.register_blueprint(session_bp, url_prefix='/session')
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
-
-    @app.template_filter('strip_letter')
-    def strip_letter_prefix(text):
-        return re.sub(r'^[A-Da-d][.)]\s*', '', str(text))
 
     @app.route('/favicon.ico')
     def favicon():

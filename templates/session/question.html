@@ -42,7 +42,7 @@
                 {% for option in question.options %}
                 <button type="submit" name="answer" value="{{ option }}"
                         class="choice-btn" data-key="{{ 'ABCD'[loop.index0] }}">
-                    <span class="choice-text">{{ option | strip_letter }}</span>
+                    <span class="choice-text">{{ option }}</span>
                 </button>
                 {% endfor %}
             </div>

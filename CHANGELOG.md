@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Removed — Dead Code Cleanup
+- Removed `strip_letter` template filter from `app.py` — v2 templates never produce letter prefixes
+- Removed `{{ option | strip_letter }}` from `question.html` — replaced with `{{ option }}`
+- Removed unused `re` import from `app.py`
+- Removed `#answer-input` auto-focus from `session.js` — HTML `autofocus` attribute handles this
+
 ### Hardened — Tighten CSP script-src
 - Removed `'unsafe-inline'` from `script-src` in Content-Security-Policy header
 - No inline scripts exist — all JS loaded via external `session.js`

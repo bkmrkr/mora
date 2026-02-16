@@ -135,6 +135,7 @@
                 {% for option in question.options %}
                 <button type="submit" name="answer" value="{{ option }}"
                         class="choice-btn" data-key="{{ 'ABCD'[loop.index0] }}">
+                    <span class="choice-key">{{ 'ABCD'[loop.index0] }}</span>
                     <span class="choice-text">{{ option }}</span>
                 </button>
                 {% endfor %}

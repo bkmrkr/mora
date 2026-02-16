@@ -35,12 +35,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Keyboard shortcuts for MCQ
+    // Keyboard shortcuts for MCQ (A/B/C/D or 1/2/3/4)
     document.addEventListener('keydown', function(e) {
-        if (submitted) return;  // Ignore after submission
-        const key = e.key.toUpperCase();
+        if (submitted) return;
+        var key = e.key.toUpperCase();
+        // Map number keys to letter keys
+        var numMap = {'1': 'A', '2': 'B', '3': 'C', '4': 'D'};
+        if (numMap[key]) key = numMap[key];
         if ('ABCD'.includes(key)) {
-            const btn = document.querySelector('.choice-btn[data-key="' + key + '"]');
+            var btn = document.querySelector('.choice-btn[data-key="' + key + '"]');
             if (btn) {
                 btn.click();
             }

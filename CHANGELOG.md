@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Visible keyboard shortcuts on answer buttons
+- Each MCQ choice now shows its keyboard shortcut (A/B/C/D) as a styled key badge
+- Added number key support (1/2/3/4) as alternative shortcuts
+- Key badge highlights on button hover for visual feedback
+- Makes the app feel more game-like for fast learners
+
 ### Added — Unlock preview on question card
 - Shows what skill will be unlocked when the current skill is mastered
 - Purple pill: "Mastering this unlocks: [skill name]"

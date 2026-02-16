@@ -132,6 +132,9 @@
             <span class="momentum-badge momentum-falling" title="Needs practice">&#9660;</span>
             {% endif %}
         </div>
+        {% if question.why_reason %}
+        <div class="why-reason">{{ question.why_reason }}</div>
+        {% endif %}
         {% if question.unlock_preview %}
         <div class="unlock-preview">&#128275; Mastering this unlocks: {{ question.unlock_preview }}</div>
         {% endif %}

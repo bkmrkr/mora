@@ -45,8 +45,10 @@ def generate_next(session_id, student, current_skill_id=None, retry_skill_id=Non
     analysis = analyze_recent(recent_attempts)
 
     # Select skill (retry overrides normal selection)
+    is_retry = False
     if retry_skill_id and retry_skill_id in TEMPLATES:
         skill_id = retry_skill_id
+        is_retry = True
     else:
         skill_id = select_skill(analysis, student_progress, current_skill_id)
     if not skill_id:
@@ -157,6 +159,27 @@ def generate_next(session_id, student, current_skill_id=None, retry_skill_id=Non
         'is_review': is_review,
         'review_reason': review_reason,
     }
+    # "Why this question?" — metacognition helper (review reasons shown in badge)
+    if is_retry:
+        why_reason = "Let's try this skill again after the miss."
+    elif is_review:
+        why_reason = None  # review_reason already shown in badge
+    elif prog['total_attempts'] == 0:
+        why_reason = 'New skill! Your prerequisites are all mastered.'
+    elif len(skill_attempts) >= 4:
+        recent_correct = sum(1 for a in skill_attempts[:4] if a['is_correct'])
+        if recent_correct <= 2:
+            why_reason = f'You got {recent_correct} of the last 4 right — needs practice.'
+        elif mastery_pct >= 50:
+            why_reason = f'{mastery_pct}% mastered — getting close!'
+        else:
+            why_reason = 'Building up this skill step by step.'
+    elif mastery_pct >= 50:
+        why_reason = f'{mastery_pct}% mastered — almost there!'
+    else:
+        why_reason = None
+    question_dict['why_reason'] = why_reason
+
     # Unlock preview: what does mastering this skill unlock?
     unlock_preview = None
     if not is_review and mastery_pct < 65:

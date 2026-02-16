@@ -1,5 +1,14 @@
 # Mora v2 Changelog
 
+### Added — "Why this question?" metacognition helper
+- Subtle italic text below progress bar explains why the adaptive system chose this question
+- "New skill! Your prerequisites are all mastered." for first encounter
+- "Let's try this skill again after the miss." for retries
+- "You got N of the last 4 right — needs practice." for struggling skills
+- "N% mastered — getting close!" for near-mastery skills
+- Review questions skip this (review reason already shown in badge)
+- Teaches students about their own learning process (metacognition)
+
 ### Added — Strength/weakness insights on welcome banner
 - "Strong at: [skill]" (green) shows highest-accuracy skill with 70%+ accuracy
 - "Working on: [skill]" (amber) shows lowest-accuracy unmastered skill

@@ -283,7 +283,39 @@ body {
     background: #ede9fe;
     color: var(--primary);
 }
-.qid-badge { background: #f5f5f5; color: #999; font-size: 0.7rem; }
+.grade-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    align-self: center;
+}
+.skill-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.skill-progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.skill-progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+.skill-progress-fill.mastered {
+    background: var(--success);
+}
+.skill-progress-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    min-width: 32px;
+    text-align: right;
+}
 .question-text {
     font-size: 1.25rem;
     margin-bottom: 1.5rem;

@@ -48,7 +48,14 @@
     <div class="question-card">
         <div class="question-meta">
             <span class="node-badge">{{ question.skill_name }}</span>
-            <span class="qid-badge">Q#{{ question.question_id }}</span>
+            <span class="grade-label">Grade {{ question.skill_grade }}</span>
+        </div>
+        <div class="skill-progress-row">
+            <div class="skill-progress-bar">
+                <div class="skill-progress-fill {% if question.mastery_pct >= 65 %}mastered{% endif %}"
+                     style="width: {{ question.mastery_pct }}%"></div>
+            </div>
+            <span class="skill-progress-label">{{ question.mastery_pct }}%</span>
         </div>
 
         <div class="question-text">{{ question.content }}</div>

@@ -77,10 +77,14 @@ def generate_next(session_id, student, current_skill_id=None):
         template_id=q_data.get('template_id'),
     )
 
+    mastery_pct = round(prog['mastery_level'] * 100)
+
     question_dict = {
         'question_id': question_id,
         'skill_id': skill_id,
         'skill_name': skill['name'],
+        'skill_grade': skill['grade'],
+        'mastery_pct': mastery_pct,
         'content': q_data['question'],
         'question_type': q_type,
         'options': q_data.get('options'),

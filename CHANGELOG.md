@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Skill progress bar on question page
+- Show real-time mastery progress bar below the skill name on every question
+- Displays current mastery percentage and grade level (e.g., "Grade 1")
+- Bar turns green when skill is mastered (>= 65%)
+- Makes every correct answer feel meaningful — progress is visible in real-time
+
 ### Added — Skill mastery and grade completion celebrations
 - Detect when a student masters a skill (crosses 0.65 threshold) during a session
 - Show animated golden "Skill Mastered!" banner with spinning star on the next question

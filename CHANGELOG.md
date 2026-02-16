@@ -1,5 +1,13 @@
 # Mora v2 Changelog
 
+### Added — Adaptive hints for struggling skills
+- When a student gets 2+ consecutive wrong on a skill, the skill's tip shows as a hint banner
+- Amber lightbulb banner appears above the question with skill-specific guidance
+- Uses the `tip` field already defined for all 40 skills in curriculum/skills.py
+- Only shows for non-review questions (mastered skills don't need hints)
+- Disappears once the student gets one right (breaking the wrong streak)
+- A real tutor would notice frustration and help — now the system does too
+
 ### Added — Session detail timeline on dashboard
 - Clickable session dates in the Recent Sessions table open a full session timeline
 - Dot visualization at top shows green/red pattern for instant "how did it go?" view

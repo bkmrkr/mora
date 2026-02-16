@@ -1299,3 +1299,13 @@ body {
 .timeline-arrow { color: var(--text-muted); margin: 0 0.25rem; }
 .timeline-correct-answer { color: #16a34a; font-weight: 600; }
 .timeline-time { color: var(--text-muted); font-size: 0.8rem; white-space: nowrap; padding-top: 0.15rem; }
+
+/* Skill tip banner */
+.skill-tip-banner {
+    display: flex; align-items: flex-start; gap: 0.5rem;
+    padding: 0.75rem 1rem; border-radius: var(--radius);
+    background: #fef3c7; border: 1px solid #f59e0b;
+    margin-bottom: 1rem; font-size: 0.9rem; color: #92400e;
+}
+.tip-icon { font-size: 1.2rem; flex-shrink: 0; }
+.tip-text { line-height: 1.4; }

@@ -142,6 +142,18 @@ def generate_next(session_id, student, current_skill_id=None, retry_skill_id=Non
     else:
         momentum = None  # not enough data
 
+    # Show skill tip when student is struggling (last 2+ wrong on this skill)
+    skill_tip = None
+    if not is_review and len(skill_attempts) >= 2:
+        recent_wrong = 0
+        for a in skill_attempts:
+            if not a['is_correct']:
+                recent_wrong += 1
+            else:
+                break  # stop at first correct (consecutive wrong streak from top)
+        if recent_wrong >= 2:
+            skill_tip = skill.get('tip')
+
     question_dict = {
         'question_id': question_id,
         'skill_id': skill_id,
@@ -158,6 +170,7 @@ def generate_next(session_id, student, current_skill_id=None, retry_skill_id=Non
         'difficulty': question_difficulty,
         'is_review': is_review,
         'review_reason': review_reason,
+        'skill_tip': skill_tip,
     }
     # "Why this question?" — metacognition helper (review reasons shown in badge)
     if is_retry:

@@ -135,6 +135,12 @@
         {% if question.why_reason %}
         <div class="why-reason">{{ question.why_reason }}</div>
         {% endif %}
+        {% if question.skill_tip %}
+        <div class="skill-tip-banner">
+            <span class="tip-icon">&#128161;</span>
+            <span class="tip-text"><strong>Tip:</strong> {{ question.skill_tip }}</span>
+        </div>
+        {% endif %}
         {% if question.unlock_preview %}
         <div class="unlock-preview">&#128275; Mastering this unlocks: {{ question.unlock_preview }}</div>
         {% endif %}

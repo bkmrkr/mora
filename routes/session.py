@@ -52,6 +52,8 @@ def question(session_id):
     sess = session_model.get_by_id(session_id)
     if not sess:
         return redirect(url_for('home.index'))
+    if sess.get('ended_at'):
+        return redirect(url_for('session.end', session_id=session_id))
     student = student_model.get_by_id(sess['student_id'])
 
     current = flask_session.get('current_question')
@@ -96,6 +98,8 @@ def answer(session_id):
     sess = session_model.get_by_id(session_id)
     if not sess:
         return redirect(url_for('home.index'))
+    if sess.get('ended_at'):
+        return redirect(url_for('session.end', session_id=session_id))
     student = student_model.get_by_id(sess['student_id'])
     current = flask_session.get('current_question')
     if not current or not {'skill_id', 'question_id', 'correct_answer', 'question_type'}.issubset(current.keys()):
@@ -142,6 +146,8 @@ def feedback(session_id):
     sess = session_model.get_by_id(session_id)
     if not sess:
         return redirect(url_for('home.index'))
+    if sess.get('ended_at'):
+        return redirect(url_for('session.end', session_id=session_id))
     student = student_model.get_by_id(sess['student_id'])
     result = flask_session.get('last_result')
     if not result and sess.get('last_result_json'):
@@ -162,6 +168,8 @@ def next_question(session_id):
     sess = session_model.get_by_id(session_id)
     if not sess:
         return redirect(url_for('home.index'))
+    if sess.get('ended_at'):
+        return redirect(url_for('session.end', session_id=session_id))
     student = student_model.get_by_id(sess['student_id'])
 
     if not flask_session.get('current_question'):

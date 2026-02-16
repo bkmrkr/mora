@@ -1,5 +1,10 @@
 # Mora v2 Changelog
 
+### Fixed — Ended Sessions Could Be Resumed via Direct URL
+- Navigating to `/session/<ended_id>/question` would generate new questions for an ended session
+- Added `ended_at` guard to question, answer, feedback, and next_question routes
+- Ended sessions now redirect to the summary page
+
 ### Fixed — session.js Not Loaded, Keyboard Shortcuts Broken
 - `session.js` was never included in `question.html` — only an inline script for response time existed
 - Missing features: keyboard shortcuts (A/B/C/D), double-submit prevention, button disable on submit

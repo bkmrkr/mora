@@ -118,7 +118,7 @@ body {
 /* Short answer mode */
 .short-answer-badge {
     display: inline-block;
-    background: var(--surface);
+    background: var(--card);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 0.25rem 0.75rem;
@@ -1212,6 +1212,28 @@ body {
 .dot-correct { background: var(--success); }
 .dot-wrong { background: var(--danger-light); border: 2px solid var(--danger); }
 
+/* Mistake patterns */
+.mistake-patterns { display: flex; flex-direction: column; gap: 0.75rem; }
+.mistake-pattern {
+    padding: 0.75rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.mistake-pattern-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+.mistake-desc { font-size: 0.85rem; color: var(--text-muted); }
+.mistake-tip {
+    font-size: 0.85rem;
+    color: var(--primary);
+    margin-top: 0.25rem;
+}
+
 /* Dashboard */
 .dashboard-container h1 { margin-bottom: 1.5rem; }
 .grade-overview-bar {
@@ -1369,8 +1391,6 @@ body {
     border-radius: 50%;
     display: inline-block;
 }
-.dot-correct { background: var(--success); }
-.dot-wrong { background: var(--error); }
 
 /* Data Table */
 .table-wrap {
@@ -1632,8 +1652,6 @@ body {
 .timeline-dot {
     width: 16px; height: 16px; border-radius: 50%;
 }
-.dot-correct { background: var(--success, #22c55e); }
-.dot-wrong { background: var(--danger, #ef4444); }
 .timeline-list { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
 .timeline-entry {
     display: flex; align-items: flex-start; gap: 0.75rem;

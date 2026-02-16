@@ -12,6 +12,90 @@ from engine import elo
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
+
+def _parse_num(s):
+    """Parse a string as a number (int, float, or fraction)."""
+    s = str(s).strip()
+    try:
+        if '/' in s:
+            parts = s.split('/')
+            return float(parts[0]) / float(parts[1])
+        return float(s.replace(',', ''))
+    except (ValueError, ZeroDivisionError, IndexError):
+        return None
+
+
+def _analyze_mistakes(student_id):
+    """Analyze recent wrong answers to identify mistake patterns."""
+    recent = attempt_model.get_recent(student_id, limit=50)
+    wrong = [a for a in recent if not a['is_correct']
+             and a.get('answer_given') and a.get('correct_answer')]
+
+    if len(wrong) < 3:
+        return []
+
+    counts = {
+        'off_by_one': 0,
+        'place_value': 0,
+        'digit_swap': 0,
+        'rushing': 0,
+    }
+
+    for a in wrong:
+        sa = _parse_num(a['answer_given'])
+        ca = _parse_num(a['correct_answer'])
+        if sa is not None and ca is not None:
+            diff = abs(sa - ca)
+            if diff == 1:
+                counts['off_by_one'] += 1
+            elif diff in (10, 100, 1000):
+                counts['place_value'] += 1
+            # Digit swap check
+            ss, cs = a['answer_given'].strip(), a['correct_answer'].strip()
+            if (len(ss) == 2 and len(cs) == 2
+                    and ss[0] == cs[1] and ss[1] == cs[0]):
+                counts['digit_swap'] += 1
+        rt = a.get('response_time_seconds')
+        if rt and 0 < rt < 2:
+            counts['rushing'] += 1  # already in wrong-only list
+
+    patterns = []
+    total_wrong = len(wrong)
+    if counts['off_by_one'] >= 3:
+        pct = round(counts['off_by_one'] / total_wrong * 100)
+        patterns.append({
+            'icon': '&#128161;',
+            'label': 'Off-by-one errors',
+            'desc': f'{counts["off_by_one"]} times in last {total_wrong} mistakes ({pct}%)',
+            'tip': 'Try counting on fingers or a number line to double-check.',
+        })
+    if counts['place_value'] >= 2:
+        pct = round(counts['place_value'] / total_wrong * 100)
+        patterns.append({
+            'icon': '&#127922;',
+            'label': 'Place value mix-ups',
+            'desc': f'{counts["place_value"]} errors off by 10, 100, or 1000',
+            'tip': 'Practice identifying tens, hundreds, and thousands places.',
+        })
+    if counts['digit_swap'] >= 2:
+        patterns.append({
+            'icon': '&#128260;',
+            'label': 'Digit reversals',
+            'desc': f'{counts["digit_swap"]} times digits were swapped (e.g. 21 vs 12)',
+            'tip': 'Read the answer back to yourself before submitting.',
+        })
+    if counts['rushing'] >= 3:
+        pct = round(counts['rushing'] / total_wrong * 100)
+        patterns.append({
+            'icon': '&#9200;',
+            'label': 'Rushing',
+            'desc': f'{counts["rushing"]} wrong answers in under 2 seconds',
+            'tip': 'Slow down and read the question carefully before answering.',
+        })
+
+    return patterns[:3]  # top 3 patterns
+
+
 MATH_LEVELS = [
     (0, 'Starter', 5),
     (5, 'Explorer', 10),
@@ -307,6 +391,9 @@ def overview(student_id):
         })
     heatmap_weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
+    # Mistake pattern analysis from recent wrong answers
+    mistake_patterns = _analyze_mistakes(student_id)
+
     return render_template(
         'dashboard/overview.html',
         student=student,
@@ -327,6 +414,7 @@ def overview(student_id):
         week_summary=week_summary,
         heatmap=heatmap,
         heatmap_weekdays=heatmap_weekdays,
+        mistake_patterns=mistake_patterns,
     )
 
 

@@ -1,5 +1,17 @@
 # Mora v2 Changelog
 
+### Fixed — CSS variable bugs and duplicate rules from Ralph loop
+- Fixed `var(--surface)` → `var(--card)` in short-answer badge (undefined variable)
+- Fixed `var(--error)` → removed duplicate `.dot-wrong` rule (undefined variable)
+- Removed duplicate `.dot-correct`/`.dot-wrong` CSS rules (3 copies → 1 canonical)
+- Sparkline dots and answer timeline dots now render correctly
+
+### Added — Mistake pattern analysis on dashboard
+- Analyzes recent wrong answers to detect recurring error types
+- Identifies: off-by-one errors, place value mix-ups, digit reversals, rushing
+- Shows actionable tips for each pattern (e.g., "Try counting on fingers")
+- "Areas for Improvement" card appears on student dashboard when patterns detected
+
 ### Added — Session warm-up for returning students
 - First question of each session is now a warm-up on a mastered skill
 - Easy MCQ at -200 ELO from student's rating — designed to build confidence

@@ -96,6 +96,24 @@
     </div>
     {% endif %}
 
+    {% if mistake_patterns %}
+    <div class="card">
+        <h2>Areas for Improvement</h2>
+        <div class="mistake-patterns">
+            {% for p in mistake_patterns %}
+            <div class="mistake-pattern">
+                <div class="mistake-pattern-header">
+                    <span class="mistake-icon">{{ p.icon | safe }}</span>
+                    <span class="mistake-label">{{ p.label }}</span>
+                </div>
+                <div class="mistake-desc">{{ p.desc }}</div>
+                <div class="mistake-tip">{{ p.tip }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <div class="grade-overview-bar">
         <div class="overview-total">
             {{ total_mastered }}/{{ total_skills }} skills mastered

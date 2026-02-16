@@ -181,6 +181,31 @@ def process_answer(student, current_question, student_answer,
     if not is_correct:
         mistake_hint = _analyze_mistake(student_answer, correct_answer, skill_id)
 
+    # Personalized encouragement message (correct answers)
+    personal_message = ''
+    if is_correct:
+        skill_name = current_question.get('skill_name', '')
+        skill_total = prog['total_attempts']  # before this attempt
+        skill_correct = prog['correct_attempts']
+
+        if skill_total == 0:
+            # First time seeing this skill
+            personal_message = f'Great start with {skill_name}!'
+        elif just_mastered:
+            personal_message = f'You mastered {skill_name}!'
+        else:
+            # Check for revenge correct (previous attempt on this skill was wrong)
+            # limit=2 because current attempt is already persisted at [0]
+            skill_recent = attempt_model.get_recent_for_skill(student_id, skill_id, limit=2)
+            was_last_wrong = len(skill_recent) >= 2 and not skill_recent[1]['is_correct']
+
+            if was_last_wrong:
+                personal_message = f'You got {skill_name} this time!'
+            elif current_question['difficulty'] - before_rating > 100:
+                personal_message = 'That was a tough one — well done!'
+            elif mastery >= 0.55 and not now_mastered:
+                personal_message = f'{skill_name} is almost mastered — keep going!'
+
     return {
         'is_correct': is_correct,
         'is_close': is_close,
@@ -200,4 +225,5 @@ def process_answer(student, current_question, student_answer,
         'response_time_s': round(response_time_s, 1),
         'skill_tip': skill_tip,
         'mistake_hint': mistake_hint,
+        'personal_message': personal_message,
     }

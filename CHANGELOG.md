@@ -1,5 +1,13 @@
 # Mora v2 Changelog
 
+### Added — Personalized encouragement messages
+- "Great start with [skill]!" when a student encounters a skill for the first time
+- "You got [skill] this time!" when they answer correctly after previously getting it wrong (revenge correct)
+- "That was a tough one — well done!" when they nail a stretch-difficulty question
+- "[Skill] is almost mastered — keep going!" when mastery is close to threshold
+- Streak messages (3+ in a row) take priority for momentum
+- Makes the app feel like it truly knows each student's history
+
 ### Added — Bonus Challenge on 5th question
 - The 5th question of each session is marked as a "Bonus Challenge" with a golden gradient banner and ⚡ icon
 - Question card gets an amber border to distinguish it visually

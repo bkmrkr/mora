@@ -79,6 +79,8 @@
             Amazing! {{ streak }} in a row!
         {% elif streak >= 3 %}
             Nice streak! {{ streak }} in a row!
+        {% elif last_result.personal_message %}
+            {{ last_result.personal_message }}
         {% else %}
             Correct!
         {% endif %}

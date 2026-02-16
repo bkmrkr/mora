@@ -9,7 +9,7 @@ from models import session as session_model
 from models.progress import get as get_progress, get_for_student
 from engine.selector import analyze_recent, select_skill, compute_question_params
 from engine import elo
-from curriculum.skills import get_skill
+from curriculum.skills import get_skill, SKILLS
 from curriculum.templates.grade1 import GRADE1_TEMPLATES
 from curriculum.templates.grade2 import GRADE2_TEMPLATES
 from curriculum.templates.grade3 import GRADE3_TEMPLATES
@@ -138,6 +138,18 @@ def generate_next(session_id, student, current_skill_id=None, retry_skill_id=Non
         'difficulty': question_difficulty,
         'is_review': is_review,
     }
+    # Unlock preview: what does mastering this skill unlock?
+    unlock_preview = None
+    if not is_review and mastery_pct < 65:
+        for sid, sinfo in SKILLS.items():
+            if skill_id in sinfo.get('prerequisites', []):
+                # Check if this downstream skill is still locked
+                s_prog = student_progress.get(sid, {})
+                if not elo.is_mastered(s_prog.get('mastery_level', 0.0)):
+                    unlock_preview = sinfo['name']
+                    break
+    question_dict['unlock_preview'] = unlock_preview
+
     # Clock params for SVG generation at render time (avoids cookie bloat)
     if 'clock_hour' in q_data:
         question_dict['clock_hour'] = q_data['clock_hour']

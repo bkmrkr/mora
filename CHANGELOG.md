@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Unlock preview on question card
+- Shows what skill will be unlocked when the current skill is mastered
+- Purple pill: "Mastering this unlocks: [skill name]"
+- Only shown for unmastered skills below 65% mastery that gate other skills
+- Creates forward-looking motivation: students can see what they're working toward
+
 ### Added — Coach's Notes on session summary
 - Analyzes session performance to generate 1-2 actionable coaching insights
 - Speed analysis: praises fast recall, suggests slowing down if many slow wrong answers

@@ -499,6 +499,14 @@ body {
     min-width: 32px;
     text-align: right;
 }
+.unlock-preview {
+    font-size: 0.8rem;
+    color: #7c3aed;
+    background: #f5f3ff;
+    border-radius: 6px;
+    padding: 0.3rem 0.6rem;
+    margin-bottom: 0.5rem;
+}
 .question-text {
     font-size: 1.25rem;
     margin-bottom: 1.5rem;

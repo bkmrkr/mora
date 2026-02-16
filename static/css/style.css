@@ -232,6 +232,30 @@ body {
     50% { transform: rotate(200deg) scale(1.3); }
     to { transform: rotate(360deg) scale(1); }
 }
+.welcome-banner {
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+    border: 1px solid #86efac;
+    border-radius: var(--radius);
+    margin-bottom: 0.75rem;
+    animation: slideDown 0.3s ease-out;
+    text-align: center;
+}
+.welcome-grades {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.4rem;
+}
+.welcome-grade {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    background: #f1f5f9;
+    color: var(--text-muted);
+}
+.welcome-grade.active { background: #dbeafe; color: #1e40af; }
+.welcome-grade.complete { background: #dcfce7; color: #166534; font-weight: 600; }
 .unlock-banner {
     padding: 0.6rem 1rem;
     background: #dbeafe;
@@ -298,6 +322,18 @@ body {
     color: var(--text-muted);
     align-self: center;
 }
+.difficulty-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    align-self: center;
+    margin-left: auto;
+}
+.difficulty-warm-up { background: #dcfce7; color: #166534; }
+.difficulty-on-track { background: #dbeafe; color: #1e40af; }
+.difficulty-stretch { background: #fef3c7; color: #92400e; }
+.difficulty-challenge { background: #fce7f3; color: #9d174d; }
 .skill-progress-row {
     display: flex;
     align-items: center;

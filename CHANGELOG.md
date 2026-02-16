@@ -1,5 +1,13 @@
 # Mora v2 Changelog
 
+### Added — Difficulty indicator and personalized welcome
+- Show difficulty label on each question: Warm-up / On track / Stretch / Challenge
+- Label is computed from the gap between question difficulty and student's skill rating
+- Makes the adaptive engine visible — students see that questions adjust to their level
+- Personalized "Welcome back!" banner when returning students start a new session
+- Shows grade-by-grade progress pills (e.g., "G1: 4/10") with color coding
+- Welcome banner shown once on the first question, then auto-dismissed
+
 ### Added — Skill unlock notifications
 - When a student masters a skill, check if any new skills are now unlocked (all prerequisites met)
 - Show blue "Unlocked: Skill Name (Grade N)" banner on the next question

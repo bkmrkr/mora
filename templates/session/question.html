@@ -12,6 +12,20 @@
         <a href="{{ url_for('session.end', session_id=session_id) }}" class="btn btn-secondary btn-sm">End Session</a>
     </div>
 
+    {% if welcome %}
+    <div class="welcome-banner">
+        <strong>Welcome back, {{ student.name }}!</strong>
+        <div class="welcome-grades">
+            {% for g in range(1, 5) %}
+            {% set gp = welcome[g|string] %}
+            <span class="welcome-grade {% if gp.mastered == gp.total %}complete{% elif gp.mastered > 0 %}active{% endif %}">
+                G{{ g }}: {{ gp.mastered }}/{{ gp.total }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     {% if last_result and last_result.is_correct %}
     {% if last_result.grade_completed %}
     <div class="grade-celebration">
@@ -54,6 +68,7 @@
         <div class="question-meta">
             <span class="node-badge">{{ question.skill_name }}</span>
             <span class="grade-label">Grade {{ question.skill_grade }}</span>
+            <span class="difficulty-label difficulty-{{ question.difficulty_label|lower|replace(' ', '-') }}">{{ question.difficulty_label }}</span>
         </div>
         <div class="skill-progress-row">
             <div class="skill-progress-bar">

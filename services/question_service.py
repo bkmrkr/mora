@@ -79,12 +79,24 @@ def generate_next(session_id, student, current_skill_id=None):
 
     mastery_pct = round(prog['mastery_level'] * 100)
 
+    # Difficulty label based on gap between question and student
+    gap = question_difficulty - prog['skill_rating']
+    if gap < -150:
+        difficulty_label = 'Warm-up'
+    elif gap < 50:
+        difficulty_label = 'On track'
+    elif gap < 200:
+        difficulty_label = 'Stretch'
+    else:
+        difficulty_label = 'Challenge'
+
     question_dict = {
         'question_id': question_id,
         'skill_id': skill_id,
         'skill_name': skill['name'],
         'skill_grade': skill['grade'],
         'mastery_pct': mastery_pct,
+        'difficulty_label': difficulty_label,
         'content': q_data['question'],
         'question_type': q_type,
         'options': q_data.get('options'),

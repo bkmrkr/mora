@@ -57,6 +57,9 @@ def question(session_id):
     session_stats = _get_session_stats(session_id)
     streak = flask_session.get('streak', 0)
 
+    # Welcome message (shown once on first question)
+    welcome = flask_session.pop('welcome', None)
+
     # Generate clock SVG at render time (not stored in cookie)
     visual_svg = None
     if 'clock_hour' in current:
@@ -71,6 +74,7 @@ def question(session_id):
         session_stats=session_stats,
         visual_svg=visual_svg,
         streak=streak,
+        welcome=welcome,
     )
 
 

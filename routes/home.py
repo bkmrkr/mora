@@ -4,6 +4,9 @@ from flask import (Blueprint, render_template, redirect, url_for,
 
 from models import student as student_model
 from models import session as session_model
+from models.progress import get_for_student
+from curriculum.skills import get_skills_for_grade
+from engine.elo import is_mastered
 
 home_bp = Blueprint('home', __name__)
 
@@ -34,6 +37,21 @@ def start():
 
     # Clear any stale session data from previous sessions
     flask_session.clear()
+
+    # Build welcome message for returning students
+    progress_rows = get_for_student(student['id'])
+    if progress_rows:
+        progress_by_skill = {r['skill_id']: r for r in progress_rows}
+        # Find current grade (highest grade with any progress)
+        grade_progress = {}
+        for grade in range(1, 5):
+            skills = get_skills_for_grade(grade)
+            mastered = sum(
+                1 for s in skills
+                if is_mastered(progress_by_skill.get(s['id'], {}).get('mastery_level', 0))
+            )
+            grade_progress[str(grade)] = {'mastered': mastered, 'total': len(skills)}
+        flask_session['welcome'] = grade_progress
 
     session_id = session_model.create(student['id'])
     return redirect(url_for('session.question', session_id=session_id))

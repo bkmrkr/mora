@@ -33,6 +33,17 @@ class TestHome:
         carol_count = sum(1 for s in students if s['name'] == 'Carol')
         assert carol_count == 1
 
+    def test_start_case_insensitive_name(self, client):
+        from models import student as student_model
+        student_model.create('Carol')
+        resp = client.post('/start', data={'student_name': 'carol'},
+                           follow_redirects=False)
+        assert resp.status_code == 302
+        # Should still have only 1 student named Carol (case-insensitive match)
+        students = student_model.get_all()
+        carol_count = sum(1 for s in students if s['name'].lower() == 'carol')
+        assert carol_count == 1
+
     def test_start_empty_name_redirects(self, client):
         resp = client.post('/start', data={'student_name': ''},
                            follow_redirects=False)

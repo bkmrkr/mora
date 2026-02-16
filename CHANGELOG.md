@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Fixed — Case-Sensitive Student Name Matching
+- Typing "sophia" created a new student instead of matching existing "Sophia"
+- `get_by_name()` now uses `COLLATE NOCASE` for case-insensitive lookup
+- Schema updated with `COLLATE NOCASE` on `students.name` for new databases
+- Verified: XSS in name field safely escaped by Jinja2 auto-escaping
+
 ### Improved — Clock SVG Accessibility
 - Added `role="img"` and `aria-label="Clock face"` to clock SVG element
 - Screen readers now announce the clock image properly

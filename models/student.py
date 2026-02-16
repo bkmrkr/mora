@@ -11,7 +11,7 @@ def get_by_id(student_id):
 
 
 def get_by_name(name):
-    return query_db("SELECT * FROM students WHERE name=?", (name,), one=True)
+    return query_db("SELECT * FROM students WHERE name=? COLLATE NOCASE", (name,), one=True)
 
 
 def create(name):

@@ -20,6 +20,12 @@ class TestStudent:
         assert row is not None
         assert row['name'] == 'Bob'
 
+    def test_get_by_name_case_insensitive(self):
+        student.create('Charlie')
+        assert student.get_by_name('charlie') is not None
+        assert student.get_by_name('CHARLIE') is not None
+        assert student.get_by_name('Charlie')['name'] == 'Charlie'
+
     def test_get_by_name_missing(self):
         assert student.get_by_name('Nobody') is None
 

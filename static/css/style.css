@@ -801,9 +801,30 @@ body {
 }
 
 /* Small screens */
+/* Mobile responsive */
+@media (max-width: 600px) {
+    .container { padding: 0.75rem; }
+    .navbar { padding: 0.75rem 1rem; }
+    .stat-cards { gap: 0.5rem; }
+    .stat-card { padding: 0.75rem 0.5rem; min-width: 70px; }
+    .stat-value { font-size: 1.3rem; }
+    .session-header { gap: 0.5rem; }
+    .choices-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+    .choice-btn { padding: 1rem; font-size: 1.1rem; min-height: 50px; }
+    .node-grid { grid-template-columns: 1fr; }
+    .overview-grades { grid-template-columns: 1fr 1fr; }
+    .welcome-grades { flex-wrap: wrap; justify-content: center; }
+    .question-text { font-size: 1.1rem; }
+    .summary-actions { flex-direction: column; gap: 0.5rem; }
+    .summary-actions .btn { width: 100%; text-align: center; }
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.2rem; }
+}
 @media (max-width: 400px) {
     .data-table th, .data-table td {
         padding: 0.5rem 0.35rem;
         font-size: 0.8rem;
     }
+    .stat-cards { flex-wrap: wrap; }
+    .goal-bar { width: 40px; }
 }

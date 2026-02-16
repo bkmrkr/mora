@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Improved — Mobile-responsive layout
+- Answer buttons stack to single column on mobile (full-width touch targets)
+- Stat cards, grade overview, skill grid all reflow for small screens
+- Summary action buttons go full-width on mobile
+- Tested at 375px (iPhone SE) — all pages usable on phones and tablets
+
 ### Added — Skill-specific learning tips on wrong answers
 - Each of the 40 skills now has a pedagogical tip (e.g., "Make a ten first, then add what's left")
 - Tips shown on feedback page between explanation and encouragement

@@ -137,9 +137,10 @@ def counting_to_120(difficulty_elo):
             'difficulty': estimate_difficulty(1, 0.3 + n / 200),
         }
     else:
-        # Skip counting
+        # Skip counting (keep all numbers within 120)
         skip = random.choice([2, 5, 10])
-        start = random.randint(0, 50) * skip // skip * skip  # align to skip
+        max_start = (120 - 3 * skip) // skip * skip  # ensure last number <= 120
+        start = random.randint(0, max_start // skip) * skip
         seq = [start + skip * i for i in range(4)]
         answer = seq[-1]
         question = f'Count by {skip}s: {seq[0]}, {seq[1]}, {seq[2]}, ?'

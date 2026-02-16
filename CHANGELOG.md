@@ -1,5 +1,10 @@
 # Mora v2 Changelog
 
+### Fixed — Skip Counting Numbers Exceeding 120
+- `g1_counting`: skip counting by 10s could produce sequences up to 530 (e.g. "Count by 10s: 470, 480, 490, ?")
+- Capped start value so all numbers in the sequence stay within 120
+- 46% of skip counting questions were above grade level — now 0%
+
 ### Cleaned up — Move Local Imports to Module Level
 - `grade4.py`: moved `from math import gcd, lcm` to top-level (was re-imported on every fraction_ops call)
 - `home.py`: moved `from models import session` to top-level (was inside start() function)

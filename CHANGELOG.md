@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Hardened — Tighten CSP script-src
+- Removed `'unsafe-inline'` from `script-src` in Content-Security-Policy header
+- No inline scripts exist — all JS loaded via external `session.js`
+- `style-src 'unsafe-inline'` kept (needed for mastery bar widths, clock centering)
+- Verified: keyboard shortcuts, response time tracking, and all JS features still work
+
 ### Fixed — NULL total_correct in Empty Sessions
 - `end_session()` stored NULL instead of 0 for `total_correct` when session had no attempts
 - SQL `SUM()` returns NULL for 0 rows — added `COALESCE(..., 0)` to handle this

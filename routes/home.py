@@ -5,7 +5,7 @@ from flask import (Blueprint, render_template, redirect, url_for,
 from models import student as student_model
 from models import session as session_model
 from models.progress import get_for_student
-from curriculum.skills import get_skills_for_grade
+from curriculum.skills import get_skills_for_grade, get_skill
 from engine.elo import is_mastered
 
 home_bp = Blueprint('home', __name__)
@@ -70,6 +70,33 @@ def start():
             )
             grade_progress[str(grade)] = {'mastered': mastered, 'total': len(skills)}
         flask_session['welcome'] = grade_progress
+
+        # Strength/weakness insights for welcome banner
+        strength = None
+        weakness = None
+        practiced = [(sid, p) for sid, p in progress_by_skill.items()
+                     if p.get('total_attempts', 0) >= 3]
+        if practiced:
+            # Strength: highest accuracy among practiced skills
+            best = max(practiced, key=lambda x: x[1].get('correct_attempts', 0) / x[1]['total_attempts'])
+            best_skill = get_skill(best[0])
+            if best_skill:
+                acc = round(best[1]['correct_attempts'] / best[1]['total_attempts'] * 100)
+                if acc >= 70:
+                    strength = best_skill['name']
+            # Weakness: lowest accuracy among practiced, non-mastered skills
+            unmastered = [(sid, p) for sid, p in practiced
+                          if not is_mastered(p.get('mastery_level', 0))]
+            if unmastered:
+                worst = min(unmastered, key=lambda x: x[1].get('correct_attempts', 0) / x[1]['total_attempts'])
+                worst_skill = get_skill(worst[0])
+                if worst_skill and worst_skill['name'] != strength:
+                    weakness = worst_skill['name']
+        if strength or weakness:
+            flask_session['welcome_insights'] = {
+                'strength': strength,
+                'weakness': weakness,
+            }
 
     # Math level for session header
     total_mastered = sum(

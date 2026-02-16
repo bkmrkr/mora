@@ -34,6 +34,16 @@
             </span>
             {% endfor %}
         </div>
+        {% if welcome_insights %}
+        <div class="welcome-insights">
+            {% if welcome_insights.strength %}
+            <span class="insight-strength">Strong at: {{ welcome_insights.strength }}</span>
+            {% endif %}
+            {% if welcome_insights.weakness %}
+            <span class="insight-weakness">Working on: {{ welcome_insights.weakness }}</span>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
     {% endif %}
 

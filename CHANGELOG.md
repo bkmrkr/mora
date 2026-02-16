@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Strength/weakness insights on welcome banner
+- "Strong at: [skill]" (green) shows highest-accuracy skill with 70%+ accuracy
+- "Working on: [skill]" (amber) shows lowest-accuracy unmastered skill
+- Computed from per-skill attempt accuracy for students with 3+ attempts
+- Reinforces that the system truly knows and adapts to each student
+
 ### Added — Achievement badges on dashboard
 - Golden badge pills showing milestones: First Mastery, Rising Star (10), Halfway There (20), Legend (40)
 - Grade completion badges for each completed grade

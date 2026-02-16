@@ -305,6 +305,15 @@ body {
 }
 .welcome-grade.active { background: #dbeafe; color: #1e40af; }
 .welcome-grade.complete { background: #dcfce7; color: #166534; font-weight: 600; }
+.welcome-insights {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+}
+.insight-strength { color: #166534; font-weight: 500; }
+.insight-weakness { color: #92400e; font-weight: 500; }
 .practice-streak {
     display: inline-block;
     background: #fef3c7;

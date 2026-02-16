@@ -67,6 +67,7 @@ def question(session_id):
     # Welcome message and practice streak (shown once on first question)
     welcome = flask_session.pop('welcome', None)
     practice_streak = flask_session.pop('practice_streak', None)
+    welcome_insights = flask_session.pop('welcome_insights', None)
 
     # Session goal tracking
     session_goal = flask_session.get('session_goal', 10)
@@ -101,6 +102,7 @@ def question(session_id):
         show_goal_celebration=show_goal_celebration,
         practice_streak=practice_streak,
         math_level=math_level,
+        welcome_insights=welcome_insights,
     )
 
 

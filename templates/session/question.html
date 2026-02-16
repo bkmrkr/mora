@@ -189,7 +189,10 @@
         {% else %}
         <div class="question-text">{{ question.content }}</div>
         {% endif %}
-        <button type="button" id="speak-btn" class="speak-btn" title="Read question aloud">&#128264;</button>
+        <div class="tts-controls">
+            <button type="button" id="volume-btn" class="speak-btn" title="Toggle sound">&#128264;</button>
+            <button type="button" id="speak-btn" class="speak-btn" title="Replay question">&#128257;</button>
+        </div>
 
         {% if visual_svg %}
         <div class="clock-visual">

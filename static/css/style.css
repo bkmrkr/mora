@@ -874,6 +874,11 @@ body {
     line-height: 1.5;
 }
 
+.tts-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
 .speak-btn {
     background: none;
     border: 2px solid var(--border);
@@ -882,8 +887,7 @@ body {
     height: 40px;
     font-size: 1.2rem;
     cursor: pointer;
-    margin-bottom: 1rem;
-    transition: background 0.15s, border-color 0.15s;
+    transition: background 0.15s, border-color 0.15s, opacity 0.15s;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -892,6 +896,10 @@ body {
     background: var(--primary-light);
     border-color: var(--primary);
     color: white;
+}
+.speak-btn.muted {
+    opacity: 0.4;
+    border-style: dashed;
 }
 
 /* MCQ Choices */

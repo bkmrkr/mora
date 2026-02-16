@@ -1,11 +1,12 @@
 # Mora v2 Changelog
 
-### Added — Text-to-speech for questions
-- Questions are automatically read aloud when the page loads using the Web Speech API
-- Speaker button (🔈) below question text to replay at any time
-- Math symbols converted to spoken words (+→plus, -→minus, ×→times, ÷→divided by, =→equals)
-- Speech rate set to 0.9 for clear, child-friendly pacing
-- Zero dependencies — uses browser-native speechSynthesis
+### Added — Text-to-speech with volume control and answer feedback
+- Questions auto-read aloud on load; wrong-answer feedback page also spoken
+- Volume on/off toggle (persisted in localStorage) + replay button
+- Feedback speech reads: header + correct answer + explanation
+- Voice preference: picks warm/accented voice when available (Carmit, Tessa, Daniel)
+- Math symbols converted to spoken words for natural reading
+- Zero dependencies — browser-native speechSynthesis
 
 ### Fixed — Question template clarity and correctness
 - Grade 1: `subtraction_within_10` no longer generates trivial `a - 0` questions

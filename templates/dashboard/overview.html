@@ -5,7 +5,12 @@
     <h1>{{ student.name }}'s Progress</h1>
 
     <div class="grade-overview-bar">
-        <div class="overview-total">{{ total_mastered }}/{{ total_skills }} skills mastered</div>
+        <div class="overview-total">
+            {{ total_mastered }}/{{ total_skills }} skills mastered
+            {% if streak_days >= 2 %}
+            <span class="practice-streak">{{ streak_days }} day streak!</span>
+            {% endif %}
+        </div>
         <div class="overview-grades">
             {% for gs in grade_summary %}
             <div class="overview-grade {% if gs.complete %}overview-complete{% elif gs.mastered > 0 %}overview-active{% endif %}">
@@ -18,6 +23,20 @@
             {% endfor %}
         </div>
     </div>
+
+    {% if focus_skill %}
+    <div class="dashboard-focus">
+        <div class="focus-info">
+            <div class="focus-label">Next focus</div>
+            <div class="focus-name">{{ focus_skill.name }}</div>
+            <div class="focus-detail">Grade {{ focus_skill.grade }} — {{ focus_skill.mastery_pct }}% mastered</div>
+        </div>
+        <form action="{{ url_for('home.start') }}" method="post">
+            <input type="hidden" name="student_name" value="{{ student.name }}">
+            <button type="submit" class="btn btn-primary">Practice Now</button>
+        </form>
+    </div>
+    {% endif %}
 
     {% for grade_group in grade_tree %}
     <div class="card">

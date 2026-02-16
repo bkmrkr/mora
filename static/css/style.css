@@ -783,6 +783,26 @@ body {
     font-size: 0.875rem;
 }
 
+.dashboard-focus {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    border: 1px solid #7dd3fc;
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+}
+.dashboard-focus .focus-info { flex: 1; }
+.dashboard-focus .focus-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--primary);
+}
+.dashboard-focus .focus-name { font-size: 1.1rem; font-weight: 600; }
+.dashboard-focus .focus-detail { font-size: 0.85rem; color: var(--text-muted); }
 .dashboard-actions {
     display: flex;
     gap: 1rem;

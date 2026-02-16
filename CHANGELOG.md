@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Focus skill card with "Practice Now" on dashboard
+- Dashboard overview now shows "Next Focus" card with the skill closest to mastery
+- Prominent "Practice Now" button starts a new session directly from the dashboard
+- Practice streak badge shown next to mastery count when streak is 2+ days
+- Closes the loop between reviewing progress and taking action
+
 ### Improved — Mobile-responsive layout
 - Answer buttons stack to single column on mobile (full-width touch targets)
 - Stat cards, grade overview, skill grid all reflow for small screens

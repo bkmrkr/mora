@@ -5,7 +5,7 @@ from models import student as student_model
 from models import attempt as attempt_model
 from models import session as session_model
 from models.progress import get_for_student
-from curriculum.skills import get_skills_for_grade, get_skill
+from curriculum.skills import get_skills_for_grade, get_skill, SKILLS
 from engine import elo
 
 dashboard_bp = Blueprint('dashboard', __name__)
@@ -102,6 +102,28 @@ def overview(student_id):
     sessions = session_model.get_for_student(student_id, limit=20)
     sessions = [s for s in sessions if s['total_questions']]
 
+    # Focus skill: unmastered skill closest to mastery threshold
+    focus_skill = None
+    best_mastery = -1
+    for sid, sinfo in SKILLS.items():
+        prog = progress_by_skill.get(sid)
+        mastery = prog['mastery_level'] if prog else 0.0
+        if not elo.is_mastered(mastery) and mastery > best_mastery:
+            prereqs_met = all(
+                elo.is_mastered(progress_by_skill.get(pid, {}).get('mastery_level', 0))
+                for pid in sinfo.get('prerequisites', [])
+            )
+            if prereqs_met or not sinfo.get('prerequisites'):
+                best_mastery = mastery
+                focus_skill = {
+                    'name': sinfo['name'],
+                    'grade': sinfo['grade'],
+                    'mastery_pct': round(mastery * 100),
+                }
+
+    # Practice streak
+    streak_days, practiced_today = session_model.get_practice_streak(student_id)
+
     return render_template(
         'dashboard/overview.html',
         student=student,
@@ -110,4 +132,7 @@ def overview(student_id):
         total_mastered=total_mastered,
         total_skills=total_skills,
         sessions=sessions,
+        focus_skill=focus_skill,
+        streak_days=streak_days,
+        practiced_today=practiced_today,
     )

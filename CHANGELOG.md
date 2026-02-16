@@ -1,5 +1,13 @@
 # Mora v2 Changelog
 
+### Added — Rich student cards on home page
+- Replaced simple name chips with full progress cards for each returning student
+- Each card shows: name, math level badge, mastery progress bar, last session accuracy, focus skill
+- Grid layout adapts to screen width with consistent card sizing
+- Sophia's "Grandmaster 35/40" card stands out from "Starter 0/40" cards
+- Focus skill shows the highest-progress unlocked skill closest to mastery
+- Makes the home page feel personalized — the system knows each student before they click
+
 ### Added — "This Week" progress card on dashboard
 - Blue gradient summary card at top of student dashboard showing weekly activity
 - Questions answered, accuracy %, skills practiced, and XP gained this week

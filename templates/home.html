@@ -15,14 +15,33 @@
     {% if student_info %}
     <div class="returning-students">
         <h3>Returning students:</h3>
-        <div class="student-chips">
+        <div class="student-cards-grid">
             {% for si in student_info %}
-            <form action="{{ url_for('home.start') }}" method="post" class="chip-form">
+            <form action="{{ url_for('home.start') }}" method="post" class="student-card-form">
                 <input type="hidden" name="student_name" value="{{ si.student.name }}">
-                <button type="submit" class="student-chip">
-                    {{ si.student.name }}
-                    {% if si.mastered > 0 %}
-                    <span class="chip-mastery">{{ si.mastered }}/40</span>
+                <button type="submit" class="student-card">
+                    <div class="student-card-header">
+                        <span class="student-card-name">{{ si.student.name }}</span>
+                        <span class="student-card-level">{{ si.level }}</span>
+                    </div>
+                    <div class="student-card-mastery">
+                        <div class="student-card-bar">
+                            <div class="student-card-fill" style="width: {{ (si.mastered / si.total_skills * 100)|round }}%"></div>
+                        </div>
+                        <span class="student-card-count">{{ si.mastered }}/{{ si.total_skills }}</span>
+                    </div>
+                    {% if si.last_session %}
+                    <div class="student-card-last">
+                        Last: {{ si.last_session.accuracy }}% on {{ si.last_session.questions }} questions
+                    </div>
+                    {% endif %}
+                    {% if si.focus %}
+                    <div class="student-card-focus">
+                        Next: {{ si.focus.name }} ({{ si.focus.pct }}%)
+                    </div>
+                    {% endif %}
+                    {% if si.streak_days >= 2 %}
+                    <div class="student-card-streak">{{ si.streak_days }} day streak!</div>
                     {% endif %}
                 </button>
             </form>

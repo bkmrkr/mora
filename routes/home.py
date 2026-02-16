@@ -5,7 +5,7 @@ from flask import (Blueprint, render_template, redirect, url_for,
 from models import student as student_model
 from models import session as session_model
 from models.progress import get_for_student
-from curriculum.skills import get_skills_for_grade, get_skill
+from curriculum.skills import get_skills_for_grade, get_skill, SKILLS
 from engine.elo import is_mastered
 
 home_bp = Blueprint('home', __name__)
@@ -30,8 +30,52 @@ def index():
     student_info = []
     for s in students:
         progress = get_for_student(s['id'])
+        progress_map = {p['skill_id']: p for p in progress}
         mastered = sum(1 for p in progress if is_mastered(p['mastery_level']))
-        student_info.append({'student': s, 'mastered': mastered})
+        level = _level_name(mastered)
+
+        # Last session info
+        recent_sessions = session_model.get_for_student(s['id'], limit=1)
+        last_session = None
+        if recent_sessions and recent_sessions[0].get('total_questions'):
+            ls = recent_sessions[0]
+            q = ls['total_questions'] or 0
+            c = ls['total_correct'] or 0
+            last_session = {
+                'accuracy': round(c / q * 100) if q > 0 else 0,
+                'questions': q,
+                'date': ls['started_at'][:10] if ls.get('started_at') else '',
+            }
+
+        # Focus skill: closest to mastery, unlocked
+        focus = None
+        best_mastery = -1
+        for sid, sinfo in SKILLS.items():
+            prog = progress_map.get(sid)
+            m = prog['mastery_level'] if prog else 0.0
+            if is_mastered(m):
+                continue
+            prereqs_met = all(
+                is_mastered(progress_map.get(pid, {}).get('mastery_level', 0))
+                for pid in sinfo.get('prerequisites', [])
+            )
+            if (prereqs_met or not sinfo.get('prerequisites')) and m > best_mastery:
+                best_mastery = m
+                focus = {'name': sinfo['name'], 'pct': round(m * 100)}
+
+        # Practice streak
+        streak_days, practiced_today = session_model.get_practice_streak(s['id'])
+
+        student_info.append({
+            'student': s,
+            'mastered': mastered,
+            'total_skills': 40,
+            'level': level,
+            'last_session': last_session,
+            'focus': focus,
+            'streak_days': streak_days,
+            'practiced_today': practiced_today,
+        })
     return render_template('home.html', student_info=student_info)
 
 

@@ -1,5 +1,6 @@
 """CRUD for sessions table."""
 import uuid
+from datetime import date, timedelta
 
 from db.database import query_db, execute_db
 
@@ -56,3 +57,39 @@ def get_for_student(student_id, limit=20):
            ORDER BY started_at DESC LIMIT ?""",
         (student_id, limit),
     )
+
+
+def get_practice_streak(student_id):
+    """Count consecutive days of practice ending today or yesterday.
+
+    Returns (streak_days, practiced_today).
+    """
+    rows = query_db(
+        """SELECT DISTINCT DATE(started_at) as day
+           FROM sessions WHERE student_id=?
+           ORDER BY day DESC""",
+        (student_id,),
+    )
+    if not rows:
+        return 0, False
+
+    practice_days = {row['day'] for row in rows}
+    today = date.today().isoformat()
+    yesterday = (date.today() - timedelta(days=1)).isoformat()
+
+    practiced_today = today in practice_days
+
+    # Start counting from today or yesterday
+    if today in practice_days:
+        check = date.today()
+    elif yesterday in practice_days:
+        check = date.today() - timedelta(days=1)
+    else:
+        return 0, False
+
+    streak = 0
+    while check.isoformat() in practice_days:
+        streak += 1
+        check -= timedelta(days=1)
+
+    return streak, practiced_today

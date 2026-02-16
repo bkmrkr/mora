@@ -266,6 +266,16 @@ body {
 }
 .welcome-grade.active { background: #dbeafe; color: #1e40af; }
 .welcome-grade.complete { background: #dcfce7; color: #166534; font-weight: 600; }
+.practice-streak {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.15rem 0.6rem;
+    border-radius: 10px;
+    margin-left: 0.5rem;
+}
 .goal-progress {
     display: flex;
     align-items: center;

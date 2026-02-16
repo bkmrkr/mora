@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Daily practice streak tracking
+- Computes consecutive days of practice from session history (no schema change)
+- Welcome banner shows "N day streak!" badge for streaks of 2+ days
+- Session summary shows Day Streak stat card
+- Encourages daily practice — the consistent repetition that makes ELO-based learning effective
+
 ### Added — Answer timeline on session summary
 - Visual dot timeline showing correct (green) and wrong (red outlined) answers in order
 - Hover tooltips show question number and result (e.g., "Q3: Wrong")

@@ -30,6 +30,12 @@
             <div class="stat-label">Avg Speed</div>
         </div>
         {% endif %}
+        {% if practice_streak and practice_streak >= 2 %}
+        <div class="stat-card stat-streak">
+            <div class="stat-value">{{ practice_streak }}</div>
+            <div class="stat-label">Day Streak</div>
+        </div>
+        {% endif %}
     </div>
 
     {% if answer_timeline %}

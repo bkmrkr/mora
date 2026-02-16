@@ -58,6 +58,11 @@ def start():
             grade_progress[str(grade)] = {'mastered': mastered, 'total': len(skills)}
         flask_session['welcome'] = grade_progress
 
+    # Practice streak
+    streak_days, _ = session_model.get_practice_streak(student['id'])
+    if streak_days >= 2:
+        flask_session['practice_streak'] = streak_days
+
     # Set session goal (10 questions per session)
     flask_session['session_goal'] = 10
     flask_session['goal_celebrated'] = False

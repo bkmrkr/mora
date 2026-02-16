@@ -57,8 +57,9 @@ def question(session_id):
     session_stats = _get_session_stats(session_id)
     streak = flask_session.get('streak', 0)
 
-    # Welcome message (shown once on first question)
+    # Welcome message and practice streak (shown once on first question)
     welcome = flask_session.pop('welcome', None)
+    practice_streak = flask_session.pop('practice_streak', None)
 
     # Session goal tracking
     session_goal = flask_session.get('session_goal', 10)
@@ -89,6 +90,7 @@ def question(session_id):
         session_goal=session_goal,
         goal_reached=goal_reached,
         show_goal_celebration=show_goal_celebration,
+        practice_streak=practice_streak,
     )
 
 
@@ -271,6 +273,9 @@ def end(session_id):
     # Answer timeline (ordered dots for correct/wrong)
     answer_timeline = [bool(a['is_correct']) for a in attempts]
 
+    # Practice streak
+    practice_streak, _ = session_model.get_practice_streak(student['id'])
+
     flask_session.pop('current_question', None)
     flask_session.pop('last_result', None)
     flask_session.pop('last_skill_id', None)
@@ -289,4 +294,5 @@ def end(session_id):
         avg_time=avg_time,
         focus_skill=focus_skill,
         answer_timeline=answer_timeline,
+        practice_streak=practice_streak,
     )

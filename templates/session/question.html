@@ -22,6 +22,9 @@
     {% if welcome %}
     <div class="welcome-banner">
         <strong>Welcome back, {{ student.name }}!</strong>
+        {% if practice_streak and practice_streak >= 2 %}
+        <span class="practice-streak">{{ practice_streak }} day streak!</span>
+        {% endif %}
         <div class="welcome-grades">
             {% for g in range(1, 5) %}
             {% set gp = welcome[g|string] %}

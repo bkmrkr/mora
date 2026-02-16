@@ -835,6 +835,59 @@ body {
     font-size: 0.875rem;
 }
 
+.math-level-card {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+}
+.math-level-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+.math-level-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+.math-level-count {
+    font-size: 0.85rem;
+    opacity: 0.85;
+}
+.math-level-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.math-level-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.math-level-fill {
+    height: 100%;
+    background: #fbbf24;
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+.math-level-next {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    white-space: nowrap;
+}
+.math-level-complete {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fbbf24;
+}
+.math-level-card .practice-streak {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
 .dashboard-focus {
     display: flex;
     align-items: center;

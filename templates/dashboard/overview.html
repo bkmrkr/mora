@@ -4,12 +4,29 @@
 <div class="dashboard-container">
     <h1>{{ student.name }}'s Progress</h1>
 
-    <div class="grade-overview-bar">
-        <div class="overview-total">
-            {{ total_mastered }}/{{ total_skills }} skills mastered
+    <div class="math-level-card">
+        <div class="math-level-info">
+            <span class="math-level-name">{{ math_level.name }}</span>
+            <span class="math-level-count">{{ total_mastered }}/{{ total_skills }} skills</span>
             {% if streak_days >= 2 %}
             <span class="practice-streak">{{ streak_days }} day streak!</span>
             {% endif %}
+        </div>
+        {% if math_level.name != 'Legend' %}
+        <div class="math-level-progress">
+            <div class="math-level-bar">
+                <div class="math-level-fill" style="width: {{ math_level.progress_pct }}%"></div>
+            </div>
+            <span class="math-level-next">{{ math_level.next_at - total_mastered }} more to next level</span>
+        </div>
+        {% else %}
+        <div class="math-level-complete">All 40 skills mastered!</div>
+        {% endif %}
+    </div>
+
+    <div class="grade-overview-bar">
+        <div class="overview-total">
+            {{ total_mastered }}/{{ total_skills }} skills mastered
         </div>
         <div class="overview-grades">
             {% for gs in grade_summary %}

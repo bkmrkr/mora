@@ -10,6 +10,38 @@ from engine import elo
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
+MATH_LEVELS = [
+    (0, 'Starter', 5),
+    (5, 'Explorer', 10),
+    (10, 'Learner', 15),
+    (15, 'Scholar', 20),
+    (20, 'Expert', 25),
+    (25, 'Champion', 30),
+    (30, 'Master', 35),
+    (35, 'Grandmaster', 40),
+    (40, 'Legend', 40),
+]
+
+
+def _compute_math_level(mastered_count):
+    """Compute math level from number of mastered skills."""
+    level_name = 'Starter'
+    next_threshold = 5
+    for threshold, name, next_t in reversed(MATH_LEVELS):
+        if mastered_count >= threshold:
+            level_name = name
+            next_threshold = next_t
+            break
+    progress_in_level = mastered_count - (next_threshold - 5) if next_threshold > 5 else mastered_count
+    level_size = 5
+    pct = min(round(progress_in_level / level_size * 100), 100) if level_size > 0 else 100
+    return {
+        'name': level_name,
+        'mastered': mastered_count,
+        'next_at': next_threshold,
+        'progress_pct': pct,
+    }
+
 
 @dashboard_bp.route('/')
 def index():
@@ -127,6 +159,9 @@ def overview(student_id):
                     'mastery_pct': round(mastery * 100),
                 }
 
+    # Math level based on total mastered skills
+    math_level = _compute_math_level(total_mastered)
+
     # Practice streak
     streak_days, practiced_today = session_model.get_practice_streak(student_id)
 
@@ -161,4 +196,5 @@ def overview(student_id):
         total_questions=total_questions,
         overall_accuracy=overall_accuracy,
         accuracy_trend=accuracy_trend,
+        math_level=math_level,
     )

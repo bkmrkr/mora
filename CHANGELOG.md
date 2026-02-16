@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — Math Level system on dashboard
+- Gamified leveling: Starter → Explorer → Learner → Scholar → Expert → Champion → Master → Grandmaster → Legend
+- Each level requires 5 more mastered skills (40 total = Legend)
+- Purple gradient hero card at top of dashboard shows current level
+- Gold progress bar shows advancement toward next level
+- "N more to next level" hint keeps students motivated
+
 ### Added — Dashboard practice summary with accuracy trend chart
 - Practice Summary section with total questions, overall accuracy, and session count
 - Visual bar chart showing accuracy per session (last 10), color-coded by performance

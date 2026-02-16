@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Grade progress overview bar on dashboard
+- Summary bar at top of student dashboard: "N/40 skills mastered"
+- Four progress bars showing per-grade completion (e.g., "Grade 2: 10/10")
+- Completed grades shown in green, active grades in purple
+- Gives instant big-picture view before scrolling into per-skill details
+
 ### Added — Prerequisite skill tree on dashboard
 - Dashboard skill cards now show lock/unlock/mastered status
 - Locked skills display lock icon and "Needs: ..." with prerequisite names

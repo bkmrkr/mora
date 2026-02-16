@@ -534,6 +534,51 @@ body {
 
 /* Dashboard */
 .dashboard-container h1 { margin-bottom: 1.5rem; }
+.grade-overview-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+}
+.overview-total {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    text-align: center;
+}
+.overview-grades {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+.overview-grade { text-align: center; }
+.overview-grade-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text-muted);
+}
+.overview-active .overview-grade-label { color: var(--primary); }
+.overview-complete .overview-grade-label { color: var(--success); }
+.overview-grade-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.overview-grade-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+.overview-complete .overview-grade-fill { background: var(--success); }
+.overview-grade-count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+}
 .student-cards {
     display: grid;
     gap: 1rem;

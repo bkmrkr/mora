@@ -70,6 +70,22 @@ def overview(student_id):
             })
         grade_tree.append({'grade': grade, 'skills': skill_list})
 
+    # Grade summary for overview bar
+    grade_summary = []
+    total_mastered = 0
+    total_skills = 0
+    for gt in grade_tree:
+        mastered = sum(1 for s in gt['skills'] if s['mastered'])
+        total = len(gt['skills'])
+        total_mastered += mastered
+        total_skills += total
+        grade_summary.append({
+            'grade': gt['grade'],
+            'mastered': mastered,
+            'total': total,
+            'complete': mastered == total,
+        })
+
     sessions = session_model.get_for_student(student_id, limit=20)
     sessions = [s for s in sessions if s['total_questions']]
 
@@ -77,5 +93,8 @@ def overview(student_id):
         'dashboard/overview.html',
         student=student,
         grade_tree=grade_tree,
+        grade_summary=grade_summary,
+        total_mastered=total_mastered,
+        total_skills=total_skills,
         sessions=sessions,
     )

@@ -4,6 +4,21 @@
 <div class="dashboard-container">
     <h1>{{ student.name }}'s Progress</h1>
 
+    <div class="grade-overview-bar">
+        <div class="overview-total">{{ total_mastered }}/{{ total_skills }} skills mastered</div>
+        <div class="overview-grades">
+            {% for gs in grade_summary %}
+            <div class="overview-grade {% if gs.complete %}overview-complete{% elif gs.mastered > 0 %}overview-active{% endif %}">
+                <div class="overview-grade-label">Grade {{ gs.grade }}</div>
+                <div class="overview-grade-bar">
+                    <div class="overview-grade-fill" style="width: {{ (gs.mastered / gs.total * 100)|round }}%"></div>
+                </div>
+                <div class="overview-grade-count">{{ gs.mastered }}/{{ gs.total }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
     {% for grade_group in grade_tree %}
     <div class="card">
         <h2>Grade {{ grade_group.grade }}</h2>

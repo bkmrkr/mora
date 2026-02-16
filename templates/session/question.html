@@ -132,6 +132,13 @@
     {% endif %}
     {% endif %}
 
+    {% if question.is_warmup %}
+    <div class="warmup-banner">
+        <span class="warmup-icon">&#9728;&#65039;</span>
+        <span class="warmup-text">Warm-up!</span>
+    </div>
+    {% endif %}
+
     {% if question.is_challenge %}
     <div class="challenge-banner">
         <span class="challenge-icon">&#9889;</span>

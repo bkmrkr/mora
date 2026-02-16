@@ -46,6 +46,17 @@ def generate_next(session_id, student, current_skill_id=None,
     recent_attempts = attempt_model.get_recent(student_id, limit=30)
     analysis = analyze_recent(recent_attempts)
 
+    # Warm-up: first question of session for returning students
+    is_warmup = False
+    if (not current_skill_id and not retry_skill_id and not focus_skill_id
+            and student_progress):
+        mastered_ids = [
+            sid for sid, p in student_progress.items()
+            if elo.is_mastered(p.get('mastery_level', 0)) and sid in TEMPLATES
+        ]
+        if mastered_ids:
+            is_warmup = True
+
     # Select skill (retry overrides focus, focus overrides normal selection)
     is_retry = False
     if retry_skill_id and retry_skill_id in TEMPLATES:
@@ -54,6 +65,8 @@ def generate_next(session_id, student, current_skill_id=None,
     elif focus_skill_id and focus_skill_id in TEMPLATES:
         # Focus mode: always use this skill (repeats allowed)
         skill_id = focus_skill_id
+    elif is_warmup:
+        skill_id = random.choice(mastered_ids)
     else:
         skill_id = select_skill(analysis, student_progress, current_skill_id)
     if not skill_id:
@@ -67,6 +80,11 @@ def generate_next(session_id, student, current_skill_id=None,
     prog = get_progress(student_id, skill_id)
     student_progress[skill_id] = prog  # ensure it's in the dict
     target_diff, q_type = compute_question_params(skill_id, student_progress, analysis)
+
+    # Warm-up override: easy MCQ to build confidence
+    if is_warmup:
+        target_diff = max(500, prog.get('skill_rating', 800) - 200)
+        q_type = 'mcq'
 
     # Pick template and generate
     templates = TEMPLATES.get(skill_id, [])
@@ -177,8 +195,15 @@ def generate_next(session_id, student, current_skill_id=None,
         'review_reason': review_reason,
         'skill_tip': skill_tip,
     }
+    # Mark warm-up questions
+    if is_warmup:
+        question_dict['is_warmup'] = True
+        question_dict['difficulty_label'] = 'Warm-up'
+
     # "Why this question?" — metacognition helper (review reasons shown in badge)
-    if is_retry:
+    if is_warmup:
+        why_reason = 'Quick warm-up to get started!'
+    elif is_retry:
         why_reason = "Let's try this skill again after the miss."
     elif is_review:
         why_reason = None  # review_reason already shown in badge

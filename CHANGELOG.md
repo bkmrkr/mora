@@ -1,5 +1,13 @@
 # Mora v2 Changelog
 
+### Added — Session warm-up for returning students
+- First question of each session is now a warm-up on a mastered skill
+- Easy MCQ at -200 ELO from student's rating — designed to build confidence
+- Sunny warm-up banner with "Quick warm-up to get started!" message
+- Only activates for returning students who have mastered at least one skill
+- New students and focus mode sessions skip the warm-up
+- Mirrors real tutoring: always start with what the student knows well
+
 ### Added — Short answer mode unlocked by mastery
 - Questions gradually transition from MCQ to short answer as mastery increases
 - Low mastery (<0.3): always MCQ (scaffolded with answer choices)

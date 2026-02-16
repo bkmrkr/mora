@@ -714,6 +714,21 @@ body {
 }
 
 /* Question Card */
+.warmup-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    color: #92400e;
+    font-size: 0.9rem;
+}
+.warmup-icon { font-size: 1.1rem; }
+.warmup-text { font-weight: 600; }
+
 .challenge-banner {
     display: flex;
     align-items: center;

@@ -1,5 +1,9 @@
 # Mora v2 Changelog
 
+### Fixed — Elapsed Time Distractor Format Mismatch
+- `g3_elapsed_time`: when answer was "2 hours", distractors showed "150 minutes" instead of "2 hours 30 minutes"
+- Distractors now use `_fmt_elapsed()` helper to match answer format (hours+minutes vs minutes-only)
+
 ### Fixed — Fraction Subtraction Producing Zero
 - `g4_fraction_ops`: subtracting equivalent fractions (e.g. 2/6 - 1/3) gave "0/1" as answer
 - Now regenerates numerators when adjusted values are equal, ensuring non-zero result

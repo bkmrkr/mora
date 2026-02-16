@@ -304,8 +304,21 @@ def elapsed_time(difficulty_elo):
             answer = f'{diff_m} minutes'
 
         question = f'Class starts at {start_h}:{start_m:02d} and ends at {end_h}:{end_m:02d}. How long is class?'
-        distractors = [f'{diff_m + 30} minutes', f'{diff_m - 15} minutes',
-                       f'{diff_m + 15} minutes']
+
+        # Distractors in the same format as the answer
+        def _fmt_elapsed(minutes):
+            if minutes <= 0:
+                return None
+            if minutes < 60:
+                return f'{minutes} minutes'
+            h, m = divmod(minutes, 60)
+            if m == 0:
+                return f'{h} hour{"s" if h > 1 else ""}'
+            return f'{h} hour{"s" if h > 1 else ""} {m} minutes'
+
+        distractors = [_fmt_elapsed(diff_m + 30), _fmt_elapsed(diff_m - 15),
+                       _fmt_elapsed(diff_m + 15)]
+        distractors = [d for d in distractors if d is not None]
 
     return {
         'skill_id': 'g3_elapsed_time',

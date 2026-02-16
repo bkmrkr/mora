@@ -66,11 +66,15 @@ def overview(student_id):
             is_mastered = elo.is_mastered(mastery)
             locked = bool(prereqs) and not prereqs_met and not is_mastered
             prereq_names = []
+            prereqs_met_count = 0
             if locked:
                 for pid in prereqs:
                     ps = get_skill(pid)
-                    if ps and not elo.is_mastered(
-                            progress_by_skill.get(pid, {}).get('mastery_level', 0)):
+                    pid_mastered = elo.is_mastered(
+                        progress_by_skill.get(pid, {}).get('mastery_level', 0))
+                    if pid_mastered:
+                        prereqs_met_count += 1
+                    elif ps:
                         prereq_names.append(ps['name'])
             skill_list.append({
                 'name': s['name'],
@@ -80,6 +84,8 @@ def overview(student_id):
                 'total_attempts': prog['total_attempts'] if prog else 0,
                 'locked': locked,
                 'prereq_names': prereq_names,
+                'prereqs_met_count': prereqs_met_count,
+                'prereqs_total': len(prereqs),
             })
         grade_tree.append({'grade': grade, 'skills': skill_list})
 

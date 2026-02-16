@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Unlock progress indicators on dashboard
+- Locked skills with multiple prerequisites now show a yellow progress bar
+- "N/M unlocked" count shows how many prerequisites are already mastered
+- Helps students see they're making progress even on skills they can't attempt yet
+- Only appears for skills with 2+ prerequisites (single-prereq skills just show the name)
+
 ### Improved — Personalized session summary messages
 - Summary headline adapts to performance: "Outstanding!" (90%+), "Great Session!" (70%+), "Good Effort!" (50%+), or encouraging message
 - Subtitle personalized with student name and performance-appropriate phrasing

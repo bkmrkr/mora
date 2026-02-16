@@ -50,6 +50,14 @@
                     {{ skill.name }}
                 </div>
                 {% if skill.locked %}
+                {% if skill.prereqs_total > 1 %}
+                <div class="prereq-progress">
+                    <div class="prereq-bar">
+                        <div class="prereq-fill" style="width: {{ (skill.prereqs_met_count / skill.prereqs_total * 100)|round }}%"></div>
+                    </div>
+                    <span class="prereq-count">{{ skill.prereqs_met_count }}/{{ skill.prereqs_total }} unlocked</span>
+                </div>
+                {% endif %}
                 <div class="node-prereqs">Needs: {{ skill.prereq_names|join(', ') }}</div>
                 {% else %}
                 <div class="mastery-bar">

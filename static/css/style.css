@@ -756,6 +756,29 @@ body {
 .node-untouched { background: var(--bg); }
 .node-locked { background: #f8fafc; border-color: #e2e8f0; opacity: 0.6; }
 .node-name { font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; }
+.prereq-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0.3rem 0;
+}
+.prereq-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.prereq-fill {
+    height: 100%;
+    background: var(--warning);
+    border-radius: 2px;
+}
+.prereq-count {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
 .node-prereqs {
     font-size: 0.75rem;
     color: var(--text-muted);

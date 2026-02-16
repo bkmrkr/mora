@@ -1,5 +1,10 @@
 # Mora v2 Changelog
 
+### Added — Curriculum preview on home page
+- "40 skills across 4 grades" section below the start form
+- Shows key topics per grade: addition/subtraction (1), regrouping/multiplication (2), etc.
+- Gives new students a clear picture of the learning journey ahead
+
 ### Added — Math Level badge visible during practice sessions
 - Student's Math Level (e.g., "Grandmaster") shown as a purple pill badge in the session header
 - Makes the gamification visible during actual practice, not just on the dashboard

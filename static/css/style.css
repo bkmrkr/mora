@@ -427,6 +427,15 @@ body {
     font-size: 0.9rem;
     margin-top: 0.25rem;
 }
+.encouragement {
+    padding: 0.6rem 1rem;
+    background: #f0fdf4;
+    border-radius: 8px;
+    color: #166534;
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0.75rem 0;
+}
 .feedback-icon { font-size: 1.5rem; }
 .answer-comparison {
     background: var(--bg);

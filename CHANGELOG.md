@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Improved — Encouraging feedback on wrong answers
+- Context-aware encouragement messages based on current mastery level
+- "Almost there!" for skills near mastery (50%+), "Making progress!" for 25%+, "Every mistake helps you learn" for new skills
+- "So close!" header with eyes emoji when the answer was close to correct (via `is_close` flag)
+- Green encouragement bar between explanation and skill info — warm tone for young learners
+
 ### Added — Speed feedback and average response time
 - "Lightning!" badge on correct answers under 3 seconds, "Quick!" under 6 seconds
 - Speed badge appears as a pill on the green correct banner

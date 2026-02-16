@@ -8,8 +8,8 @@
 
     <div class="feedback-card wrong">
         <div class="feedback-header">
-            <span class="feedback-icon">&#10060;</span>
-            <h2>Not quite!</h2>
+            <span class="feedback-icon">{% if result.is_close %}&#128064;{% else %}&#10060;{% endif %}</span>
+            <h2>{% if result.is_close %}So close!{% else %}Not quite!{% endif %}</h2>
             {% if result.broken_streak and result.broken_streak >= 3 %}
             <p class="streak-broken">Good effort — you had {{ result.broken_streak }} in a row!</p>
             {% endif %}
@@ -32,6 +32,16 @@
             <p>{{ result.explanation }}</p>
         </div>
         {% endif %}
+
+        <div class="encouragement">
+            {% if result.mastery_level and result.mastery_level >= 0.5 %}
+            Almost there! You're at {{ (result.mastery_level * 100)|round|int }}% mastery.
+            {% elif result.mastery_level and result.mastery_level >= 0.25 %}
+            Making progress! Keep practicing {{ result.skill_name }}.
+            {% else %}
+            Every mistake helps you learn. You'll get it!
+            {% endif %}
+        </div>
 
         <div class="skill-update">
             <span>Skill: {{ result.skill_name }}</span>

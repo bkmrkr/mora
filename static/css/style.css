@@ -931,6 +931,14 @@ body {
     text-align: center;
     margin: 0.75rem 0;
 }
+.rush-warning {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: #fef9c3; border-left: 3px solid #eab308;
+    border-radius: 6px; font-size: 0.85rem; color: #854d0e;
+    margin-bottom: 0.75rem;
+}
+.rush-icon { font-size: 1.1rem; }
 .feedback-actions {
     display: flex; gap: 0.75rem; margin-top: 1rem;
 }

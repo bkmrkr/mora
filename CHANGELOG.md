@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Rush detection for guessing behavior
+- Detects when MCQ answers are submitted in under 1.5 seconds (likely clicking without reading)
+- Shows amber clock warning: "Take your time — read the question carefully before answering."
+- Only triggers on wrong MCQ answers with fast response times
+- Teaches good study habits: read, think, then answer
+
 ### Added — "Try Similar One" scaffolded retry on wrong answers
 - Wrong answer feedback page now shows two buttons: "Try Similar One" and "Next Skill"
 - "Try Similar One" generates a new question on the same skill for immediate practice

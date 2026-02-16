@@ -148,6 +148,12 @@ def answer(session_id):
         student, current, student_answer, response_time_s, session_id
     )
 
+    # Rush detection: very fast wrong MCQ answers suggest guessing
+    if (not result['is_correct'] and response_time_s > 0
+            and response_time_s < 1.5
+            and current.get('question_type') == 'mcq'):
+        result['rush_warning'] = True
+
     flask_session['last_result'] = result
     flask_session['last_skill_id'] = current['skill_id']
     session_model.update_last_result(session_id, json.dumps(result))

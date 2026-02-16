@@ -26,6 +26,13 @@
             </div>
         </div>
 
+        {% if result.rush_warning %}
+        <div class="rush-warning">
+            <span class="rush-icon">&#9200;</span>
+            <span>Take your time — read the question carefully before answering.</span>
+        </div>
+        {% endif %}
+
         {% if result.mistake_hint %}
         <div class="mistake-hint">
             <span class="hint-icon">&#128161;</span>

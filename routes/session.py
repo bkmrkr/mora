@@ -130,14 +130,19 @@ def answer(session_id):
 
     # Track streak
     streak = flask_session.get('streak', 0)
+    wrong_streak = flask_session.get('wrong_streak', 0)
     if result['is_correct']:
         streak += 1
         flask_session['streak'] = streak
+        flask_session['wrong_streak'] = 0
         result['streak'] = streak
         flask_session['last_result'] = result  # update with streak
     else:
         flask_session['best_streak'] = max(flask_session.get('best_streak', 0), streak)
         result['broken_streak'] = streak  # how many they had before missing
+        wrong_streak += 1
+        flask_session['wrong_streak'] = wrong_streak
+        result['wrong_streak'] = wrong_streak
         flask_session['last_result'] = result
         flask_session['streak'] = 0
 

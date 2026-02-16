@@ -39,6 +39,15 @@
         </div>
         {% endif %}
 
+        {% if result.wrong_streak and result.wrong_streak >= 3 %}
+        <div class="struggle-encouragement">
+            <div class="struggle-icon">&#128170;</div>
+            <div class="struggle-text">
+                <strong>Tough stretch — that's okay!</strong>
+                <p>Hard problems mean you're learning new things. Take a breath and try the next one.</p>
+            </div>
+        </div>
+        {% else %}
         <div class="encouragement">
             {% if result.mastery_level and result.mastery_level >= 0.5 %}
             Almost there! You're at {{ (result.mastery_level * 100)|round|int }}% mastery.
@@ -48,6 +57,7 @@
             Every mistake helps you learn. You'll get it!
             {% endif %}
         </div>
+        {% endif %}
 
         <div class="skill-update">
             <span>Skill: {{ result.skill_name }}</span>

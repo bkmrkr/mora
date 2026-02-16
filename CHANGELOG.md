@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — Struggle detection with warm encouragement
+- Tracks consecutive wrong answers during a session
+- After 3+ wrong in a row, shows a warm encouragement message with amber styling
+- "Tough stretch — that's okay! Hard problems mean you're learning new things."
+- Resets when the student gets a correct answer
+- Replaces the standard encouragement to acknowledge difficulty without discouragement
+
 ### Added — Spaced review for mastered skills
 - ~20% of questions now review mastered skills for long-term retention
 - Review questions prioritize skills not practiced recently (stalest first)

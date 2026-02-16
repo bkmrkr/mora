@@ -1,5 +1,33 @@
 # Mora v2 Changelog
 
+### Fixed — Missing Result Banner Styling
+- `result-banner` class used in `question.html` had no CSS definition — "Correct!" notification was unstyled plain text
+- Added `.result-banner` and `.result-banner.correct` styles: green background, bold green text, rounded corners
+- Now provides clear visual feedback when a student answers correctly
+
+### Improved — Move Inline Styles to CSS Classes
+- Removed redundant inline `style=` from clock visual div — `.clock-visual` CSS class already had these properties
+- Fixed `.clock-visual` margin: changed `margin-bottom: 1rem` to `margin: 1rem 0` to match original
+- Replaced inline styles in `error.html` with `.error-content` CSS class
+- Replaced inline styles in `retry.html` with `.retry-content` CSS class
+- Only 2 dynamic inline styles remain (mastery bar widths — data-driven, must stay inline)
+
+### Removed — Dead v1 CSS Cleanup
+- Removed 323 lines of unused CSS (749 → 426 lines, 43% reduction)
+- Removed: `.report-form`, `.report-btn`, `.report-question` (report feature)
+- Removed: `.btn-topic`, `.topic-name`, `.topic-desc`, `.topic-chip`, `.topic-list` (topic selection)
+- Removed: `img.math-inline`, `img.math-display`, `code.math-fallback` (LLM math rendering)
+- Removed: `.two-panel-layout`, `.panel-left`, `.panel-right` (v1 two-panel layout)
+- Removed: `.result-card`, `.result-correct`, `.result-wrong`, `.result-empty`, `.result-header`, `.result-icon`, `.result-label`, `.result-row`, `.result-key`, `.result-meta`, `.delta` (v1 result card)
+- Removed: `.progress-card`, `.progress-node`, `.progress-node-header`, `.progress-node-name`, `.progress-node-pct` (v1 progress card)
+- Removed: `.difficulty-display`, `.difficulty-dots`, `.difficulty-dot` (v1 difficulty display)
+- Removed: `.diagram-visual`, `.topic-mastery-display`, `.session-stat`, `.end-btn-form`, `.session-top-bar`, `.choice-letter`, `.pagination`, `.row-correct`, `.row-wrong`, `.question-cell`, `.progress-text`, `.progress-bar`, `.progress-fill`, `.mastery-bar.small`, `.topic-start-form`, `.end-session-form`, `.encouragement`, `.original-question`, `.key-concept`, `.tip-box`, `.type-badge`, `.text-mastered`, `.onboard-card`
+
+### Fixed — Student Chips Stacked Vertically
+- Home page student chips displayed vertically instead of horizontally
+- Added `.student-chips` CSS class with `display: flex; flex-wrap: wrap; gap: 0.5rem`
+- Chips now display in a clean horizontal row that wraps on narrow screens
+
 ### Hardened — Tighten CSP img-src
 - Removed `data:` from `img-src` — no data URIs used; clock SVG is inline markup
 - Final CSP: `default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; script-src 'self'`

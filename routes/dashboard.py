@@ -271,6 +271,31 @@ def overview(student_id):
             'new_masteries': week_new_masteries,
         }
 
+    # Practice heatmap: last 28 days, aligned to start on Monday
+    practice_days = session_model.get_practice_days(student_id, days=35)
+    today = date.today()
+    raw_start = today - timedelta(days=27)
+    # Align to Monday (weekday 0 = Monday)
+    start_date = raw_start - timedelta(days=raw_start.weekday())
+    total_days = (today - start_date).days + 1
+    # Pad to complete weeks
+    total_days = ((total_days + 6) // 7) * 7
+    heatmap = []
+    for i in range(total_days):
+        d = start_date + timedelta(days=i)
+        day_str = d.isoformat()
+        is_future = d > today
+        count = practice_days.get(day_str, 0) if not is_future else 0
+        heatmap.append({
+            'date': day_str,
+            'day': d.day,
+            'count': count,
+            'level': min(count // 5, 3) if count > 0 else 0,
+            'is_today': d == today,
+            'is_future': is_future,
+        })
+    heatmap_weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+
     return render_template(
         'dashboard/overview.html',
         student=student,
@@ -289,6 +314,8 @@ def overview(student_id):
         mastery_timeline=mastery_timeline,
         badges=badges,
         week_summary=week_summary,
+        heatmap=heatmap,
+        heatmap_weekdays=heatmap_weekdays,
     )
 
 

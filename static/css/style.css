@@ -1567,6 +1567,45 @@ body {
 .tip-icon { font-size: 1.2rem; flex-shrink: 0; }
 .tip-text { line-height: 1.4; }
 
+/* Practice heatmap */
+.heatmap-weekdays {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+    margin-bottom: 2px;
+}
+.heatmap-weekday {
+    text-align: center; font-size: 0.65rem; color: #94a3b8;
+    font-weight: 600; text-transform: uppercase;
+}
+.heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 0.75rem;
+}
+.heatmap-cell {
+    padding: 6px 0;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; color: #64748b;
+    cursor: default;
+    transition: transform 0.1s;
+}
+.heatmap-cell:hover { transform: scale(1.1); }
+.heatmap-level-0 { background: #f1f5f9; }
+.heatmap-level-1 { background: #bbf7d0; color: #166534; }
+.heatmap-level-2 { background: #4ade80; color: #14532d; }
+.heatmap-level-3 { background: #16a34a; color: #fff; }
+.heatmap-today { outline: 2px solid #3b82f6; outline-offset: 1px; }
+.heatmap-future { opacity: 0.3; }
+.heatmap-day { font-weight: 500; }
+.heatmap-legend {
+    display: flex; align-items: center; gap: 4px;
+    justify-content: flex-end; font-size: 0.7rem; color: #94a3b8;
+}
+.heatmap-cell-sm {
+    width: 14px; height: 14px; border-radius: 3px;
+}
+
 /* Week summary card */
 .week-summary-card {
     background: linear-gradient(135deg, #eff6ff, #e0f2fe);

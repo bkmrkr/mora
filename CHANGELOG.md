@@ -1,5 +1,14 @@
 # Mora v2 Changelog
 
+### Added — Practice heatmap on dashboard
+- GitHub-style 4-week calendar grid on student overview page
+- Shows which days had practice sessions with green intensity levels (0-3)
+- Grid aligned to start on Monday with weekday headers (M T W T F S S)
+- Today highlighted with blue outline; future dates faded
+- Hover tooltip shows date and question count
+- "Less → More" legend with color scale
+- Reinforces the habit loop: see your green squares, want to keep the streak going
+
 ### Added — "Did you know?" math insights on correct answers
 - 26 curated math facts across 20 skills shown ~30% of the time after correct answers
 - Blue lightbulb banner between the "Correct!" result and the next question

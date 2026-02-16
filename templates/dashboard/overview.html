@@ -35,6 +35,33 @@
     </div>
     {% endif %}
 
+    {% if heatmap %}
+    <div class="card">
+        <h2>Practice Calendar</h2>
+        <div class="heatmap-weekdays">
+            {% for wd in heatmap_weekdays %}
+            <div class="heatmap-weekday">{{ wd }}</div>
+            {% endfor %}
+        </div>
+        <div class="heatmap-grid">
+            {% for day in heatmap %}
+            <div class="heatmap-cell heatmap-level-{{ day.level }} {% if day.is_today %}heatmap-today{% endif %} {% if day.is_future %}heatmap-future{% endif %}"
+                 title="{{ day.date }}: {{ day.count }} questions">
+                <span class="heatmap-day">{{ day.day }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="heatmap-legend">
+            <span class="heatmap-legend-label">Less</span>
+            <div class="heatmap-cell-sm heatmap-level-0"></div>
+            <div class="heatmap-cell-sm heatmap-level-1"></div>
+            <div class="heatmap-cell-sm heatmap-level-2"></div>
+            <div class="heatmap-cell-sm heatmap-level-3"></div>
+            <span class="heatmap-legend-label">More</span>
+        </div>
+    </div>
+    {% endif %}
+
     {% if week_summary %}
     <div class="week-summary-card">
         <h2>This Week</h2>

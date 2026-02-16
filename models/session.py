@@ -59,6 +59,19 @@ def get_for_student(student_id, limit=20):
     )
 
 
+def get_practice_days(student_id, days=28):
+    """Return a dict of {date_str: question_count} for the last N days."""
+    cutoff = (date.today() - timedelta(days=days - 1)).isoformat()
+    rows = query_db(
+        """SELECT DATE(started_at) as day, SUM(total_questions) as total
+           FROM sessions WHERE student_id=? AND DATE(started_at) >= ?
+           AND total_questions > 0
+           GROUP BY DATE(started_at)""",
+        (student_id, cutoff),
+    )
+    return {row['day']: row['total'] for row in rows} if rows else {}
+
+
 def get_practice_streak(student_id):
     """Count consecutive days of practice ending today or yesterday.
 

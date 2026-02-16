@@ -45,7 +45,11 @@
 
         <div class="skill-update">
             <span>Skill: {{ result.skill_name }}</span>
-            <span>Rating: {{ result.skill_rating }}</span>
+            <span>Rating: {{ result.skill_rating }}
+                {% if result.rating_change %}
+                <span class="rating-change rating-down">{{ result.rating_change }}</span>
+                {% endif %}
+            </span>
         </div>
 
         <form action="{{ url_for('session.next_question', session_id=session_id) }}" method="post">

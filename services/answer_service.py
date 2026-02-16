@@ -116,6 +116,8 @@ def process_answer(student, current_question, student_answer,
         elif response_time_s <= 6:
             speed_label = 'Quick!'
 
+    rating_change = round(new_rating - before_rating, 1)
+
     return {
         'is_correct': is_correct,
         'is_close': is_close,
@@ -126,6 +128,7 @@ def process_answer(student, current_question, student_answer,
         'skill_name': current_question.get('skill_name', ''),
         'explanation': current_question.get('explanation', ''),
         'skill_rating': round(new_rating, 1),
+        'rating_change': rating_change,
         'mastery_level': round(mastery, 3),
         'just_mastered': just_mastered,
         'grade_completed': grade_completed,

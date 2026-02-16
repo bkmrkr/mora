@@ -84,6 +84,9 @@
         {% if last_result.speed_label %}
         <span class="speed-badge">{{ last_result.speed_label }}</span>
         {% endif %}
+        {% if last_result.rating_change and last_result.rating_change > 0 %}
+        <span class="rating-change rating-up">+{{ last_result.rating_change }}</span>
+        {% endif %}
     </div>
     {% endif %}
 

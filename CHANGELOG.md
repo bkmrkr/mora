@@ -1,5 +1,11 @@
 # Mora v2 Changelog
 
+### Added — Visible skill rating changes
+- Correct answers show green "+N" badge on the result banner (e.g., "+6.6")
+- Wrong answers show red "-N" badge next to skill rating on feedback page
+- Makes the adaptive ELO engine tangible — students see harder questions are worth more
+- Rating change computed from before/after skill ratings already tracked in answer service
+
 ### Added — Daily practice streak tracking
 - Computes consecutive days of practice from session history (no schema change)
 - Welcome banner shows "N day streak!" badge for streaks of 2+ days

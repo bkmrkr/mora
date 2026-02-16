@@ -244,12 +244,13 @@ def next_question(session_id):
     if not flask_session.get('current_question'):
         last_skill = flask_session.get('last_skill_id')
         focus_skill = flask_session.get('focus_skill_id')
-        # After wrong answer, ~50% chance to retry the same skill
-        retry_skill = None
-        last_result = flask_session.get('last_result')
-        if last_result and not last_result.get('is_correct') and last_skill:
-            if random.random() < 0.5:
-                retry_skill = last_skill
+        # Explicit retry from feedback page, or auto-retry (~50%)
+        retry_skill = request.form.get('retry_skill')
+        if not retry_skill:
+            last_result = flask_session.get('last_result')
+            if last_result and not last_result.get('is_correct') and last_skill:
+                if random.random() < 0.5:
+                    retry_skill = last_skill
         next_q = question_service.generate_next(
             session_id, student, last_skill, retry_skill_id=retry_skill,
             focus_skill_id=focus_skill,

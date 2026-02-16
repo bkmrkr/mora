@@ -931,6 +931,10 @@ body {
     text-align: center;
     margin: 0.75rem 0;
 }
+.feedback-actions {
+    display: flex; gap: 0.75rem; margin-top: 1rem;
+}
+.feedback-actions .btn { flex: 1; }
 .struggle-encouragement {
     display: flex;
     align-items: center;

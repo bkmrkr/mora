@@ -1,5 +1,12 @@
 # Mora v2 Changelog
 
+### Added — "Try Similar One" scaffolded retry on wrong answers
+- Wrong answer feedback page now shows two buttons: "Try Similar One" and "Next Skill"
+- "Try Similar One" generates a new question on the same skill for immediate practice
+- "Next Skill" moves to the normal skill selection (previous behavior)
+- Gives students agency to practice what they got wrong — core scaffolding technique
+- The retry question shows "Let's try this skill again after the miss."
+
 ### Changed — Adaptive session goals
 - Session goal now adapts based on student's recent session lengths
 - Computed as median of last 10 completed sessions + 2, clamped to 5-25

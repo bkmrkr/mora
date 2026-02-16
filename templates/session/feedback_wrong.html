@@ -75,9 +75,15 @@
             </span>
         </div>
 
-        <form action="{{ url_for('session.next_question', session_id=session_id) }}" method="post">
-            <button type="submit" class="btn btn-primary">Next Question</button>
-        </form>
+        <div class="feedback-actions">
+            <form action="{{ url_for('session.next_question', session_id=session_id) }}" method="post" class="feedback-form">
+                <input type="hidden" name="retry_skill" value="{{ result.skill_id }}">
+                <button type="submit" class="btn btn-primary">Try Similar One</button>
+            </form>
+            <form action="{{ url_for('session.next_question', session_id=session_id) }}" method="post" class="feedback-form">
+                <button type="submit" class="btn btn-secondary">Next Skill</button>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

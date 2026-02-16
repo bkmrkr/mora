@@ -266,6 +266,7 @@ def two_step_word(difficulty_elo):
 
     variant = random.choice(['add_then_sub', 'add_then_add', 'sub_then_add'])
     if variant == 'add_then_sub':
+        c = min(c, a + b - 1)  # ensure positive result
         answer = a + b - c
         question = f'Sam has {a} stickers. He gets {b} more, then gives away {c}. How many stickers does Sam have?'
         explanation = f'{a} + {b} = {a + b}, then {a + b} - {c} = {answer}'

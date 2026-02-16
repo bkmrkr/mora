@@ -31,7 +31,7 @@ def subtraction_within_10(difficulty_elo):
     """g1_sub_10: Subtraction within 10."""
     max_val = 7 if difficulty_elo < 700 else 10
     a = random.randint(1, max_val)
-    b = random.randint(0, a)
+    b = random.randint(0, a - 1)
     answer = a - b
     distractors = arithmetic_distractors(answer, a, b, op='-')
     return {
@@ -72,7 +72,7 @@ def subtraction_within_20(difficulty_elo):
     """g1_sub_20: Subtraction within 20."""
     max_val = 15 if difficulty_elo < 700 else 20
     a = random.randint(2, max_val)
-    b = random.randint(1, a)
+    b = random.randint(1, a - 1)
     answer = a - b
     distractors = arithmetic_distractors(answer, a, b, op='-')
     return {

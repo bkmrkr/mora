@@ -1,5 +1,10 @@
 # Mora v2 Changelog
 
+### Fixed — Eliminate Zero-Result Subtraction and Two-Step Questions
+- `g1_sub_10` and `g1_sub_20`: prevented n - n = 0 questions (e.g. "What is 6 - 6?")
+- `g2_two_step`: prevented add_then_sub variant from producing zero (e.g. "gets 3 more, gives away 9" from 6)
+- Subtraction results now always >= 1; "5 - 0" still valid (teaches subtracting zero)
+
 ### Fixed — Money Template Grammar
 - `g2_money`: "How many cents are 5 pennys worth?" → "pennies" (correct plural)
 - `g2_money`: "How many cents is ..." → "How many cents are ..." (consistent grammar)

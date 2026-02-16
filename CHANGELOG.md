@@ -6,6 +6,10 @@
 - Lowered short answer threshold to 0.5 — students type answers once they're getting ~50% right on a skill
 - Verified in Playwright: text input renders, correct/wrong answers graded, feedback works
 
+### Fixed — Dashboard Shows "No Students" for Invalid Student ID
+- `/dashboard/999` rendered empty index template saying "No students yet"
+- Now redirects to `/dashboard/` which shows the actual student list
+
 ### Added — Styled Error Pages (404/500)
 - Created `templates/error.html` extending `base.html` — proper nav, "Go Home" button
 - Error handler now renders template instead of Flask's bare default HTML

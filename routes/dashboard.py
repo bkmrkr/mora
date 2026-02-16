@@ -1,5 +1,5 @@
 """Dashboard routes — grade progression per student."""
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect, url_for
 
 from models import student as student_model
 from models import attempt as attempt_model
@@ -32,7 +32,7 @@ def index():
 def overview(student_id):
     student = student_model.get_by_id(student_id)
     if not student:
-        return render_template('dashboard/index.html', student_stats=[])
+        return redirect(url_for('dashboard.index'))
 
     all_progress = get_for_student(student_id)
     progress_by_skill = {p['skill_id']: p for p in all_progress}

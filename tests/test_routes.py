@@ -221,8 +221,7 @@ class TestDashboard:
 
     def test_dashboard_overview_nonexistent_student(self, client):
         resp = client.get('/dashboard/9999')
-        assert resp.status_code == 200
-        # Renders empty dashboard index
+        assert resp.status_code == 302  # Redirects to dashboard index
 
     def test_full_flow_home_to_dashboard(self, client):
         """Complete flow: home → start → answer → end → dashboard."""
